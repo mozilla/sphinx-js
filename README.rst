@@ -2,6 +2,17 @@
 sphinx-js
 =========
 
-Everything is horrible except Sphinx. JS is horrible, but there's no point making it more horrible by leaving it undocumented or, almost worse, condemning new users to reverse-engineering how to use your lib from an alphabetical list of routine names, a la JSDoc.
+Why
+===
 
-Add ``sphinx_js`` to your Sphinx ``extensions`` in conf.py. JSDoc your JS code. Then call our special directive, whatever we choose to call it.
+For documentation, everything is horrible except Sphinx. JS is also horrible, but there's no point making it more horrible by leaving it undocumented or, almost worse, condemning new users to reverse-engineering how to use your lib from an alphabetical list of routine names, a la JSDoc.
+
+How
+===
+
+Install JSDoc using npm. Add ``sphinx_js`` to your Sphinx ``extensions`` in conf.py. JSDoc your JS code. Then call our special directive, whatever we choose to call it.
+
+Tests
+=====
+
+Run `python setup.py test`.
