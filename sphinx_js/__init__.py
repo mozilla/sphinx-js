@@ -1,5 +1,3 @@
-from functools import partial
-
 from .directive import auto_function_directive_bound_to_app
 from .jsdoc import run_jsdoc
 
