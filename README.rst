@@ -10,7 +10,9 @@ For documentation, everything is horrible except Sphinx. JS is also horrible, bu
 How
 ===
 
-Install JSDoc using npm. Add ``sphinx_js`` to your Sphinx ``extensions`` in conf.py. JSDoc your JS code. Then call our special directive, whatever we choose to call it.
+Install JSDoc using npm. Add ``sphinx_js`` to your Sphinx ``extensions`` in conf.py. Document your JS code using JSDoc formatting. Then call our special directive in your Sphinx docs::
+
+    .. js-autofunction:: someFunction
 
 Tests
 =====
