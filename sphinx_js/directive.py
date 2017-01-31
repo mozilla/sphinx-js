@@ -14,20 +14,8 @@ def auto_function_directive_bound_to_app(app):
         has_content = True
         required_arguments = 1
         optional_arguments = 0
-        final_argument_whitespace = False
 
-        option_spec = {
-            # Whether or not to show the class docstring--if None, don't show the
-            # docstring, if empty string use __doc__, otherwise use the value of
-            # the attribute on the class
-            'show-docstring': directives.unchanged,
-
-            # Whether or not to hide the class name
-            'hide-classname': directives.flag,
-
-            # Prepend a specified namespace
-            'namespace': directives.unchanged
-        }
+        option_spec = {}
 
         def run(self):
             self.reporter = self.state.document.reporter
