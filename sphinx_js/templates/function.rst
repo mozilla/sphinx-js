@@ -1,4 +1,4 @@
-.. function:: {{ name }}({{ args }})
+.. function:: {{ name }}{{ params }}
 
    {% if description -%}
    {{ description|indent(3) }}
