@@ -17,4 +17,4 @@ Install JSDoc using npm. Add ``sphinx_js`` to your Sphinx ``extensions`` in conf
 Tests
 =====
 
-Run `python setup.py test`.
+Run ``python setup.py test``.

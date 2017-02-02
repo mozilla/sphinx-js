@@ -18,7 +18,12 @@ class Tests(TestCase):
             eq_(file.read(), contents)
 
     def test_autofunction(self):
-        self._file_contents_eq('index', 'Return the ratio of the inline text length of the links in an element\nto the inline text length of the entire element.\n')
+        self._file_contents_eq('index',
+"""linkDensity(node)
+
+   Return the ratio of the inline text length of the links in an
+   element to the inline text length of the entire element.
+""")
 
     def tearDown(self):
         rmtree(join(self.docs_dir, '_build'))
