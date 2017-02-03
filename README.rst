@@ -44,17 +44,17 @@ Our directives work much like Sphinx's standard `autodoc
 <http://www.sphinx-doc.org/en/latest/ext/autodoc.html>`_ ones. You can specify
 just a function or class name::
 
-    .. js-autofunction:: someFunction
+    .. js:autofunction:: someFunction
 
 Or you can throw in your own explicit parameter list, if you want to note
 optional parameters::
 
-    .. js-autofunction:: someFunction(foo, bar[, baz])
+    .. js:autofunction:: someFunction(foo, bar[, baz])
 
 You can even add additional content. If you do, it will appear just below any
 extracted documentation::
 
-    .. js-autofunction:: someFunction
+    .. js:autofunction:: someFunction
 
         Here are some things that will appear...
 

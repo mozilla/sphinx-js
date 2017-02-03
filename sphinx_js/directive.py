@@ -6,14 +6,14 @@ from jinja2 import Environment, FileSystemLoader
 
 
 def auto_function_directive_bound_to_app(app):
-    """Give the js-autofunction directive access to the Sphinx app singleton by
+    """Give the js:autofunction directive access to the Sphinx app singleton by
     closing over it.
 
     That's where we store the JSDoc output.
 
     """
     class AutoFunctionDirective(Directive):
-        """js-autofunction directive, which spits out a js:function directive
+        """js:autofunction directive, which spits out a js:function directive
 
         Takes a single argument which is a JS function name combined with an
         optional formal parameter list, all mashed together in a single string.

@@ -8,7 +8,7 @@ from sphinx.util.osutil import cd
 
 
 class AutoFunctionTests(TestCase):
-    """Tests for the ``js-autofunction`` directive"""
+    """Tests for the ``js:autofunction`` directive"""
 
     @classmethod
     def setup_class(cls):

@@ -1,1 +1,1 @@
-.. js-autofunction:: linkDensity
+.. js:autofunction:: linkDensity
