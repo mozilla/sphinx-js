@@ -16,6 +16,10 @@ Setup
 2. Install Sphinx. (TODO: Make this more explicit for non-Python people.)
 3. Make a documentation folder in your project using ``sphinx-quickstart``.
 4. Add ``sphinx_js`` to ``extensions`` in the generated Sphinx conf.py.
+5. Add ``js_source_path = '../somewhere/else'`` to conf.py, assuming the root
+   of your JS source tree is at that path, relative to conf.py itself. The
+   default is ``../``, which works well when there is a ``docs`` folder at the
+   root of your project.
 
 Use
 ===

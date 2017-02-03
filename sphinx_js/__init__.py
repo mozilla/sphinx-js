@@ -10,3 +10,5 @@ def setup(app):
 
     app.add_directive('js-autofunction', auto_function_directive_bound_to_app(app))
     # TODO: We could add a js:module with app.add_directive_to_domain().
+
+    app.add_config_value('js_source_path', '../', 'env')
