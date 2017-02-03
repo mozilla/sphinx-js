@@ -38,7 +38,8 @@ def auto_function_directive_bound_to_app(app):
             rst = template.render(
                 name=name,
                 params=params,
-                description=doclet.get('description', ''))
+                description=doclet.get('description', ''),
+                content='\n'.join(self.content))
 
             # Parse the RST into docutils nodes with a fresh doc, and return
             # them:

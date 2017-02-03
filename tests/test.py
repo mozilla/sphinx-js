@@ -38,7 +38,17 @@ class AutoFunctionTests(TestCase):
 
    Return the ratio of the inline text length of the links in an
    element to the inline text length of the entire element.
+
+   Things are "neat".
+
+   Off the beat.
+
+   * Sweet
+
+   * Fleet
 """)
+        # Oddly enough, the text renderer renders those bullets with a blank
+        # line between, but the HTML renderer does make them a single list.
 
     @classmethod
     def teardown_class(cls):
