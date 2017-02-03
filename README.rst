@@ -15,7 +15,7 @@ Setup
 1. Install JSDoc using npm.
 2. Install Sphinx. (TODO: Make this more explicit for non-Python people.)
 3. Make a documentation folder in your project using ``sphinx-quickstart``.
-3. Add ``sphinx_js`` to ``extensions`` in the generated Sphinx conf.py.
+4. Add ``sphinx_js`` to ``extensions`` in the generated Sphinx conf.py.
 
 Use
 ===
