@@ -21,7 +21,9 @@ class AutoFunctionTests(TestCase):
             eq_(file.read(), contents)
 
     def test_autofunction_minimal(self):
-        self._file_contents_eq('index',
+        """Make sure we render correctly and pull the params out of the JS code
+        when only the function name is provided."""
+        self._file_contents_eq('autofunction_minimal',
 """linkDensity(node)
 
    Return the ratio of the inline text length of the links in an
@@ -29,7 +31,9 @@ class AutoFunctionTests(TestCase):
 """)
 
     def test_autofunction_explicit(self):
-        self._file_contents_eq('explicit',
+        """Make sure any explicitly provided params override the ones from the
+        code."""
+        self._file_contents_eq('autofunction_explicit',
 """linkDensity(snorko, borko[, forko])
 
    Return the ratio of the inline text length of the links in an
@@ -42,4 +46,3 @@ class AutoFunctionTests(TestCase):
 
 
 # test_content """Make sure literal content is preserved."""
-# test_explicit_args """Make sure you're allowed to write out the args explicitly."""
