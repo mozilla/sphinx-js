@@ -23,22 +23,43 @@ class AutoFunctionTests(TestCase):
     def test_autofunction_minimal(self):
         """Make sure we render correctly and pull the params out of the JS code
         when only the function name is provided."""
-        self._file_contents_eq('autofunction_minimal',
-"""linkDensity(node)
-
-   Return the ratio of the inline text length of the links in an
-   element to the inline text length of the entire element.
-""")
+        self._file_contents_eq(
+            'autofunction_minimal',
+            'linkDensity(node)' + DESCRIPTION + FIELDS)
 
     def test_autofunction_explicit(self):
         """Make sure any explicitly provided params override the ones from the
-        code."""
-        self._file_contents_eq('autofunction_explicit',
-"""linkDensity(snorko, borko[, forko])
+        code, and make sure any explicit arbitrary RST content gets
+        preserved."""
+        self._file_contents_eq(
+            'autofunction_explicit',
+            'linkDensity(snorko, borko[, forko])' + DESCRIPTION + FIELDS + CONTENT)
+
+    @classmethod
+    def teardown_class(cls):
+        rmtree(join(cls.docs_dir, '_build'))
+
+
+DESCRIPTION = """
 
    Return the ratio of the inline text length of the links in an
-   element to the inline text length of the entire element.
+   element to the inline text length of the entire element."""
 
+FIELDS = """
+
+   Throws:
+      **PartyError|FartyError** -- Something with multiple types
+
+   Returns:
+      **Number** -- What a thing
+
+   Arguments:
+      * **node** (*Node*) -- Something of a single type
+"""
+
+# Oddly enough, the text renderer renders these bullets with a blank line
+# between, but the HTML renderer does make them a single list.
+CONTENT = """
    Things are "neat".
 
    Off the beat.
@@ -46,13 +67,4 @@ class AutoFunctionTests(TestCase):
    * Sweet
 
    * Fleet
-""")
-        # Oddly enough, the text renderer renders those bullets with a blank
-        # line between, but the HTML renderer does make them a single list.
-
-    @classmethod
-    def teardown_class(cls):
-        rmtree(join(cls.docs_dir, '_build'))
-
-
-# test_content """Make sure literal content is preserved."""
+"""

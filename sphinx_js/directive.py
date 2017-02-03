@@ -3,6 +3,7 @@ from os.path import dirname, join
 from docutils.parsers.rst import Directive, Parser as RstParser
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
+from six import iteritems
 
 
 def auto_function_directive_bound_to_app(app):
@@ -28,16 +29,16 @@ def auto_function_directive_bound_to_app(app):
 
         def run(self):
             # Get the relevant documentation together:
-            name = self._function_name()
+            name = self._name()
             doclet = app._sphinxjs_jsdoc_output[name]
-            params = self._function_params(doclet)
 
             # Render to RST using Jinja:
             env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
             template = env.get_template('function.rst')
             rst = template.render(
                 name=name,
-                params=params,
+                params=self._formal_params(doclet),
+                fields=self._fields(doclet),
                 description=doclet.get('description', ''),
                 content='\n'.join(self.content))
 
@@ -50,15 +51,64 @@ def auto_function_directive_bound_to_app(app):
             RstParser().parse(rst, doc)
             return doc.children
 
-        def _function_params(self, doclet):
+        def _formal_params(self, doclet):
             """Return the JS function params, looking first to any explicit
             params written into the directive and falling back to those in the
             JS code."""
             name, paren, params = self.arguments[0].partition('(')
             return ('(%s' % params) if params else '(%s)' % ', '.join(doclet['meta']['code']['paramnames'])
 
-        def _function_name(self):
+        def _name(self):
             """Return the JS function name."""
             return self.arguments[0].split('(')[0]
 
+        def _fields(self, doclet):
+            """Return an iterable of "fields" to be included in the js:function directive, like params, return values, and exceptions.
+
+            Each field consists of a tuple ``(heads, tail)``, where heads are
+            words that go between colons (as in ``:param string href:``) and
+            tail comes after.
+
+            """
+            FIELD_TYPES = {'returns': _returns_formatter,
+                           'params': _params_formatter,
+                           'exceptions': _exceptions_formatter}
+            for field_name, callback in iteritems(FIELD_TYPES):
+                for field in doclet[field_name]:
+                    yield callback(field)
+
     return AutoFunctionDirective
+
+
+def _returns_formatter(field):
+    """Derive heads and tail from ``@returns`` blocks."""
+    types = _or_types(field)
+    tail = ('**%s** -- ' % types) if types else ''
+    tail += field.get('description', '')
+    return ['returns'], tail
+
+
+def _params_formatter(field):
+    """Derive heads and tail from ``@param`` blocks."""
+    heads = ['param']
+    types = _or_types(field)
+    if types:
+        heads.append(types)
+    heads.append(field['name'])
+    tail = field.get('description', '')
+    return heads, tail
+
+
+def _exceptions_formatter(field):
+    heads = ['throws']
+    types = _or_types(field)
+    if types:
+        heads.append(types)
+    tail = field.get('description', '')
+    return heads, tail
+
+
+def _or_types(field):
+    """Return all the types in a doclet subfield like "params" or "returns"
+    with vertical bars between them, like "number|string"."""
+    return '|'.join(field.get('type', {}).get('names', []))

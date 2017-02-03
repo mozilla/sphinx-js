@@ -31,7 +31,10 @@ Document your JS code using standard JSDoc formatting::
    /**
     * Return the ratio of the inline text length of the links in an element to
     * the inline text length of the entire element.
-    * @param {node} A node of some kind
+    *
+    * @param {Node} node - Types or not: either works.
+    * @throws {PartyError|Hearty} Multiple types work fine.
+    * @returns {Number} Types and descriptions are both supported.
     */
    function linkDensity(node) {
        const length = node.flavors.get('paragraphish').inlineLength;
@@ -64,6 +67,13 @@ extracted documentation::
         * Docs
 
         Enjoy!
+
+Caveats
+=======
+
+* We don't understand the inline JSDoc constructs like ``{@link foo}``; you have to use Sphinx-style equivalents for now, like ``:js:func:`foo` ``.
+* So far, we understand and convert only the JSDoc block tags ``@param``, ``@returns``, ``@throws``, and their synonyms. Other ones will go *poof* into the ether.
+
 
 Tests
 =====
