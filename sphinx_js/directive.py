@@ -2,7 +2,7 @@ from os.path import dirname, join
 
 from docutils.parsers.rst import Directive, Parser as RstParser
 from docutils.utils import new_document
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, PackageLoader
 
 
 def auto_function_directive_bound_to_app(app):
@@ -33,7 +33,7 @@ def auto_function_directive_bound_to_app(app):
             params = self._function_params(doclet)
 
             # Render to RST using Jinja:
-            env = Environment(loader=FileSystemLoader(join(dirname(__file__), 'templates')))
+            env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
             template = env.get_template('function.rst')
             rst = template.render(
                 name=name,
