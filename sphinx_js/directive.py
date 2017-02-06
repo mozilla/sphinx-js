@@ -74,7 +74,7 @@ def auto_function_directive_bound_to_app(app):
                            'params': _params_formatter,
                            'exceptions': _exceptions_formatter}
             for field_name, callback in iteritems(FIELD_TYPES):
-                for field in doclet[field_name]:
+                for field in doclet.get(field_name, []):
                     yield callback(field)
 
     return AutoFunctionDirective
@@ -100,6 +100,7 @@ def _params_formatter(field):
 
 
 def _exceptions_formatter(field):
+    """Derive heads and tail from ``@throws`` blocks."""
     heads = ['throws']
     types = _or_types(field)
     if types:
