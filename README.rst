@@ -24,7 +24,7 @@ Setup
 Use
 ===
 
-Document your JS code using standard JSDoc formatting::
+Document your JS code using standard JSDoc formatting:
 
     /**
      * Return the ratio of the inline text length of the links in an element to
