@@ -1,4 +1,5 @@
 from os.path import dirname, join
+from re import sub
 
 from docutils.parsers.rst import Directive, Parser as RstParser
 from docutils.utils import new_document
@@ -39,7 +40,7 @@ def auto_function_directive_bound_to_app(app):
             env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
             template = env.get_template('function.rst')
             rst = template.render(
-                name=name,
+                name=_namepath_to_dotted(name),
                 params=self._formal_params(doclet),
                 fields=self._fields(doclet),
                 description=doclet.get('description', ''),
@@ -116,3 +117,11 @@ def _or_types(field):
     """Return all the types in a doclet subfield like "params" or "returns"
     with vertical bars between them, like "number|string"."""
     return '|'.join(field.get('type', {}).get('names', []))
+
+
+def _namepath_to_dotted(namepath):
+    """Convert a node.js-style namepath (``class#instanceMethod``) to a dotted
+    style that Sphinx will better index."""
+    # TODO: Handle "module:"
+    # TODO: Skip backslash-escaped .~#, which are proper parts of names.
+    return sub('[#~-]', '.', namepath)  # - is for JSDoc 2.

@@ -68,6 +68,15 @@ extracted documentation::
 
         Enjoy!
 
+Use `JSDoc namepath syntax <http://usejsdoc.org/about-namepaths.html>`_ to disambiguate same-named entities::
+
+    .. js:autofunction:: SomeClass#someInstanceMethod
+
+Behind the scenes, sphinx-js will changes those to dotted names so that...
+
+* Sphinx's "shortening" syntax works: ``:func:`~InwardRhs.atMost` `` prints as merely ``atMost()``. (For now, you should always use dots rather than other namepath separators: ``#~``.)
+* Sphinx indexes more informatively, saying methods belong to their classes.
+
 To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and then say simply ``autofunction`` rather than ``js:autofunction``.
 
 Caveats
