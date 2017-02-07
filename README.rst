@@ -24,7 +24,7 @@ Setup
 Use
 ===
 
-Document your JS code using standard JSDoc formatting::
+Document your JS code using standard JSDoc formatting:
 
 .. code-block:: js
 
