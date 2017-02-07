@@ -12,8 +12,8 @@ long_description=open('README.rst', 'r', encoding='utf8').read()
 
 setup(
     name='sphinx_js',
-    version='0.1',
-    description='A shim for using Sphinx on JSDoc-documented JS code',
+    version='1.0',
+    description='Support for using Sphinx on JSDoc-documented JS code',
     long_description=long_description,
     author='Erik Rose',
     author_email='erikrose@grinchcentral.com',
@@ -31,10 +31,6 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.6',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
-        'Programming Language :: Python :: 3.5'],
+        'Programming Language :: Python :: 2.7'],
     keywords=['sphinx', 'documentation', 'docs', 'javascript', 'js', 'restructured'],
 )
