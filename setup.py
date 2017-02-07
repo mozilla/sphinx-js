@@ -11,7 +11,7 @@ from setuptools import setup, find_packages
 long_description=open('README.rst', 'r', encoding='utf8').read()
 
 setup(
-    name='sphinx_js',
+    name='sphinx-js',
     version='1.0',
     description='Support for using Sphinx on JSDoc-documented JS code',
     long_description=long_description,
