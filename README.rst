@@ -72,7 +72,7 @@ Use `JSDoc namepath syntax <http://usejsdoc.org/about-namepaths.html>`_ to disam
 
 Behind the scenes, sphinx-js will changes those to dotted names so that...
 
-* Sphinx's "shortening" syntax works: ``:func:`~InwardRhs.atMost` `` prints as merely ``atMost()``. (For now, you should always use dots rather than other namepath separators: ``#~``.)
+* Sphinx's "shortening" syntax works: ``:func:`~InwardRhs.atMost``` prints as merely ``atMost()``. (For now, you should always use dots rather than other namepath separators: ``#~``.)
 * Sphinx indexes more informatively, saying methods belong to their classes.
 
 To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and then say simply ``autofunction`` rather than ``js:autofunction``.
@@ -80,7 +80,7 @@ To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and th
 Caveats
 =======
 
-* We don't understand the inline JSDoc constructs like ``{@link foo}``; you have to use Sphinx-style equivalents for now, like ``:js:func:`foo` `` (or simply ``:func:`foo` `` if you have set ``primary_domain = 'js'`` in conf.py.
+* We don't understand the inline JSDoc constructs like ``{@link foo}``; you have to use Sphinx-style equivalents for now, like ``:js:func:`foo``` (or simply ``:func:`foo``` if you have set ``primary_domain = 'js'`` in conf.py.
 * So far, we understand and convert only the JSDoc block tags ``@param``, ``@returns``, ``@throws``, and their synonyms. Other ones will go *poof* into the ether.
 * You may have to run ``make clean html`` rather than just ``make html``, since Sphinx doesn't notice that things need to be rebuilt unless you change your RSTs. (Changing your JS code will not suffice.)
 
