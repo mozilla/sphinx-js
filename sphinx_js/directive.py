@@ -30,7 +30,10 @@ def auto_function_directive_bound_to_app(app):
         def run(self):
             # Get the relevant documentation together:
             name = self._name()
-            doclet = app._sphinxjs_jsdoc_output[name]
+            doclet = app._sphinxjs_jsdoc_output.get(name)
+            if doclet is None:
+                app.warn('No JSDoc documentation for the longname "%s" was found.' % name)
+                return []
 
             # Render to RST using Jinja:
             env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
