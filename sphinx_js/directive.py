@@ -2,6 +2,7 @@ from os.path import dirname, join
 from re import sub
 
 from docutils.parsers.rst import Directive, Parser as RstParser
+from docutils.parsers.rst.directives import flag
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
 from six import iteritems
@@ -26,11 +27,14 @@ def auto_function_directive_bound_to_app(app):
         optional_arguments = 0
         final_argument_whitespace = True
 
-        option_spec = {}
+        option_spec = {
+            'short-name': flag
+        }
 
         def run(self):
             # Get the relevant documentation together:
             name = self._name()
+            dotted_name = _namepath_to_dotted(name)
             doclet = app._sphinxjs_jsdoc_output.get(name)
             if doclet is None:
                 app.warn('No JSDoc documentation for the longname "%s" was found.' % name)
@@ -40,7 +44,8 @@ def auto_function_directive_bound_to_app(app):
             env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
             template = env.get_template('function.rst')
             rst = template.render(
-                name=_namepath_to_dotted(name),
+                name=dotted_name.split('.')[-1] if 'short-name' in self.options
+                     else dotted_name,
                 params=self._formal_params(doclet),
                 fields=self._fields(doclet),
                 description=doclet.get('description', ''),

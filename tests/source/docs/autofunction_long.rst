@@ -1,0 +1,1 @@
+.. js:autofunction:: ContainingClass#someMethod

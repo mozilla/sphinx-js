@@ -12,3 +12,11 @@ function linkDensity(node) {
                                                 element => element.tagName !== 'A');
     return (length - lengthWithoutLinks) / length;
 }
+
+class ContainingClass {
+    /**
+     * Here.
+     */
+    someMethod(hi) {
+    }
+}

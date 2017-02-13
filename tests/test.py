@@ -35,6 +35,19 @@ class AutoFunctionTests(TestCase):
             'autofunction_explicit',
             'linkDensity(snorko, borko[, forko])' + DESCRIPTION + FIELDS + CONTENT)
 
+    def test_autofunction_short(self):
+        """Make sure the ``:short-name:`` option works."""
+        self._file_contents_eq(
+            'autofunction_short',
+            'someMethod(hi)\n\n   Here.\n')
+
+    def test_autofunction_long(self):
+        """Make sure instance methods get converted to dotted notation which
+        indexes better in Sphinx."""
+        self._file_contents_eq(
+            'autofunction_long',
+            'ContainingClass.someMethod(hi)\n\n   Here.\n')
+
     @classmethod
     def teardown_class(cls):
         rmtree(join(cls.docs_dir, '_build'))

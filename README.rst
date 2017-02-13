@@ -77,6 +77,11 @@ Behind the scenes, sphinx-js will changes those to dotted names so that...
 
 To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and then say simply ``autofunction`` rather than ``js:autofunction``.
 
+``js:autofunction`` has one option, ``:short-name:``, which comes in handy for chained APIs whose implementation details you want to keep out of sight. When you use it on a class method, the containing class won't be mentioned in the docs, the function will appear under its short name in indices, and cross references must use the short name as well (``:func:`someFunction```)::
+
+    .. js:autofunction:: someClass#someFunction
+       :short-name:
+
 Caveats
 =======
 
