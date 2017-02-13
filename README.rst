@@ -93,3 +93,12 @@ Tests
 =====
 
 Run ``python setup.py test``.
+
+Version History
+===============
+
+1.1
+  * Add ``:short-name:`` option.
+
+1.0
+  * Initial release, with just ``js:autofunction``

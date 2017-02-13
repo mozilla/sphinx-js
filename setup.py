@@ -12,7 +12,7 @@ long_description=open('README.rst', 'r', encoding='utf8').read()
 
 setup(
     name='sphinx-js',
-    version='1.0',
+    version='1.1',
     description='Support for using Sphinx on JSDoc-documented JS code',
     long_description=long_description,
     author='Erik Rose',
