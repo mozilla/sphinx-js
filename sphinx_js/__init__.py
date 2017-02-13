@@ -8,9 +8,22 @@ def setup(app):
     # is RSTs.
     app.connect('builder-inited', run_jsdoc)
 
+    app.connect('env-before-read-docs', read_all_docs)
+
     app.add_directive_to_domain('js',
                                 'autofunction',
                                 auto_function_directive_bound_to_app(app))
     # TODO: We could add a js:module with app.add_directive_to_domain().
 
     app.add_config_value('js_source_path', '../', 'env')
+
+
+def read_all_docs(app, env, doc_names):
+    """Add all found docs to the to-be-read list, because we have no way of
+    telling which ones reference JS code that might have changed.
+
+    Otherwise, builds go stale until you touch the stale RSTs or do a ``make
+    clean``.
+
+    """
+    doc_names[:] = env.found_docs
