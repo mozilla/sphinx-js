@@ -60,14 +60,14 @@ DESCRIPTION = """
 
 FIELDS = """
 
+   Arguments:
+      * **node** (*Node*) -- Something of a single type
+
    Throws:
       **PartyError|FartyError** -- Something with multiple types
 
    Returns:
       **Number** -- What a thing
-
-   Arguments:
-      * **node** (*Node*) -- Something of a single type
 """
 
 # Oddly enough, the text renderer renders these bullets with a blank line

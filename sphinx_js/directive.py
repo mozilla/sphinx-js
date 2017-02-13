@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from os.path import dirname, join
 from re import sub
 
@@ -79,9 +80,9 @@ def auto_function_directive_bound_to_app(app):
             tail comes after.
 
             """
-            FIELD_TYPES = {'returns': _returns_formatter,
-                           'params': _params_formatter,
-                           'exceptions': _exceptions_formatter}
+            FIELD_TYPES = OrderedDict([('params', _params_formatter),
+                                       ('exceptions', _exceptions_formatter),
+                                       ('returns', _returns_formatter)])
             for field_name, callback in iteritems(FIELD_TYPES):
                 for field in doclet.get(field_name, []):
                     yield callback(field)
