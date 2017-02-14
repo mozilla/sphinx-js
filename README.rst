@@ -90,11 +90,18 @@ To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and th
 autoclass
 ---------
 
-We provide a basic ``js:autoclass`` directive which pulls in class comments and constructor docstrings, concatenating them. It's otherwise identical to ``js:autofunction`` and even takes the same ``:short-name:`` flag, which can come in handy for inner classes. It doesn't yet autodocument class members. ::
+We provide a basic ``js:autoclass`` directive which pulls in class comments and constructor docstrings, concatenating them. It's otherwise identical to ``js:autofunction`` and even takes the same ``:short-name:`` flag, which can come in handy for inner classes. It doesn't yet autodocument class members, but you can pull them in one at a time by embedding ``js:autofunction``. ::
 
     .. js:autoclass:: SomeEs6Class(args, if, you[, wish])
 
+       .. js:autofunction:: SomeEs6Class#someMethod
+
        Additional content can go here and appears below the in-code comments.
+
+Example
+=======
+
+A good example using most of sphinx-js's functionality is the Fathom documentation. A particularly juicy page is https://mozilla.github.io/fathom/ruleset.html. Click the "View page source" link to see the raw directives.
 
 Caveats
 =======
@@ -109,6 +116,11 @@ Run ``python setup.py test``.
 
 Version History
 ===============
+
+1.2
+  * Always do full rebuilds; don't leave pages stale when JS code has changed but the RSTs have not.
+  * Make Python-3-compatible.
+  * Add basic ``autoclass`` directive.
 
 1.1
   * Add ``:short-name:`` option.
