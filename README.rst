@@ -12,7 +12,7 @@ sphinx-js lets you use the industry-leading Sphinx documentation tool with JS pr
 Setup
 =====
 
-1. Install JSDoc using npm.
+1. Install JSDoc using npm. ``jsdoc`` must be on your ``$PATH``, so you might want to ``npm install -g jsdoc``. We're known to work with jsdoc 3.4.3.
 2. Install Sphinx. (TODO: Make this more explicit for non-Python people.)
 3. Make a documentation folder in your project using ``sphinx-quickstart``.
 4. Add ``sphinx_js`` to ``extensions`` in the generated Sphinx conf.py.
@@ -23,6 +23,8 @@ Setup
 
 Use
 ===
+
+In short, use the directives below, then build your Sphinx docs as usual by running ``make html`` in your docs directory.
 
 autofunction
 ------------
