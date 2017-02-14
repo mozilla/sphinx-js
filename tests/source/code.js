@@ -13,7 +13,18 @@ function linkDensity(node) {
     return (length - lengthWithoutLinks) / length;
 }
 
+/**
+ * Class doc.
+ */
 class ContainingClass {
+    /**
+     * Constructor doc.
+     *
+     * @arg ho A thing
+     */
+    constructor(ho) {
+    }
+
     /**
      * Here.
      */

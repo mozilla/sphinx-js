@@ -24,6 +24,9 @@ Setup
 Use
 ===
 
+autofunction
+------------
+
 Document your JS code using standard JSDoc formatting::
 
     /**
@@ -81,6 +84,15 @@ To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and th
 
     .. js:autofunction:: someClass#someFunction
        :short-name:
+
+autoclass
+---------
+
+We provide a basic ``js:autoclass`` directive which pulls in class comments and constructor docstrings, concatenating them. It's otherwise identical to ``js:autofunction`` and even takes the same ``:short-name:`` flag, which can come in handy for inner classes. It doesn't yet autodocument class members. ::
+
+    .. js:autoclass:: SomeEs6Class(args, if, you[, wish])
+
+       Additional content can go here and appears below the in-code comments.
 
 Caveats
 =======

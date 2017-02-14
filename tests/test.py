@@ -48,6 +48,13 @@ class AutoFunctionTests(TestCase):
             'autofunction_long',
             'ContainingClass.someMethod(hi)\n\n   Here.\n')
 
+    def test_autoclass(self):
+        """Make sure classes show their class comment and constructor
+        comment."""
+        self._file_contents_eq(
+            'autoclass',
+            'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n')
+
     @classmethod
     def teardown_class(cls):
         rmtree(join(cls.docs_dir, '_build'))

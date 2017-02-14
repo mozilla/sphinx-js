@@ -1,4 +1,4 @@
-from .directive import auto_function_directive_bound_to_app
+from .directive import auto_class_directive_bound_to_app, auto_function_directive_bound_to_app
 from .jsdoc import run_jsdoc
 
 
@@ -13,6 +13,9 @@ def setup(app):
     app.add_directive_to_domain('js',
                                 'autofunction',
                                 auto_function_directive_bound_to_app(app))
+    app.add_directive_to_domain('js',
+                                'autoclass',
+                                auto_class_directive_bound_to_app(app))
     # TODO: We could add a js:module with app.add_directive_to_domain().
 
     app.add_config_value('js_source_path', '../', 'env')

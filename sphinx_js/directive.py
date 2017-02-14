@@ -9,6 +9,76 @@ from jinja2 import Environment, PackageLoader
 from six import iteritems
 
 
+class JsDirective(Directive):
+    """Abstract directive which knows how to pull things out of JSDoc output"""
+
+    has_content = True
+    required_arguments = 1
+    optional_arguments = 0
+    final_argument_whitespace = True
+
+    option_spec = {
+        'short-name': flag
+    }
+
+    def _run(self, app):
+        """Render a thing shaped like a function, having a name and arguments.
+
+        Fill in args, docstrings, and info fields from stored JSDoc output.
+
+        """
+        # Get the relevant documentation together:
+        name = self._name()
+        dotted_name = _namepath_to_dotted(name)
+        if 'short-name' in self.options:
+            dotted_name = dotted_name.split('.')[-1]
+        doclet = app._sphinxjs_jsdoc_output.get(name)
+        if doclet is None:
+            app.warn('No JSDoc documentation for the longname "%s" was found.' % name)
+            return []
+
+        # Render to RST using Jinja:
+        env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
+        template = env.get_template(self._template)
+        rst = template.render(**self._template_vars(dotted_name, doclet))
+
+        # Parse the RST into docutils nodes with a fresh doc, and return
+        # them:
+        #
+        # Not sure if passing the settings from the "real" doc is the right
+        # thing to do here:
+        doc = new_document('dummy', settings=self.state.document.settings)
+        RstParser().parse(rst, doc)
+        return doc.children
+
+    def _name(self):
+        """Return the JS function or class name."""
+        return self.arguments[0].split('(')[0]
+
+    def _formal_params(self, doclet):
+        """Return the JS function or class params, looking first to any
+        explicit params written into the directive and falling back to
+        those in the JS code."""
+        name, paren, params = self.arguments[0].partition('(')
+        return ('(%s' % params) if params else '(%s)' % ', '.join(doclet['meta']['code']['paramnames'])
+
+    def _fields(self, doclet):
+        """Return an iterable of "info fields" to be included in the directive,
+        like params, return values, and exceptions.
+
+        Each field consists of a tuple ``(heads, tail)``, where heads are
+        words that go between colons (as in ``:param string href:``) and
+        tail comes after.
+
+        """
+        FIELD_TYPES = OrderedDict([('params', _params_formatter),
+                                   ('exceptions', _exceptions_formatter),
+                                   ('returns', _returns_formatter)])
+        for field_name, callback in iteritems(FIELD_TYPES):
+            for field in doclet.get(field_name, []):
+                yield callback(field)
+
+
 def auto_function_directive_bound_to_app(app):
     """Give the js:autofunction directive access to the Sphinx app singleton by
     closing over it.
@@ -16,78 +86,59 @@ def auto_function_directive_bound_to_app(app):
     That's where we store the JSDoc output.
 
     """
-    class AutoFunctionDirective(Directive):
+    class AutoFunctionDirective(JsDirective):
         """js:autofunction directive, which spits out a js:function directive
 
         Takes a single argument which is a JS function name combined with an
         optional formal parameter list, all mashed together in a single string.
 
         """
-        has_content = True
-        required_arguments = 1
-        optional_arguments = 0
-        final_argument_whitespace = True
-
-        option_spec = {
-            'short-name': flag
-        }
+        _template = 'function.rst'
 
         def run(self):
-            # Get the relevant documentation together:
-            name = self._name()
-            dotted_name = _namepath_to_dotted(name)
-            doclet = app._sphinxjs_jsdoc_output.get(name)
-            if doclet is None:
-                app.warn('No JSDoc documentation for the longname "%s" was found.' % name)
-                return []
+            return self._run(app)
 
-            # Render to RST using Jinja:
-            env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
-            template = env.get_template('function.rst')
-            rst = template.render(
-                name=dotted_name.split('.')[-1] if 'short-name' in self.options
-                     else dotted_name,
+        def _template_vars(self, name, doclet):
+            return dict(
+                name=name,
                 params=self._formal_params(doclet),
                 fields=self._fields(doclet),
                 description=doclet.get('description', ''),
                 content='\n'.join(self.content))
 
-            # Parse the RST into docutils nodes with a fresh doc, and return
-            # them:
-            #
-            # Not sure if passing the settings from the "real" doc is the right
-            # thing to do here:
-            doc = new_document('dummy', settings=self.state.document.settings)
-            RstParser().parse(rst, doc)
-            return doc.children
-
-        def _formal_params(self, doclet):
-            """Return the JS function params, looking first to any explicit
-            params written into the directive and falling back to those in the
-            JS code."""
-            name, paren, params = self.arguments[0].partition('(')
-            return ('(%s' % params) if params else '(%s)' % ', '.join(doclet['meta']['code']['paramnames'])
-
-        def _name(self):
-            """Return the JS function name."""
-            return self.arguments[0].split('(')[0]
-
-        def _fields(self, doclet):
-            """Return an iterable of "fields" to be included in the js:function directive, like params, return values, and exceptions.
-
-            Each field consists of a tuple ``(heads, tail)``, where heads are
-            words that go between colons (as in ``:param string href:``) and
-            tail comes after.
-
-            """
-            FIELD_TYPES = OrderedDict([('params', _params_formatter),
-                                       ('exceptions', _exceptions_formatter),
-                                       ('returns', _returns_formatter)])
-            for field_name, callback in iteritems(FIELD_TYPES):
-                for field in doclet.get(field_name, []):
-                    yield callback(field)
-
     return AutoFunctionDirective
+
+
+def auto_class_directive_bound_to_app(app):
+    """Give the js:autofunction directive access to the Sphinx app singleton by
+    closing over it.
+
+    That's where we store the JSDoc output.
+
+    """
+    class AutoClassDirective(JsDirective):
+        """js:autoclass directive, which spits out a js:class directive
+
+        Takes a single argument which is a JS class name combined with an
+        optional formal parameter list for the constructor, all mashed together
+        in a single string.
+
+        """
+        _template = 'class.rst'
+
+        def run(self):
+            return self._run(app)
+
+        def _template_vars(self, name, doclet):
+            return dict(
+                name=name,
+                params=self._formal_params(doclet),
+                fields=self._fields(doclet),
+                class_comment=doclet.get('classdesc', ''),
+                constructor_comment=doclet.get('description', ''),
+                content='\n'.join(self.content))
+
+    return AutoClassDirective
 
 
 def _returns_formatter(field):
