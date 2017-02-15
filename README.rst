@@ -103,6 +103,8 @@ Example
 
 A good example using most of sphinx-js's functionality is the Fathom documentation. A particularly juicy page is https://mozilla.github.io/fathom/ruleset.html. Click the "View page source" link to see the raw directives.
 
+Fathom also carries a Travis CI configuration and a deployment script for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them. (ReadTheDocs, which is otherwise the canonical hosting platform for Sphinx docs, doesn't work because it won't run JSDoc for us, nor will it accept uploads of docs built externally.)
+
 Caveats
 =======
 
@@ -112,7 +114,7 @@ Caveats
 Tests
 =====
 
-Run ``python setup.py test``.
+Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 
 Version History
 ===============
