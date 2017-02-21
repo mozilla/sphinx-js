@@ -7,9 +7,12 @@ from sphinx.cmdline import main as sphinx_main
 from sphinx.util.osutil import cd
 
 
-class AutoFunctionTests(TestCase):
-    """Tests for the ``js:autofunction`` directive"""
+class Tests(TestCase):
+    """Pretty much all the tests, run against a single Sphinx tree.
 
+    Yes, it's too coupled.
+
+    """
     @classmethod
     def setup_class(cls):
         cls.docs_dir = join(dirname(__file__), 'source', 'docs')
@@ -54,6 +57,12 @@ class AutoFunctionTests(TestCase):
         self._file_contents_eq(
             'autoclass',
             'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n')
+
+    def test_autoattribute(self):
+        """Make sure ``autoattribute`` works."""
+        self._file_contents_eq(
+            'autoattribute',
+            'ContainingClass.someVar\n\n   A var\n')
 
     @classmethod
     def teardown_class(cls):

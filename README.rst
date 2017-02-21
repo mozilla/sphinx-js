@@ -98,6 +98,26 @@ We provide a basic ``js:autoclass`` directive which pulls in class comments and 
 
        Additional content can go here and appears below the in-code comments.
 
+autoattribute
+-------------
+
+This is useful for documenting public properties::
+
+    class Fnode {
+        constructor(element) {
+            /**
+             * The raw DOM element this wrapper describes
+             */
+            this.element = element;
+        }
+    }
+
+And then, in the docs... ::
+
+    .. autoclass:: Fnode
+
+       .. autoattribute:: Fnode#element
+
 Example
 =======
 
@@ -118,6 +138,9 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 
 Version History
 ===============
+
+1.3
+  * Add ``autoattribute`` directive.
 
 1.2
   * Always do full rebuilds; don't leave pages stale when JS code has changed but the RSTs have not.

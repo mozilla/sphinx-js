@@ -111,11 +111,8 @@ def auto_function_directive_bound_to_app(app):
 
 def auto_class_directive_bound_to_app(app):
     """Give the js:autofunction directive access to the Sphinx app singleton by
-    closing over it.
+    closing over it."""
 
-    That's where we store the JSDoc output.
-
-    """
     class AutoClassDirective(JsDirective):
         """js:autoclass directive, which spits out a js:class directive
 
@@ -139,6 +136,30 @@ def auto_class_directive_bound_to_app(app):
                 content='\n'.join(self.content))
 
     return AutoClassDirective
+
+
+def auto_attribute_directive_bound_to_app(app):
+    """Give the js:autoattribute directive access to the Sphinx app singleton
+    by closing over it."""
+
+    class AutoAttributeDirective(JsDirective):
+        """js:autoattribute directive, which spits out a js:attribute directive
+
+        Takes a single argument which is a JS attribute name.
+
+        """
+        _template = 'attribute.rst'
+
+        def run(self):
+            return self._run(app)
+
+        def _template_vars(self, name, doclet):
+            return dict(
+                name=name,
+                description=doclet.get('description', ''),
+                content='\n'.join(self.content))
+
+    return AutoAttributeDirective
 
 
 def _returns_formatter(field):

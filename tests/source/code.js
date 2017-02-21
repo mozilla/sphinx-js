@@ -23,6 +23,10 @@ class ContainingClass {
      * @arg ho A thing
      */
     constructor(ho) {
+        /**
+         * A var
+         */
+        this.someVar = 4;
     }
 
     /**
