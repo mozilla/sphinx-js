@@ -3,7 +3,8 @@
  * the inline text length of the entire element.
  *
  * @param {Node} node - Something of a single type
- * @throws {PartyError|FartyError} Something with multiple types
+ * @throws {PartyError|FartyError} Something with multiple types and a line
+ *    that wraps
  * @returns {Number} What a thing
  */
 function linkDensity(node) {

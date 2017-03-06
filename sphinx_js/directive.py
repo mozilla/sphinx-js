@@ -80,7 +80,9 @@ class JsDirective(Directive):
                                    ('returns', _returns_formatter)])
         for field_name, callback in iteritems(FIELD_TYPES):
             for field in doclet.get(field_name, []):
-                yield callback(field)
+                description = field.get('description', '')
+                unwrapped = sub(r'[ \t]*\n[ \t]*', ' ', description)
+                yield callback(field, unwrapped)
 
 
 def auto_function_directive_bound_to_app(app):
@@ -166,32 +168,32 @@ def auto_attribute_directive_bound_to_app(app):
     return AutoAttributeDirective
 
 
-def _returns_formatter(field):
+def _returns_formatter(field, description):
     """Derive heads and tail from ``@returns`` blocks."""
     types = _or_types(field)
     tail = ('**%s** -- ' % types) if types else ''
-    tail += field.get('description', '')
+    tail += description
     return ['returns'], tail
 
 
-def _params_formatter(field):
+def _params_formatter(field, description):
     """Derive heads and tail from ``@param`` blocks."""
     heads = ['param']
     types = _or_types(field)
     if types:
         heads.append(types)
     heads.append(field['name'])
-    tail = field.get('description', '')
+    tail = description
     return heads, tail
 
 
-def _exceptions_formatter(field):
+def _exceptions_formatter(field, description):
     """Derive heads and tail from ``@throws`` blocks."""
     heads = ['throws']
     types = _or_types(field)
     if types:
         heads.append(types)
-    tail = field.get('description', '')
+    tail = description
     return heads, tail
 
 
@@ -206,4 +208,4 @@ def _namepath_to_dotted(namepath):
     style that Sphinx will better index."""
     # TODO: Handle "module:"
     # TODO: Skip backslash-escaped .~#, which are proper parts of names.
-    return sub('[#~-]', '.', namepath)  # - is for JSDoc 2.
+    return sub(r'[#~-]', '.', namepath)  # - is for JSDoc 2.

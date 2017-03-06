@@ -140,6 +140,7 @@ Version History
 ===============
 
 1.3.1
+  * Tolerate @args and other info field lines that are wrapped in the source code.
   * Cite the file and line of the source comment in Sphinx-emitted warnings and errors.
 
 1.3
