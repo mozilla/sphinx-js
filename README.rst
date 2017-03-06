@@ -139,6 +139,9 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 Version History
 ===============
 
+1.3.1
+  * Cite the file and line of the source comment in Sphinx-emitted warnings and errors.
+
 1.3
   * Add ``autoattribute`` directive.
 

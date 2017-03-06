@@ -43,11 +43,15 @@ class JsDirective(Directive):
         rst = template.render(**self._template_vars(dotted_name, doclet))
 
         # Parse the RST into docutils nodes with a fresh doc, and return
-        # them:
+        # them.
         #
         # Not sure if passing the settings from the "real" doc is the right
         # thing to do here:
-        doc = new_document('dummy', settings=self.state.document.settings)
+        meta = doclet['meta']
+        doc = new_document('%s:%s(%s)' % (meta['filename'],
+                                          doclet['longname'],
+                                          meta['lineno']),
+                           settings=self.state.document.settings)
         RstParser().parse(rst, doc)
         return doc.children
 
