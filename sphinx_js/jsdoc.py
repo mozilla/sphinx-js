@@ -6,8 +6,8 @@ def run_jsdoc(app):
     """Run JSDoc across a whole codebase, and squirrel away its results."""
     # JSDoc defaults to utf8-encoded output.
     jsdoc_command = ['jsdoc', app.config.js_source_path, '-X']
-    if app.config.js_config_path:
-        jsdoc_command.extend(['-c', app.config.js_config_path])
+    if app.config.jsdoc_config_path:
+        jsdoc_command.extend(['-c', app.config.jsdoc_config_path])
     doclets = loads(check_output(jsdoc_command).decode('utf8'))
     app._sphinxjs_jsdoc_output = dict((d['longname'], d) for d in doclets
                                       if d.get('comment')

@@ -20,8 +20,7 @@ Setup
    of your JS source tree is at that path, relative to conf.py itself. The
    default is ``../``, which works well when there is a ``docs`` folder at the
    root of your project.
-6. Optionally, add ``js_config_path = '../conf.json'`` to a ``jsdoc``
-   configuration file. If not specified, then no config file will be used.
+6. If you have special jsdoc configuration, add ``jsdoc_config_path = '../conf.json'`` (for example) to conf.py as well.
 
 Use
 ===
