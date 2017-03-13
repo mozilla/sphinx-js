@@ -132,6 +132,10 @@ This is also the way to document ES6-style getters and setters, as it omits the 
         }
     }
 
+And then, in the docs... ::
+
+   .. autoattribute:: Bing#bong
+
 Example
 =======
 
