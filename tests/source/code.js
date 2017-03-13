@@ -35,4 +35,14 @@ class ContainingClass {
      */
     someMethod(hi) {
     }
+
+    /**
+     * Setting this also frobs the frobnicator.
+     */
+    get bar() {
+      return this._bar;
+    }
+    set bar(baz) {
+      this._bar = _bar;
+    }
 }

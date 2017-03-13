@@ -119,6 +119,19 @@ And then, in the docs... ::
 
        .. autoattribute:: Fnode#element
 
+This is also the way to document ES6-style getters and setters, as it omits the trailing ``()`` of a function. The assumed practice is the usual JSDoc one: document only one of your getter/setter pair::
+
+    class Bing {
+        /** The bong of the bing */
+        get bong() {
+            return this._bong;
+        }
+
+        set bong(newBong) {
+            this._bong = newBong * 2;
+        }
+    }
+
 Example
 =======
 

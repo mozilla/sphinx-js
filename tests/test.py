@@ -64,6 +64,12 @@ class Tests(TestCase):
             'autoattribute',
             'ContainingClass.someVar\n\n   A var\n')
 
+    def test_getter_setter(self):
+        """Make sure ES6-style getters and setters can be documented."""
+        self._file_contents_eq(
+            'getter_setter',
+            'ContainingClass.bar\n\n   Setting this also frobs the frobnicator.\n')
+
     @classmethod
     def teardown_class(cls):
         rmtree(join(cls.docs_dir, '_build'))

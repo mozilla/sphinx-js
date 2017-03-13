@@ -1,0 +1,1 @@
+.. js:autoattribute:: ContainingClass#bar
