@@ -7,6 +7,7 @@ from docutils.parsers.rst.directives import flag
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
 from six import iteritems
+from sphinx.ext.autodoc import ALL, members_option
 
 
 class JsDirective(Directive):
@@ -21,26 +22,44 @@ class JsDirective(Directive):
         'short-name': flag
     }
 
-    def _run(self, app):
-        """Render a thing shaped like a function, having a name and arguments.
+
+class JsRenderer(object):
+    """Abstract superclass for renderers of various sphinx-js directives
+
+    Provides an inversion-of-control framework for rendering and bridges us
+    from the hidden, closed-over JsDirective subclasses to top-level classes
+    that can see and use each other.
+
+    """
+    def __init__(self, directive, app):
+        """
+        :arg directive: The associated Sphinx directive
+        :arg app: The Sphinx global app object. Some methods need this.
+        """
+        # content, arguments, options, app: all need to be accessible to
+        # template_vars, so we bring them in as constructor params and stow
+        # them away on the instance so calls to template_vars don't need to
+        # concern themselves with what it needs.
+        self._arguments = directive.arguments
+        self._content = directive.content
+        self._options = directive.options
+        self._directive = directive
+        self._app = app
+    
+    def rst_nodes(self):
+        """Render into RST nodes a thing shaped like a function, having a name
+        and arguments.
 
         Fill in args, docstrings, and info fields from stored JSDoc output.
 
         """
         # Get the relevant documentation together:
         name = self._name()
-        dotted_name = _namepath_to_dotted(name)
-        if 'short-name' in self.options:
-            dotted_name = dotted_name.split('.')[-1]
-        doclet = app._sphinxjs_jsdoc_output.get(name)
+        doclet = self._app._sphinxjs_doclets_by_longname.get(name)
         if doclet is None:
             app.warn('No JSDoc documentation for the longname "%s" was found.' % name)
             return []
-
-        # Render to RST using Jinja:
-        env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
-        template = env.get_template(self._template)
-        rst = template.render(**self._template_vars(dotted_name, doclet))
+        rst = self.rst(name, doclet, use_short_name='short-name' in self._options)
 
         # Parse the RST into docutils nodes with a fresh doc, and return
         # them.
@@ -51,19 +70,30 @@ class JsDirective(Directive):
         doc = new_document('%s:%s(%s)' % (meta['filename'],
                                           doclet['longname'],
                                           meta['lineno']),
-                           settings=self.state.document.settings)
+                           settings=self._directive.state.document.settings)
         RstParser().parse(rst, doc)
         return doc.children
 
+    def rst(self, name, doclet, use_short_name=False):
+        """Return rendered RST about an entity with the given name and doclet."""
+        dotted_name = _namepath_to_dotted(name)
+        if use_short_name:
+            dotted_name = dotted_name.split('.')[-1]
+
+        # Render to RST using Jinja:
+        env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
+        template = env.get_template(self._template)
+        return template.render(**self._template_vars(dotted_name, doclet))
+
     def _name(self):
-        """Return the JS function or class name."""
-        return self.arguments[0].split('(')[0]
+        """Return the JS function or class longname."""
+        return self._arguments[0].split('(')[0]
 
     def _formal_params(self, doclet):
         """Return the JS function or class params, looking first to any
         explicit params written into the directive and falling back to
         those in the JS code."""
-        name, paren, params = self.arguments[0].partition('(')
+        name, paren, params = self._arguments[0].partition('(')
         return ('(%s' % params) if params else '(%s)' % ', '.join(doclet['meta']['code']['paramnames'])
 
     def _fields(self, doclet):
@@ -99,18 +129,8 @@ def auto_function_directive_bound_to_app(app):
         optional formal parameter list, all mashed together in a single string.
 
         """
-        _template = 'function.rst'
-
         def run(self):
-            return self._run(app)
-
-        def _template_vars(self, name, doclet):
-            return dict(
-                name=name,
-                params=self._formal_params(doclet),
-                fields=self._fields(doclet),
-                description=doclet.get('description', ''),
-                content='\n'.join(self.content))
+            return AutoFunctionRenderer(self, app).rst_nodes()
 
     return AutoFunctionDirective
 
@@ -127,19 +147,14 @@ def auto_class_directive_bound_to_app(app):
         in a single string.
 
         """
-        _template = 'class.rst'
+        option_spec = JsDirective.option_spec.copy()
+        option_spec.update({
+            'members': members_option,  # doesn't include constructor
+            'exclude-members': _members_to_exclude,
+            'private-members': flag})
 
         def run(self):
-            return self._run(app)
-
-        def _template_vars(self, name, doclet):
-            return dict(
-                name=name,
-                params=self._formal_params(doclet),
-                fields=self._fields(doclet),
-                class_comment=doclet.get('classdesc', ''),
-                constructor_comment=doclet.get('description', ''),
-                content='\n'.join(self.content))
+            return AutoClassRenderer(self, app).rst_nodes()
 
     return AutoClassDirective
 
@@ -154,18 +169,67 @@ def auto_attribute_directive_bound_to_app(app):
         Takes a single argument which is a JS attribute name.
 
         """
-        _template = 'attribute.rst'
-
         def run(self):
-            return self._run(app)
-
-        def _template_vars(self, name, doclet):
-            return dict(
-                name=name,
-                description=doclet.get('description', ''),
-                content='\n'.join(self.content))
+            return AutoAttributeRenderer(self, app).rst_nodes()
 
     return AutoAttributeDirective
+
+
+class AutoFunctionRenderer(JsRenderer):
+    _template = 'function.rst'
+
+    def _template_vars(self, name, doclet):
+        return dict(
+            name=name,
+            params=self._formal_params(doclet),
+            fields=self._fields(doclet),
+            description=doclet.get('description', ''),
+            content='\n'.join(self._content))
+
+
+class AutoClassRenderer(JsRenderer):
+    _template = 'class.rst'
+
+    def _template_vars(self, name, doclet):
+        return dict(
+            name=name,
+            params=self._formal_params(doclet),
+            fields=self._fields(doclet),
+            class_comment=doclet.get('classdesc', ''),
+            constructor_comment=doclet.get('description', ''),
+            content='\n'.join(self._content),
+            members=self._members_of(
+                name,
+                exclude=self._options.get('exclude-members', set()),
+                include_private=self._options.get('private-members', False))
+                if 'members' in self._options else '')
+
+    def _members_of(self, name, exclude, include_private):
+        """Return RST describing the members of the named class.
+
+        :arg exclude: Set of names of members to exclude
+        :arg include_private: Whether to include private members
+
+        """
+        def rst_for(doclet):
+            renderer = (AutoFunctionRenderer if doclet.get('kind') == 'function'
+                        else AutoAttributeRenderer)
+            return renderer(self._directive, self._app).rst(
+                doclet['longname'],
+                doclet,
+                use_short_name=False)
+        return '\n\n'.join(rst_for(doclet) for doclet in
+                           self._app._sphinxjs_doclets_by_class[name])
+
+
+class AutoAttributeRenderer(JsRenderer):
+    _template = 'attribute.rst'
+
+    def _template_vars(self, name, doclet):
+        return dict(
+            name=name,
+            description=doclet.get('description', ''),
+            content='\n'.join(self._content))
 
 
 def _returns_formatter(field, description):
@@ -209,3 +273,13 @@ def _namepath_to_dotted(namepath):
     # TODO: Handle "module:"
     # TODO: Skip backslash-escaped .~#, which are proper parts of names.
     return sub(r'[#~-]', '.', namepath)  # - is for JSDoc 2.
+
+
+def _members_to_exclude(arg):
+    """Return a set of members to exclude given a comma-delim list them.
+
+    Exclude none if none are passed. This differs from autodocs' behavior,
+    which excludes all. That seemed useless to me.
+
+    """
+    return set(a.strip() for a in (arg or '').split(','))

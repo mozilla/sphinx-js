@@ -58,6 +58,17 @@ class Tests(TestCase):
             'autoclass',
             'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n')
 
+    def test_autoclass_members(self):
+        """Make sure classes list their members if ``:members:`` is specified.
+
+        Make sure it shows both functions and attributes and shows getters and
+        setters as if they are attributes.
+
+        """
+        self._file_contents_eq(
+            'autoclass_members',
+            'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n\n   ContainingClass.someVar\n\n      A var\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n')
+
     def test_autoattribute(self):
         """Make sure ``autoattribute`` works."""
         self._file_contents_eq(
