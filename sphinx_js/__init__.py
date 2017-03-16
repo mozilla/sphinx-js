@@ -1,6 +1,6 @@
-from .directive import (auto_class_directive_bound_to_app,
-                        auto_function_directive_bound_to_app,
-                        auto_attribute_directive_bound_to_app)
+from .directives import (auto_class_directive_bound_to_app,
+                         auto_function_directive_bound_to_app,
+                         auto_attribute_directive_bound_to_app)
 from .jsdoc import run_jsdoc
 
 
