@@ -62,12 +62,20 @@ class Tests(TestCase):
         """Make sure classes list their members if ``:members:`` is specified.
 
         Make sure it shows both functions and attributes and shows getters and
-        setters as if they are attributes.
+        setters as if they are attributes. Make sure it doesn't show private
+        members.
 
         """
         self._file_contents_eq(
             'autoclass_members',
             'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n\n   ContainingClass.someVar\n\n      A var\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n')
+
+    def test_autoclass_private_members(self):
+        """Make sure classes list their private members if
+        ``:private-members:`` is specified."""
+        self._file_contents_eq(
+            'autoclass_private_members',
+            'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n\n   ContainingClass.someVar\n\n      A var\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n\n   ContainingClass.secret()\n\n      Private thing.\n')
 
     def test_autoattribute(self):
         """Make sure ``autoattribute`` works."""

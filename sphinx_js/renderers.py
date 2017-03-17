@@ -23,9 +23,9 @@ class JsRenderer(object):
         :arg app: The Sphinx global app object. Some methods need this.
         """
         # content, arguments, options, app: all need to be accessible to
-        # template_vars, so we bring them in as constructor params and stow
-        # them away on the instance so calls to template_vars don't need to
-        # concern themselves with what it needs.
+        # template_vars, so we bring them in on construction and stow them away
+        # on the instance so calls to template_vars don't need to concern
+        # themselves with what it needs.
         self._arguments = directive.arguments
         self._content = directive.content
         self._options = directive.options
@@ -127,7 +127,7 @@ class AutoClassRenderer(JsRenderer):
             members=self._members_of(
                 name,
                 exclude=self._options.get('exclude-members', set()),
-                include_private=self._options.get('private-members', False))
+                include_private='private-members' in self._options)
                 if 'members' in self._options else '')
 
     def _members_of(self, name, exclude, include_private):
@@ -144,8 +144,11 @@ class AutoClassRenderer(JsRenderer):
                 doclet['longname'],
                 doclet,
                 use_short_name=False)
-        return '\n\n'.join(rst_for(doclet) for doclet in
-                           self._app._sphinxjs_doclets_by_class[name])
+        return '\n\n'.join(
+            rst_for(doclet) for doclet in
+            self._app._sphinxjs_doclets_by_class[name]
+            if doclet.get('access', 'public') == 'public'
+            or (doclet.get('access') == 'private' and include_private))
 
 
 class AutoAttributeRenderer(JsRenderer):

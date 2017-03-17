@@ -45,4 +45,10 @@ class ContainingClass {
     set bar(baz) {
       this._bar = _bar;
     }
+
+    /**
+     * Private thing.
+     * @private
+     */
+    secret() {}
 }
