@@ -35,7 +35,7 @@ def auto_function_directive_bound_to_app(app):
 
         """
         def run(self):
-            return AutoFunctionRenderer(self, app).rst_nodes()
+            return AutoFunctionRenderer.from_directive(self, app).rst_nodes()
 
     return AutoFunctionDirective
 
@@ -57,7 +57,7 @@ def auto_class_directive_bound_to_app(app):
             'private-members': flag})
 
         def run(self):
-            return AutoClassRenderer(self, app).rst_nodes()
+            return AutoClassRenderer.from_directive(self, app).rst_nodes()
 
     return AutoClassDirective
 
@@ -70,7 +70,7 @@ def auto_attribute_directive_bound_to_app(app):
 
         """
         def run(self):
-            return AutoAttributeRenderer(self, app).rst_nodes()
+            return AutoAttributeRenderer.from_directive(self, app).rst_nodes()
 
     return AutoAttributeDirective
 

@@ -3,6 +3,7 @@ from os.path import dirname, join
 from re import sub
 
 from docutils.parsers.rst import Parser as RstParser
+from docutils.statemachine import StringList
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
 from six import iteritems
@@ -17,20 +18,35 @@ class JsRenderer(object):
     that can see and use each other.
 
     """
-    def __init__(self, directive, app):
-        """
-        :arg directive: The associated Sphinx directive
-        :arg app: The Sphinx global app object. Some methods need this.
-        """
+    def __init__(self, directive, app, arguments=None, content=None, options=None):
+        self._directive = directive
+
         # content, arguments, options, app: all need to be accessible to
         # template_vars, so we bring them in on construction and stow them away
         # on the instance so calls to template_vars don't need to concern
         # themselves with what it needs.
-        self._arguments = directive.arguments
-        self._content = directive.content
-        self._options = directive.options
-        self._directive = directive
         self._app = app
+        self._arguments = arguments or []
+        self._content = content or StringList()
+        self._options = options or {}
+
+    @classmethod
+    def from_directive(cls, directive, app):
+        """Return one of these whose state is all derived from a directive.
+
+        This is suitable for top-level calls but not for when a renderer is
+        being called from a different renderer, lest content and such from the
+        outer directive be duplicated in the inner directive.
+
+        :arg directive: The associated Sphinx directive
+        :arg app: The Sphinx global app object. Some methods need this.
+
+        """
+        return cls(directive,
+                   app,
+                   arguments=directive.arguments,
+                   content=directive.content,
+                   options=directive.options)
 
     def rst_nodes(self):
         """Render into RST nodes a thing shaped like a function, having a name
@@ -143,7 +159,10 @@ class AutoClassRenderer(JsRenderer):
         def rst_for(doclet):
             renderer = (AutoFunctionRenderer if doclet.get('kind') == 'function'
                         else AutoAttributeRenderer)
-            return renderer(self._directive, self._app).rst(
+            # Pass a dummy arg list with no formal param list so
+            # _formal_params() won't find an explicit param list in there and
+            # override what it finds in the code:
+            return renderer(self._directive, self._app, arguments=['dummy']).rst(
                 doclet['longname'],
                 doclet,
                 use_short_name=False)
