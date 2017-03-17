@@ -150,6 +150,7 @@ class AutoClassRenderer(JsRenderer):
     def _members_of(self, name, include, exclude, should_include_private):
         """Return RST describing the members of the named class.
 
+        :arg name: The longname of the class we're documenting
         :arg include: List of names of members to include. If empty, include
             all.
         :arg exclude: Set of names of members to exclude
@@ -179,7 +180,7 @@ class AutoClassRenderer(JsRenderer):
             doclets = self._app._sphinxjs_doclets_by_class[name]
             if not include:
                 # Specifying none means listing all.
-                return doclets
+                return sorted(doclets, key=lambda d: d['name'])
             included_set = set(include)
             # Even if there are 2 doclets with the same short name (e.g. a
             # static member and an instance one), keep them both. This

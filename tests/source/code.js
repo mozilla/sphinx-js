@@ -72,3 +72,12 @@ class ClosedClass {
      */
     publical3() {}
 }
+
+/** Non-alphabetical class. */
+class NonAlphabetical {
+    /** Fun z. */
+    z() {}
+
+    /** Fun a. */
+    a() {}
+}
