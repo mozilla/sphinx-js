@@ -32,6 +32,7 @@ class ContainingClass {
 
     /**
      * Here.
+     * @protected
      */
     someMethod(hi) {
     }
