@@ -52,3 +52,22 @@ class ContainingClass {
      */
     secret() {}
 }
+
+// We won't add any new members to this class, because it would break some tests.
+/** Closed class. */
+class ClosedClass {
+    /**
+     * Public thing.
+     */
+    publical() {}
+
+    /**
+     * Public thing 2.
+     */
+    publical2() {}
+
+    /**
+     * Public thing 3.
+     */
+    publical3() {}
+}

@@ -147,8 +147,9 @@ class AutoClassRenderer(JsRenderer):
         return '\n\n'.join(
             rst_for(doclet) for doclet in
             self._app._sphinxjs_doclets_by_class[name]
-            if doclet.get('access', 'public') == 'public'
-            or (doclet.get('access') == 'private' and include_private))
+            if (doclet.get('access', 'public') == 'public'
+                or (doclet.get('access') == 'private' and include_private))
+            and doclet['name'] not in exclude)
 
 
 class AutoAttributeRenderer(JsRenderer):

@@ -77,6 +77,13 @@ class Tests(TestCase):
             'autoclass_private_members',
             'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n\n   ContainingClass.someVar\n\n      A var\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n\n   ContainingClass.secret()\n\n      Private thing.\n')
 
+    def test_autoclass_exclude_members(self):
+        """Make sure ``exclude-members`` option actually excludes listed
+        members."""
+        self._file_contents_eq(
+            'autoclass_exclude_members',
+            'class ClosedClass()\n\n   Closed class.\n\n   ClosedClass.publical()\n\n      Public thing.\n')
+
     def test_autoattribute(self):
         """Make sure ``autoattribute`` works."""
         self._file_contents_eq(
