@@ -14,4 +14,8 @@
 
    {{ content|indent(3) }}
 
+   {% if members -%}
+     {{ members|indent(3) }}
+   {%- endif %}
+
 

@@ -91,13 +91,37 @@ To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and th
 autoclass
 ---------
 
-We provide a basic ``js:autoclass`` directive which pulls in class comments and constructor docstrings, concatenating them. It's otherwise identical to ``js:autofunction`` and even takes the same ``:short-name:`` flag, which can come in handy for inner classes. It doesn't yet autodocument class members, but you can pull them in one at a time by embedding ``js:autofunction``. ::
+We provide a ``js:autoclass`` directive which documents a class with the concatenation of its above-class comments and its constructor comment. It shares all the features of ``js:autofunction`` and even takes the same ``:short-name:`` flag, which can come in handy for inner classes. The easiest way to use it is to invoke the ``:members:`` option, which automatically documents all your class's public methods and attributes::
 
-    .. js:autoclass:: SomeEs6Class(args, if, you[, wish])
+    .. js:autoclass:: SomeEs6Class(constructor, args, if, you[, wish])
+       :members:
+
+You can add private members by saying... ::
+
+    .. js:autoclass:: SomeEs6Class
+       :members:
+       :private-members:
+
+Privacy is determined by JSDoc ``@private`` tags.
+
+Exclude certain members by name with ``:exclude-members:``::
+
+    .. js:autoclass:: SomeEs6Class
+       :members:
+       :exclude-members: Foo, bar, baz
+
+Or explicitly whitelist the members you want listed. We will respect your ordering.
+
+    .. js:autoclass:: SomeEs6Class
+       :members: Qux, qum
+
+Finally, if you want full control, pull your class members in one at a time by embedding ``js:autofunction`` or ``js:autoattribute``::
+
+    .. js:autoclass:: SomeEs6Class
 
        .. js:autofunction:: SomeEs6Class#someMethod
 
-       Additional content can go here and appears below the in-code comments.
+       Additional content can go here and appears below the in-code comments, allowing you to intersperse long prose passages and examples that you don't want in your code.
 
 autoattribute
 -------------
@@ -156,6 +180,11 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 
 Version History
 ===============
+
+1.5
+  * Add ``:members:`` option to ``autoclass``.
+  * Add ``:private-members:`` and ``:exclude-members:`` options to go with it.
+  * Significantly refactor to allow directive classes to interact with each other.
 
 1.4
   * Add ``jsdoc_config_path`` option.
