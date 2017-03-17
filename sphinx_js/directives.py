@@ -1,3 +1,12 @@
+"""These are the actual Sphinx directives we provide, but they are skeletal.
+
+The real meat is in their parallel renderer classes, in renderers.py. The split
+is due to the unfortunate trick we need here of having functions return the
+directive classes after providing them the ``app`` symbol, where we store the
+JSDoc output, via closure. The renderer classes, able to be top-level classes,
+can access each other and collaborate.
+
+"""
 from docutils.parsers.rst import Directive, Parser as RstParser
 from docutils.parsers.rst.directives import flag
 from sphinx.ext.autodoc import members_option
@@ -19,12 +28,6 @@ class JsDirective(Directive):
 
 
 def auto_function_directive_bound_to_app(app):
-    """Give the js:autofunction directive access to the Sphinx app singleton by
-    closing over it.
-
-    That's where we store the JSDoc output.
-
-    """
     class AutoFunctionDirective(JsDirective):
         """js:autofunction directive, which spits out a js:function directive
 
@@ -39,9 +42,6 @@ def auto_function_directive_bound_to_app(app):
 
 
 def auto_class_directive_bound_to_app(app):
-    """Give the js:autofunction directive access to the Sphinx app singleton by
-    closing over it."""
-
     class AutoClassDirective(JsDirective):
         """js:autoclass directive, which spits out a js:class directive
 
@@ -63,9 +63,6 @@ def auto_class_directive_bound_to_app(app):
 
 
 def auto_attribute_directive_bound_to_app(app):
-    """Give the js:autoattribute directive access to the Sphinx app singleton
-    by closing over it."""
-
     class AutoAttributeDirective(JsDirective):
         """js:autoattribute directive, which spits out a js:attribute directive
 
