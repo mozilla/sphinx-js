@@ -70,6 +70,13 @@ class Tests(TestCase):
             'autoclass_members',
             'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n\n   ContainingClass.someVar\n\n      A var\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n')
 
+    def test_autoclass_members_list(self):
+        """Make sure including a list of names after ``members`` limits it to
+        those names and follows the order you specify."""
+        self._file_contents_eq(
+            'autoclass_members_list',
+            'class ClosedClass()\n\n   Closed class.\n\n   ClosedClass.publical3()\n\n      Public thing 3.\n\n   ClosedClass.publical()\n\n      Public thing.\n')
+
     def test_autoclass_private_members(self):
         """Make sure classes list their private members if
         ``:private-members:`` is specified."""

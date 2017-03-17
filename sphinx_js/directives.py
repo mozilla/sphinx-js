@@ -9,7 +9,6 @@ can access each other and collaborate.
 """
 from docutils.parsers.rst import Directive, Parser as RstParser
 from docutils.parsers.rst.directives import flag
-from sphinx.ext.autodoc import members_option
 
 from .renderers import AutoFunctionRenderer, AutoClassRenderer, AutoAttributeRenderer
 
@@ -52,7 +51,8 @@ def auto_class_directive_bound_to_app(app):
         """
         option_spec = JsDirective.option_spec.copy()
         option_spec.update({
-            'members': members_option,  # doesn't include constructor
+            'members': lambda members: [m.strip() for m in members.split(',')]
+                                       if members else [],
             'exclude-members': _members_to_exclude,
             'private-members': flag})
 

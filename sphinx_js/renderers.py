@@ -31,7 +31,7 @@ class JsRenderer(object):
         self._options = directive.options
         self._directive = directive
         self._app = app
-    
+
     def rst_nodes(self):
         """Render into RST nodes a thing shaped like a function, having a name
         and arguments.
@@ -126,15 +126,18 @@ class AutoClassRenderer(JsRenderer):
             content='\n'.join(self._content),
             members=self._members_of(
                 name,
+                include=self._options['members'],
                 exclude=self._options.get('exclude-members', set()),
-                include_private='private-members' in self._options)
+                should_include_private='private-members' in self._options)
                 if 'members' in self._options else '')
 
-    def _members_of(self, name, exclude, include_private):
+    def _members_of(self, name, include, exclude, should_include_private):
         """Return RST describing the members of the named class.
 
+        :arg include: List of names of members to include. If empty, include
+            all.
         :arg exclude: Set of names of members to exclude
-        :arg include_private: Whether to include private members
+        :arg should_include_private: Whether to include private members
 
         """
         def rst_for(doclet):
@@ -144,11 +147,35 @@ class AutoClassRenderer(JsRenderer):
                 doclet['longname'],
                 doclet,
                 use_short_name=False)
+
+        def doclets_to_include(include):
+            """Return the doclets that should be included (before excludes and
+            access specifiers are taken into account).
+
+            This will either be the doclets explicitly listed after the
+            ``:members:`` option, in that order, or all doclets that are
+            members of the class.
+
+            """
+            doclets = self._app._sphinxjs_doclets_by_class[name]
+            if not include:
+                # Specifying none means listing all.
+                return doclets
+            included_set = set(include)
+            # Even if there are 2 doclets with the same short name (e.g. a
+            # static member and an instance one), keep them both. This
+            # prefiltering step should make the below sort less horrible, even
+            # though I'm calling index().
+            included_doclets = [d for d in doclets if d['name'] in included_set]
+            # sort()'s stability should keep same-named doclets in the order
+            # JSDoc spits them out in.
+            included_doclets.sort(key=lambda d: include.index(d['name']))
+            return included_doclets
+
         return '\n\n'.join(
-            rst_for(doclet) for doclet in
-            self._app._sphinxjs_doclets_by_class[name]
+            rst_for(doclet) for doclet in doclets_to_include(include)
             if (doclet.get('access', 'public') in ('public', 'protected')
-                or (doclet.get('access') == 'private' and include_private))
+                or (doclet.get('access') == 'private' and should_include_private))
             and doclet['name'] not in exclude)
 
 
