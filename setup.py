@@ -12,7 +12,7 @@ long_description=open('README.rst', 'r', encoding='utf8').read()
 
 setup(
     name='sphinx-js',
-    version='1.4',
+    version='1.5',
     description='Support for using Sphinx on JSDoc-documented JS code',
     long_description=long_description,
     author='Erik Rose',
@@ -27,11 +27,13 @@ setup(
     classifiers=[
         'Intended Audience :: Developers',
         'Natural Language :: English',
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3'
+        'Programming Language :: Python :: 3',
+        'Topic :: Documentation :: Sphinx',
+        'Topic :: Software Development :: Documentation'
         ],
     keywords=['sphinx', 'documentation', 'docs', 'javascript', 'js', 'restructured'],
 )

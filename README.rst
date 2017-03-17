@@ -91,7 +91,7 @@ To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and th
 autoclass
 ---------
 
-We provide a ``js:autoclass`` directive which documents a class with the concatenation of its above-class comments and its constructor comment. It shares all the features of ``js:autofunction`` and even takes the same ``:short-name:`` flag, which can come in handy for inner classes. The easiest way to use it is to invoke the ``:members:`` option, which automatically documents all your class's public methods and attributes::
+We provide a ``js:autoclass`` directive which documents a class with the concatenation of its class comment and its constructor comment. It shares all the features of ``js:autofunction`` and even takes the same ``:short-name:`` flag, which can come in handy for inner classes. The easiest way to use it is to invoke the ``:members:`` option, which automatically documents all your class's public methods and attributes::
 
     .. js:autoclass:: SomeEs6Class(constructor, args, if, you[, wish])
        :members:
@@ -110,7 +110,7 @@ Exclude certain members by name with ``:exclude-members:``::
        :members:
        :exclude-members: Foo, bar, baz
 
-Or explicitly whitelist the members you want listed. We will respect your ordering.
+Or explicitly list the members you want. We will respect your ordering. ::
 
     .. js:autoclass:: SomeEs6Class
        :members: Qux, qum
@@ -121,7 +121,9 @@ Finally, if you want full control, pull your class members in one at a time by e
 
        .. js:autofunction:: SomeEs6Class#someMethod
 
-       Additional content can go here and appears below the in-code comments, allowing you to intersperse long prose passages and examples that you don't want in your code.
+       Additional content can go here and appears below the in-code comments,
+       allowing you to intersperse long prose passages and examples that you
+       don't want in your code.
 
 autoattribute
 -------------
@@ -184,7 +186,7 @@ Version History
 1.5
   * Add ``:members:`` option to ``autoclass``.
   * Add ``:private-members:`` and ``:exclude-members:`` options to go with it.
-  * Significantly refactor to allow directive classes to interact with each other.
+  * Significantly refactor to allow directive classes to talk to each other.
 
 1.4
   * Add ``jsdoc_config_path`` option.
