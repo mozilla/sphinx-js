@@ -183,6 +183,9 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 Version History
 ===============
 
+1.5.1
+  * Sort ``:members:`` alphabetically when an order is not explicitly specified.
+
 1.5
   * Add ``:members:`` option to ``autoclass``.
   * Add ``:private-members:`` and ``:exclude-members:`` options to go with it.
