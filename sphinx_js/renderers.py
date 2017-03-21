@@ -59,7 +59,7 @@ class JsRenderer(object):
         name = self._name()
         doclet = self._app._sphinxjs_doclets_by_longname.get(name)
         if doclet is None:
-            app.warn('No JSDoc documentation for the longname "%s" was found.' % name)
+            self._app.warn('No JSDoc documentation for the longname "%s" was found.' % name)
             return []
         rst = self.rst(name, doclet, use_short_name='short-name' in self._options)
 
