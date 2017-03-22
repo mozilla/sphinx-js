@@ -183,6 +183,9 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 Version History
 ===============
 
+1.5.2
+  * Fix crasher while warning that a specified longname isn't found.
+
 1.5.1
   * Sort ``:members:`` alphabetically when an order is not explicitly specified.
 
