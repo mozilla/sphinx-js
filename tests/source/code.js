@@ -81,3 +81,9 @@ class NonAlphabetical {
     /** Fun a. */
     a() {}
 }
+
+/**
+ * This doesn't emit a paramnames key in meta.code.
+ * @class
+ */
+const NoParamnames = {};

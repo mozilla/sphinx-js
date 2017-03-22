@@ -96,7 +96,7 @@ class JsRenderer(object):
         explicit params written into the directive and falling back to
         those in the JS code."""
         name, paren, params = self._arguments[0].partition('(')
-        return ('(%s' % params) if params else '(%s)' % ', '.join(doclet['meta']['code']['paramnames'])
+        return ('(%s' % params) if params else '(%s)' % ', '.join(doclet['meta']['code'].get('paramnames', []))
 
     def _fields(self, doclet):
         """Return an iterable of "info fields" to be included in the directive,

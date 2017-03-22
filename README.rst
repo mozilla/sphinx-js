@@ -183,6 +183,10 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 Version History
 ===============
 
+Unreleased
+  * Fix KeyError when trying to gather the constructor params of a plain old
+    object labeled as a ``@class``.
+
 1.5.2
   * Fix crasher while warning that a specified longname isn't found.
 

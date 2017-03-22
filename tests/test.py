@@ -83,6 +83,13 @@ class Tests(TestCase):
             'autoclass_alphabetical',
             'class NonAlphabetical()\n\n   Non-alphabetical class.\n\n   NonAlphabetical.a()\n\n      Fun a.\n\n   NonAlphabetical.z()\n\n      Fun z.\n')
 
+    def test_autoclass_no_paramnames(self):
+        """Make sure we don't have KeyErrors on naked, memberless objects
+        labeled as classes."""
+        self._file_contents_eq(
+            'autoclass_no_paramnames',
+            "class NoParamnames()\n\n   This doesn't emit a paramnames key in meta.code.\n")
+
     def test_autoclass_private_members(self):
         """Make sure classes list their private members if
         ``:private-members:`` is specified."""
