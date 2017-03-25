@@ -122,6 +122,24 @@ class Tests(TestCase):
             'avoid_shadowing',
             'more_code.shadow()\n\n   Another thing named shadow, to threaten to shadow the one in\n   code.js\n')
 
+    def test_object_literal(self):
+        """Make sure object initializer classes can be documented."""
+        self._file_contents_eq(
+            'autoclass_object_literal',
+            'class ObjectLiteralClass()\n\n   Object initializer \u201cclass\u201d definition in literal notation.\n\n   ObjectLiteralClass.foo()\n\n      Foos the bars.\n\n      Arguments:\n         * **bar** (*string*) \u2013 the Bar to Foo.\n\n      Returns:\n         **string** \u2013 - Returns the Foo\u2019d Bar.\n')
+
+    def test_private_forwarding(self):
+        """Make sure public classes that forward to private classes can be documented."""
+        self._file_contents_eq(
+            'autoclass_private_forwarding',
+            'class PublicClass()\n\n   This is the public API. All methods forward to PrivateClass.\n\n   PublicClass.public(foo)\n\n      This is the method we want to appear on the public API.\n\n      Arguments:\n         * **foo** (*string*) \u2013 We want the foo.\n')
+
+    def test_autoclass_object_literal_private_forwarding(self):
+        """Make sure public object initalizers that forward to private object initalizers can be documented."""
+        self._file_contents_eq(
+            'autoclass_object_literal_private_forwarding',
+            'class PublicObjectLiteral()\n\n   This is the public API. All methods forward to PrivateClass.\n\n   PublicObjectLiteral.public()\n\n      This is the method we want to appear on the public API.\n\n      Arguments:\n         * **foo** (*string*) \u2013 We want the foo.\n')
+
     @classmethod
     def teardown_class(cls):
         rmtree(join(cls.docs_dir, '_build'))

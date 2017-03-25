@@ -90,3 +90,111 @@ const NoParamnames = {};
 
 /** Thing to be shadowed in more_code.js */
 function shadow() {}
+
+/**
+ * Object initializer "class" definition in literal notation.
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Object_initializer
+ * @class
+ */
+var ObjectLiteralClass = {
+    /**
+     * Foos the bars.
+     * @param {string} bar - the Bar to Foo.
+     * @returns {string} - Returns the Foo'd Bar.
+     */
+    foo(bar) {
+        return bar;
+    }
+}
+
+/**
+ * Private class renamed as public class, using the jsdoc lends tag.
+ *
+ * A common pattern in some codebases is to have a public class which
+ * forwards to a private class, where the jsdoc annotations live.
+ *
+ * @lends PublicClass
+ */
+class PrivateClass {
+    /**
+     * This is the method we want to appear on the public API.
+     * @param {string} foo - We want the foo.
+     */
+    public(foo) {
+        return foo;
+    }
+
+    /**
+     * This is a private method which should *not* appear on the public API.
+     * @param {string} foo - Gotta have that foo.
+     * @private
+     */
+    private(foo) {
+        return foo
+    }
+}
+
+/**
+ * This is the public API. All methods forward to PrivateClass.
+ */
+class PublicClass {
+    constructor() {
+        this._privateClass = new PrivateClass();
+    }
+
+    /**
+     * This should *not* appear in the documentation.
+     *
+     * @param {string} foo - You don't want this foo.
+     * @private
+     */
+    public(foo) {
+        return this._privateClass(foo);
+    }
+}
+
+/**
+ * Private class renamed as public class, using the jsdoc lends tag.
+ * Same as above but using object initializer written in literal object
+ * notation.
+ *
+ * A common pattern in some codebases is to have a public class which
+ * forwards to a private class, where the jsdoc annotations live.
+ *
+ * @lends PublicObjectLiteral
+ */
+var PrivateObjectLiteral = {
+    /**
+     * This is the method we want to appear on the public API.
+     * @param {string} foo - We want the foo.
+     */
+    public(foo) {
+        return foo;
+    },
+
+    /**
+     * This is a private method which should *not* appear on the public API.
+     * @param {string} foo - Gotta have that foo.
+     * @private
+     */
+    private(foo) {
+        return foo
+    }
+}
+
+/**
+ * This is the public API. All methods forward to PrivateClass.
+ */
+var PublicObjectLiteral = {
+    _privateClass: new PrivateClass(),
+
+    /**
+     * This should *not* appear in the documentation.
+     *
+     * @param {string} foo - You don't want this foo.
+     * @private
+     */
+    public(foo) {
+        return this._privateClass(foo);
+    }
+}

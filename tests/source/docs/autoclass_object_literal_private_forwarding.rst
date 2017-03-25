@@ -1,0 +1,2 @@
+.. js:autoclass:: PublicObjectLiteral
+   :members:
