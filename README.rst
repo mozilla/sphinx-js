@@ -5,21 +5,18 @@ sphinx-js
 Why
 ===
 
-When you write a JavaScript library, how do you explain it to people? If it's a small project in a domain your users are familiar with, JSDoc's hierarchal list of routines might suffice. But what about for larger projects? How can you intersperse prose with your API docs without having to copy and paste things?
+When you write a JavaScript library, how do you explain it to people? If it's a small project in a domain your users are familiar with, JSDoc's alphabetical list of routines might suffice. But what about larger projects? How can you intersperse prose with your API docs without having to copy and paste things?
 
-sphinx-js lets you use the industry-leading Sphinx documentation tool with JS projects. It provides a handful of directives, patterned after the Python-centric autodoc ones, for pulling JSDoc-formatted function and class documentation into reStructuredText pages. And, because you can keep using JSDoc in your code, you remain compatible with the rest of your JS tooling, like Google's Closure Compiler.
+sphinx-js lets you use the industry-leading `Sphinx <http://sphinx-doc.org/>`_ documentation tool with JS projects. It provides a handful of directives, patterned after the Python-centric `autodoc <www.sphinx-doc.org/en/latest/ext/autodoc.html>`_ ones, for pulling JSDoc-formatted documentation into reStructuredText pages. And, because you can keep using JSDoc in your code, you remain compatible with the rest of your JS tooling, like Google's Closure Compiler.
 
 Setup
 =====
 
 1. Install JSDoc using npm. ``jsdoc`` must be on your ``$PATH``, so you might want to ``npm install -g jsdoc``. We're known to work with jsdoc 3.4.3.
-2. Install Sphinx. (TODO: Make this more explicit for non-Python people.)
-3. Make a documentation folder in your project using ``sphinx-quickstart``.
-4. Add ``sphinx_js`` to ``extensions`` in the generated Sphinx conf.py.
-5. Add ``js_source_path = '../somewhere/else'`` to conf.py, assuming the root
-   of your JS source tree is at that path, relative to conf.py itself. The
-   default is ``../``, which works well when there is a ``docs`` folder at the
-   root of your project.
+2. `Install Sphinx <http://www.sphinx-doc.org/en/stable/tutorial.html#autodoc>`_.
+3. Make a documentation folder in your project by running ``sphinx-quickstart``.
+4. In the generated Sphinx conf.py file, add ``sphinx_js`` to ``extensions``.
+5. Also in conf.py, add ``js_source_path = '../somewhere/else'`` on a line by itself. This means the root of your JS source tree is at that path, relative to the conf.py file. The default is ``../``, which works well when there is a ``docs`` folder at the root of your project and your source code lives directly inside the root.
 6. If you have special jsdoc configuration, add ``jsdoc_config_path = '../conf.json'`` (for example) to conf.py as well.
 
 Use
@@ -47,8 +44,7 @@ Document your JS code using standard JSDoc formatting::
         return (length - lengthWithoutLinks) / length;
     }
 
-Our directives work much like Sphinx's standard `autodoc
-<http://www.sphinx-doc.org/en/latest/ext/autodoc.html>`_ ones. You can specify
+Our directives work much like Sphinx's standard autodoc ones. You can specify
 just a function::
 
     .. js:autofunction:: someFunction
@@ -71,17 +67,6 @@ extracted documentation::
         * Docs
 
         Enjoy!
-
-Use `JSDoc namepath syntax <http://usejsdoc.org/about-namepaths.html>`_ to disambiguate same-named entities::
-
-    .. js:autofunction:: SomeClass#someInstanceMethod
-
-Behind the scenes, sphinx-js will changes those to dotted names so that...
-
-* Sphinx's "shortening" syntax works: ``:func:`~InwardRhs.atMost``` prints as merely ``atMost()``. (For now, you should always use dots rather than other namepath separators: ``#~``.)
-* Sphinx indexes more informatively, saying methods belong to their classes.
-
-To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and then say simply ``autofunction`` rather than ``js:autofunction``.
 
 ``js:autofunction`` has one option, ``:short-name:``, which comes in handy for chained APIs whose implementation details you want to keep out of sight. When you use it on a class method, the containing class won't be mentioned in the docs, the function will appear under its short name in indices, and cross references must use the short name as well (``:func:`someFunction```)::
 
@@ -162,6 +147,40 @@ And then, in the docs... ::
 
    .. autoattribute:: Bing#bong
 
+Dodging Ambiguity With Pathnames
+--------------------------------
+
+If you have same-named objects in different files, use pathnames to disambiguate them. Here's a particularly long example::
+
+    .. js:autofunction:: ./some/dir/some/file.SomeClass#someInstanceMethod.staticMethod~innerMember
+
+You may recognize the separators ``#.~`` from `JSDoc namepaths <http://usejsdoc.org/about-namepaths.html>`_; they work the same here.
+
+For conciseness, you can use any unique suffix, as long as it consists of complete path segments. These would all be equivalent to the above, assuming they are unique within your source tree::
+
+    innerMember
+    staticMethod~innerMember
+    SomeClass#someInstanceMethod.staticMethod~innerMember
+    some/file.SomeClass#someInstanceMethod.staticMethod~innerMember
+
+Things to note:
+
+* We use simple file paths rather than JSDoc's ``module:`` prefix.
+* We use simple backslash escaping exclusively rather than switching escaping schemes halfway through the path; JSDoc itself `is headed that way as well <https://github.com/jsdoc3/jsdoc/issues/876>`_. The characters that need to be escaped are ``#.~(/``, though you do not need to escape the dots in a leading ``./`` or ``../``. A really horrible path might be... ::
+
+    some/path\ with\ spaces/file.topLevelObject#instanceMember.staticMember\(with\(parens
+* Relative paths are relative to the ``js_source_path`` specified in the config. Absolute paths are not allowed.
+
+Behind the scenes, sphinx-js will change all separators to dots so that...
+
+* Sphinx's "shortening" syntax works: ``:func:`~InwardRhs.atMost``` prints as merely ``atMost()``. (For now, you should always use dots rather than other namepath separators: ``#~``.)
+* Sphinx indexes more informatively, saying methods belong to their classes.
+
+Saving Keystrokes By Setting The Primary Domain
+-----------------------------------------------
+
+To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and then say (for example) ``autofunction`` rather than ``js:autofunction``.
+
 Example
 =======
 
@@ -183,7 +202,13 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 Version History
 ===============
 
-Unreleased
+2.0
+  * Deal with ambiguous object paths. Symbols with identical JSDoc longnames (such as two top-level things called "foo" in different files) will no longer have one shadow the other. Introduce an unambiguous path convention for referring to objects. Add a real parser to parse them rather than the dirty tricks we were using before. Backward compatibility breaks a little, because ambiguous references are now a fatal error, rather than quietly referring to the last definition JSDoc happened to encounter.
+  * Index everything into a suffix tree so you can use any unique path suffix to refer to an object.
+  * Other fallout of having a real parser:
+    * Stop supporting "-" as a namepath separator.
+    * No longer spuriously translate escaped separators in namepaths into dots.
+    * Otherwise treat paths and escapes properly. For example, we can now handle symbols that contain "(".
   * Fix KeyError when trying to gather the constructor params of a plain old
     object labeled as a ``@class``.
 
