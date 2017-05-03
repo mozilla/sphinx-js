@@ -8,7 +8,7 @@ from sphinx.util.osutil import cd
 
 
 class Tests(TestCase):
-    """Pretty much all the tests, run against a single Sphinx tree.
+    """Tests which require our one big Sphinx tree to be built.
 
     Yes, it's too coupled.
 
@@ -17,7 +17,8 @@ class Tests(TestCase):
     def setup_class(cls):
         cls.docs_dir = join(dirname(__file__), 'source', 'docs')
         with cd(cls.docs_dir):
-            sphinx_main(['dummy', '-b', 'text', '-E', '.', '_build'])
+            if sphinx_main(['dummy', '-b', 'text', '-E', '.', '_build']):
+                raise RuntimeError('Sphinx build exploded.')
 
     def _file_contents_eq(self, filename, contents):
         with open(join(self.docs_dir, '_build', '%s.txt' % filename)) as file:
@@ -115,6 +116,12 @@ class Tests(TestCase):
         self._file_contents_eq(
             'getter_setter',
             'ContainingClass.bar\n\n   Setting this also frobs the frobnicator.\n')
+
+    def test_no_shadowing(self):
+        """Make sure we can disambiguate objects of the same name."""
+        self._file_contents_eq(
+            'avoid_shadowing',
+            'more_code.shadow()\n\n   Another thing named shadow, to threaten to shadow the one in\n   code.js\n')
 
     @classmethod
     def teardown_class(cls):

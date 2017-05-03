@@ -87,3 +87,6 @@ class NonAlphabetical {
  * @class
  */
 const NoParamnames = {};
+
+/** Thing to be shadowed in more_code.js */
+function shadow() {}

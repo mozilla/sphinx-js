@@ -6,8 +6,11 @@ from docutils.parsers.rst import Parser as RstParser
 from docutils.statemachine import StringList
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
-from six import iteritems
-from sphinx.ext.autodoc import ALL
+from six import iteritems, text_type
+from sphinx.errors import SphinxError
+
+from .parsers import PathVisitor
+from .suffix_tree import SuffixAmbiguous, SuffixNotFound
 
 
 class JsRenderer(object):
@@ -15,7 +18,9 @@ class JsRenderer(object):
 
     Provides an inversion-of-control framework for rendering and bridges us
     from the hidden, closed-over JsDirective subclasses to top-level classes
-    that can see and use each other.
+    that can see and use each other. Handles parsing of a single, all-consuming
+    argument that consists of a JS entity reference and an optional formal
+    parameter list.
 
     """
     def __init__(self, directive, app, arguments=None, content=None, options=None):
@@ -26,7 +31,7 @@ class JsRenderer(object):
         # on the instance so calls to template_vars don't need to concern
         # themselves with what it needs.
         self._app = app
-        self._arguments = arguments or []
+        self._partial_path, self._explicit_formal_params = PathVisitor().parse(arguments[0])
         self._content = content or StringList()
         self._options = options or {}
 
@@ -55,37 +60,43 @@ class JsRenderer(object):
         Fill in args, docstrings, and info fields from stored JSDoc output.
 
         """
-        # Get the relevant documentation together:
-        name = self._name()
-        doclet = self._app._sphinxjs_doclets_by_longname.get(name)
-        if doclet is None:
-            self._app.warn('No JSDoc documentation for the longname "%s" was found.' % name)
-            return []
-        rst = self.rst(name, doclet, use_short_name='short-name' in self._options)
+        try:
+            # Get the relevant documentation together:
+            doclet, full_path = self._app._sphinxjs_doclets_by_path.get_with_path(self._partial_path)
+        except SuffixNotFound as exc:
+            raise SphinxError('No JSDoc documentation was found for object "%s" or any path ending with that.'
+                              % ''.join(exc.segments))
+        except SuffixAmbiguous as exc:
+            raise SphinxError('More than one JS object matches the path suffix "%s". Candidate paths have these segments in front: %s'
+                              % (''.join(exc.segments), exc.next_possible_keys))
+        else:
+            rst = self.rst(self._partial_path,
+                           full_path,
+                           doclet,
+                           use_short_name='short-name' in self._options)
 
-        # Parse the RST into docutils nodes with a fresh doc, and return
-        # them.
-        #
-        # Not sure if passing the settings from the "real" doc is the right
-        # thing to do here:
-        meta = doclet['meta']
-        doc = new_document('%s:%s(%s)' % (meta['filename'],
-                                          doclet['longname'],
-                                          meta['lineno']),
-                           settings=self._directive.state.document.settings)
-        RstParser().parse(rst, doc)
-        return doc.children
+            # Parse the RST into docutils nodes with a fresh doc, and return
+            # them.
+            #
+            # Not sure if passing the settings from the "real" doc is the right
+            # thing to do here:
+            meta = doclet['meta']
+            doc = new_document('%s:%s(%s)' % (meta['filename'],
+                                              doclet['longname'],
+                                              meta['lineno']),
+                               settings=self._directive.state.document.settings)
+            RstParser().parse(rst, doc)
+            return doc.children
+        return []
 
-    def rst(self, name, doclet, use_short_name=False):
+    def rst(self, partial_path, full_path, doclet, use_short_name=False):
         """Return rendered RST about an entity with the given name and doclet."""
-        dotted_name = _namepath_to_dotted(name)
-        if use_short_name:
-            dotted_name = dotted_name.split('.')[-1]
+        dotted_name = partial_path[-1] if use_short_name else _dotted_path(partial_path)
 
         # Render to RST using Jinja:
         env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
         template = env.get_template(self._template)
-        return template.render(**self._template_vars(dotted_name, doclet))
+        return template.render(**self._template_vars(dotted_name, full_path, doclet))
 
     def _name(self):
         """Return the JS function or class longname."""
@@ -95,8 +106,8 @@ class JsRenderer(object):
         """Return the JS function or class params, looking first to any
         explicit params written into the directive and falling back to
         those in the JS code."""
-        name, paren, params = self._arguments[0].partition('(')
-        return ('(%s' % params) if params else '(%s)' % ', '.join(doclet['meta']['code'].get('paramnames', []))
+        return (self._explicit_formal_params or
+                ('(%s)' % ', '.join(doclet['meta']['code'].get('paramnames', []))))
 
     def _fields(self, doclet):
         """Return an iterable of "info fields" to be included in the directive,
@@ -120,7 +131,7 @@ class JsRenderer(object):
 class AutoFunctionRenderer(JsRenderer):
     _template = 'function.rst'
 
-    def _template_vars(self, name, doclet):
+    def _template_vars(self, name, full_path, doclet):
         return dict(
             name=name,
             params=self._formal_params(doclet),
@@ -132,7 +143,7 @@ class AutoFunctionRenderer(JsRenderer):
 class AutoClassRenderer(JsRenderer):
     _template = 'class.rst'
 
-    def _template_vars(self, name, doclet):
+    def _template_vars(self, name, full_path, doclet):
         return dict(
             name=name,
             params=self._formal_params(doclet),
@@ -141,16 +152,16 @@ class AutoClassRenderer(JsRenderer):
             constructor_comment=doclet.get('description', ''),
             content='\n'.join(self._content),
             members=self._members_of(
-                name,
+                full_path,
                 include=self._options['members'],
                 exclude=self._options.get('exclude-members', set()),
                 should_include_private='private-members' in self._options)
                 if 'members' in self._options else '')
 
-    def _members_of(self, name, include, exclude, should_include_private):
+    def _members_of(self, full_path, include, exclude, should_include_private):
         """Return RST describing the members of the named class.
 
-        :arg name: The longname of the class we're documenting
+        :arg full_path list: The unambiguous path of the class we're documenting
         :arg include: List of names of members to include. If empty, include
             all.
         :arg exclude: Set of names of members to exclude
@@ -164,7 +175,8 @@ class AutoClassRenderer(JsRenderer):
             # _formal_params() won't find an explicit param list in there and
             # override what it finds in the code:
             return renderer(self._directive, self._app, arguments=['dummy']).rst(
-                doclet['longname'],
+                [doclet['name']],
+                'dummy_full_path',
                 doclet,
                 use_short_name=False)
 
@@ -177,7 +189,7 @@ class AutoClassRenderer(JsRenderer):
             members of the class.
 
             """
-            doclets = self._app._sphinxjs_doclets_by_class[name]
+            doclets = self._app._sphinxjs_doclets_by_class[tuple(full_path)]
             if not include:
                 # Specifying none means listing all.
                 return sorted(doclets, key=lambda d: d['name'])
@@ -202,7 +214,7 @@ class AutoClassRenderer(JsRenderer):
 class AutoAttributeRenderer(JsRenderer):
     _template = 'attribute.rst'
 
-    def _template_vars(self, name, doclet):
+    def _template_vars(self, name, full_path, doclet):
         return dict(
             name=name,
             description=doclet.get('description', ''),
@@ -244,9 +256,9 @@ def _or_types(field):
     return '|'.join(field.get('type', {}).get('names', []))
 
 
-def _namepath_to_dotted(namepath):
-    """Convert a node.js-style namepath (``class#instanceMethod``) to a dotted
-    style that Sphinx will better index."""
-    # TODO: Handle "module:"
-    # TODO: Skip backslash-escaped .~#, which are proper parts of names.
-    return sub(r'[#~-]', '.', namepath)  # - is for JSDoc 2.
+def _dotted_path(segments):
+    """Convert a JS object path (``['dir/', 'file/', 'class#',
+    'instanceMethod']``) to a dotted style that Sphinx will better index."""
+    segments_without_separators = [s[:-1] for s in segments[:-1]]
+    segments_without_separators.append(segments[-1])
+    return '.'.join(segments_without_separators)
