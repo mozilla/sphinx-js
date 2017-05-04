@@ -19,7 +19,12 @@ setup(
     author_email='erikrose@grinchcentral.com',
     license='MIT',
     packages=find_packages(exclude=['ez_setup']),
-    tests_require=['nose'],
+    tests_require=['nose',
+                   # Sphinx's plain-text renderer changes behavior slightly
+                   # with regard to how it emits class names in 1.6b1, which
+                   # breaks our admittedly brittle tests. 1.6b2 has a bug that
+                   # makes it crash on run, so we pin to 1.6b1.
+                   'Sphinx==1.6b1'],
     test_suite='nose.collector',
     url='https://github.com/erikrose/sphinx-js',
     include_package_data=True,
