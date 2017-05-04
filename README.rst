@@ -206,6 +206,7 @@ Version History
   * Deal with ambiguous object paths. Symbols with identical JSDoc longnames (such as two top-level things called "foo" in different files) will no longer have one shadow the other. Introduce an unambiguous path convention for referring to objects. Add a real parser to parse them rather than the dirty tricks we were using before. Backward compatibility breaks a little, because ambiguous references are now a fatal error, rather than quietly referring to the last definition JSDoc happened to encounter.
   * Index everything into a suffix tree so you can use any unique path suffix to refer to an object.
   * Other fallout of having a real parser:
+
     * Stop supporting "-" as a namepath separator.
     * No longer spuriously translate escaped separators in namepaths into dots.
     * Otherwise treat paths and escapes properly. For example, we can now handle symbols that contain "(".
