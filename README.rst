@@ -5,24 +5,67 @@ sphinx-js
 Why
 ===
 
-When you write a JavaScript library, how do you explain it to people? If it's a small project in a domain your users are familiar with, JSDoc's alphabetical list of routines might suffice. But what about larger projects? How can you intersperse prose with your API docs without having to copy and paste things?
+When you write a JavaScript library, how do you explain it to people? If it's a small project in a domain your users are familiar with, JSDoc's alphabetical list of routines might suffice. But in a larger project, it is useful to intersperse prose with your API docs without having to copy and paste things.
 
 sphinx-js lets you use the industry-leading `Sphinx <http://sphinx-doc.org/>`_ documentation tool with JS projects. It provides a handful of directives, patterned after the Python-centric `autodoc <www.sphinx-doc.org/en/latest/ext/autodoc.html>`_ ones, for pulling JSDoc-formatted documentation into reStructuredText pages. And, because you can keep using JSDoc in your code, you remain compatible with the rest of your JS tooling, like Google's Closure Compiler.
 
 Setup
 =====
 
-1. Install JSDoc using npm. ``jsdoc`` must be on your ``$PATH``, so you might want to ``npm install -g jsdoc``. We're known to work with jsdoc 3.4.3.
-2. `Install Sphinx <http://www.sphinx-doc.org/en/stable/tutorial.html>`_.
-3. Make a documentation folder in your project by running ``sphinx-quickstart``.
-4. In the generated Sphinx conf.py file, add ``sphinx_js`` to ``extensions``.
-5. Also in conf.py, add ``js_source_path = '../somewhere/else'`` on a line by itself. This means the root of your JS source tree is at that path, relative to the conf.py file. The default is ``../``, which works well when there is a ``docs`` folder at the root of your project and your source code lives directly inside the root.
+1. Install JSDoc using npm. ``jsdoc`` must be on your ``$PATH``, so you might want to install it globally::
+
+        npm install -g jsdoc
+
+   We're known to work with jsdoc 3.4.3.
+2. Install sphinx-js, which will pull in Sphinx itself as a dependency::
+
+        pip install sphinx-js
+
+3. Make a documentation folder in your project by running ``sphinx-quickstart`` and answering its questions::
+
+        cd my-project
+        sphinx-quickstart
+
+          > Root path for the documentation [.]: docs
+          > Separate source and build directories (y/n) [n]:
+          > Name prefix for templates and static dir [_]:
+          > Project name: My Project
+          > Author name(s): Fred Fredson
+          > Project version []: 1.0
+          > Project release [1.0]:
+          > Project language [en]:
+          > Source file suffix [.rst]:
+          > Name of your master document (without suffix) [index]:
+          > Do you want to use the epub builder (y/n) [n]:
+          > autodoc: automatically insert docstrings from modules (y/n) [n]:
+          > doctest: automatically test code snippets in doctest blocks (y/n) [n]:
+          > intersphinx: link between Sphinx documentation of different projects (y/n) [n]:
+          > todo: write "todo" entries that can be shown or hidden on build (y/n) [n]:
+          > coverage: checks for documentation coverage (y/n) [n]:
+          > imgmath: include math, rendered as PNG or SVG images (y/n) [n]:
+          > mathjax: include math, rendered in the browser by MathJax (y/n) [n]:
+          > ifconfig: conditional inclusion of content based on config values (y/n) [n]:
+          > viewcode: include links to the source code of documented Python objects (y/n) [n]:
+          > githubpages: create .nojekyll file to publish the document on GitHub pages (y/n) [n]:
+          > Create Makefile? (y/n) [y]:
+          > Create Windows command file? (y/n) [y]:
+
+4. In the generated Sphinx conf.py file, turn on ``sphinx_js`` by adding it to ``extensions``::
+
+        extensions = ['sphinx_js']
+
+5. If your JS source code is anywhere but at the root of your project, add ``js_source_path = '../somewhere/else'`` on a line by itself in conf.py. The root of your JS source tree should be where that setting points, relative to the conf.py file. (The default, ``../``, works well when there is a ``docs`` folder at the root of your project and your source code lives directly inside the root.)
 6. If you have special jsdoc configuration, add ``jsdoc_config_path = '../conf.json'`` (for example) to conf.py as well.
+7. If you're documenting only JS and no other languages, you can set your "primary domain" to JS in conf.py::
+
+        primary_domain = 'js'
+
+   Then you can omit all the "js:" prefixes in the directives below.
 
 Use
 ===
 
-In short, use the directives below, then build your Sphinx docs as usual by running ``make html`` in your docs directory.
+In short, use the directives below, then build your Sphinx docs by running ``make html`` in your docs directory. (If you have never used Sphinx or written reStructuredText before, here is `where we left off in its tutorial <http://www.sphinx-doc.org/en/stable/tutorial.html#defining-document-structure>`_. For a quick start, just add things to index.rst for now.)
 
 autofunction
 ------------
