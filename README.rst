@@ -202,6 +202,9 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 Version History
 ===============
 
+2.0.1
+  * Fix spurious syntax errors while loading large JSDoc output by writing it to a temp file first. (jhkennedy)
+
 2.0
   * Deal with ambiguous object paths. Symbols with identical JSDoc longnames (such as two top-level things called "foo" in different files) will no longer have one shadow the other. Introduce an unambiguous path convention for referring to objects. Add a real parser to parse them rather than the dirty tricks we were using before. Backward compatibility breaks a little, because ambiguous references are now a fatal error, rather than quietly referring to the last definition JSDoc happened to encounter.
   * Index everything into a suffix tree so you can use any unique path suffix to refer to an object.
