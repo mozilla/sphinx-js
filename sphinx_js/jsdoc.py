@@ -1,7 +1,7 @@
 from collections import defaultdict
 from json import load
 from os.path import abspath, relpath, sep
-from subprocess import Popen, PIPE
+from subprocess import PIPE, Popen
 from tempfile import TemporaryFile
 
 from .parsers import path_and_formal_params, PathVisitor
@@ -19,12 +19,12 @@ def run_jsdoc(app):
         jsdoc_command.extend(['-c', app.config.jsdoc_config_path])
     
     # Use a temporary file to handle large output volume
-    with TemporaryFile() as tmp:
-        p = Popen(jsdoc_command, stdout=tmp, stderr=PIPE)
+    with TemporaryFile() as temp:
+        p = Popen(jsdoc_command, stdout=temp, stderr=PIPE)
         p.wait()
-        # once output is finished, move back to beginning of file and load it
-        tmp.seek(0)
-        doclets = load(tmp)
+        # Once output is finished, move back to beginning of file and load it:
+        temp.seek(0)
+        doclets = load(temp)
 
     # 2 doclets are made for classes, and they are largely redundant: one for
     # the class itself and another for the constructor. However, the
