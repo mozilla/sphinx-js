@@ -13,7 +13,7 @@ Setup
 =====
 
 1. Install JSDoc using npm. ``jsdoc`` must be on your ``$PATH``, so you might want to ``npm install -g jsdoc``. We're known to work with jsdoc 3.4.3.
-2. `Install Sphinx <http://www.sphinx-doc.org/en/stable/tutorial.html#autodoc>`_.
+2. `Install Sphinx <http://www.sphinx-doc.org/en/stable/tutorial.html>`_.
 3. Make a documentation folder in your project by running ``sphinx-quickstart``.
 4. In the generated Sphinx conf.py file, add ``sphinx_js`` to ``extensions``.
 5. Also in conf.py, add ``js_source_path = '../somewhere/else'`` on a line by itself. This means the root of your JS source tree is at that path, relative to the conf.py file. The default is ``../``, which works well when there is a ``docs`` folder at the root of your project and your source code lives directly inside the root.
