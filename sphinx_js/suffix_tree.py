@@ -20,7 +20,7 @@ class SuffixTree(object):
             tree = tree.setdefault(seg, {})
         seg = unambiguous_segments[0]
         if seg in tree:
-            raise PathTaken('Attempted to add a path already in the suffix tree: "%s".' % ''.join(unambiguous_segments))
+            raise PathTaken(unambiguous_segments)
         else:
             tree[seg] = Value(value)
 
@@ -67,7 +67,7 @@ class SuffixError(Exception):
         self.segments = segments
 
     def __str__(self):
-        return self._message % self.segments
+        return self._message % ''.join(self.segments)
 
 
 class PathTaken(SuffixError):
@@ -89,4 +89,4 @@ class SuffixAmbiguous(SuffixError):
         self.next_possible_keys = next_possible_keys
 
     def __str__(self):
-        return 'Ambiguous path: %s could continue as any of %s.' % (self.segments, self.next_possible_keys)
+        return 'Ambiguous path: %s could continue as any of %s.' % (''.join(self.segments), self.next_possible_keys)

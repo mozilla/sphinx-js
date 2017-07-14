@@ -4,8 +4,10 @@ from os.path import abspath, relpath, sep
 from subprocess import PIPE, Popen
 from tempfile import TemporaryFile
 
+from six import iterkeys, python_2_unicode_compatible
+
 from .parsers import path_and_formal_params, PathVisitor
-from .suffix_tree import SuffixTree
+from .suffix_tree import PathTaken, SuffixTree
 
 
 def run_jsdoc(app):
@@ -17,7 +19,7 @@ def run_jsdoc(app):
     jsdoc_command = ['jsdoc', source_path, '-X']
     if app.config.jsdoc_config_path:
         jsdoc_command.extend(['-c', app.config.jsdoc_config_path])
-    
+
     # Use a temporary file to handle large output volume
     with TemporaryFile() as temp:
         p = Popen(jsdoc_command, stdout=temp, stderr=PIPE)
@@ -36,10 +38,16 @@ def run_jsdoc(app):
 
     # Build table for lookup by name, which most directives use:
     app._sphinxjs_doclets_by_path = SuffixTree()
+    conflicts = []
     for d in doclets:
-        app._sphinxjs_doclets_by_path.add(
-            doclet_full_path(d, source_path),
-            d)
+        try:
+            app._sphinxjs_doclets_by_path.add(
+                doclet_full_path(d, source_path),
+                d)
+        except PathTaken as conflict:
+            conflicts.append(conflict.segments)
+    if conflicts:
+        raise PathsTaken(conflicts)
 
     # Build lookup table for autoclass's :members: option. This will also
     # pick up members of functions (inner variables), but it will instantly
@@ -92,3 +100,21 @@ def without_ending(str, ending):
     if str.endswith(ending):
         return str[:-len(ending)]
     return str
+
+
+class PathsTaken(Exception):
+    """One or more JS objects had the same paths.
+
+    Rolls up multiple PathTaken exceptions for mass reporting.
+
+    """
+    def __init__(self, conflicts):
+        # List of paths, each given as a list of segments:
+        self.conflicts = conflicts
+
+    def __str__(self):
+        return ("Your JS code contains multiple documented objects at each of "
+                "these paths:\n\n  %s\n\nWe won't know which one you're "
+                "talking about. Using JSDoc tags like @class might help you "
+                "differentiate them." %
+                '\n  '.join(''.join(c) for c in self.conflicts))

@@ -245,6 +245,9 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 Version History
 ===============
 
+2.1
+  * Aggregate PathTaken errors, and report them all at once. This means you don't have to run JSDoc repeatedly while cleaning up large projects.
+
 2.0.1
   * Fix spurious syntax errors while loading large JSDoc output by writing it to a temp file first. (jhkennedy)
 
