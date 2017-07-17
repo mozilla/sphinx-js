@@ -2,7 +2,7 @@ from os.path import dirname, join
 from shutil import rmtree
 from unittest import TestCase
 
-from nose.tools import eq_
+from nose.tools import eq_, ok_, assert_in, assert_not_in
 from sphinx.cmdline import main as sphinx_main
 from sphinx.util.osutil import cd
 
@@ -20,9 +20,12 @@ class Tests(TestCase):
             if sphinx_main(['dummy', '-b', 'text', '-E', '.', '_build']):
                 raise RuntimeError('Sphinx build exploded.')
 
-    def _file_contents_eq(self, filename, contents):
+    def _file_contents(self, filename):
         with open(join(self.docs_dir, '_build', '%s.txt' % filename)) as file:
-            eq_(file.read(), contents)
+            return file.read()
+
+    def _file_contents_eq(self, filename, contents):
+        eq_(self._file_contents(filename), contents)
 
     def test_autofunction_minimal(self):
         """Make sure we render correctly and pull the params out of the JS code
@@ -55,9 +58,9 @@ class Tests(TestCase):
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
         comment."""
-        self._file_contents_eq(
-            'autoclass',
-            'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n')
+        contents = self._file_contents('autoclass')
+        assert_in('Class doc.', contents)
+        assert_in('Constructor doc.', contents)
 
     def test_autoclass_members(self):
         """Make sure classes list their members if ``:members:`` is specified.
@@ -84,26 +87,19 @@ class Tests(TestCase):
             'autoclass_alphabetical',
             'class NonAlphabetical()\n\n   Non-alphabetical class.\n\n   NonAlphabetical.a()\n\n      Fun a.\n\n   NonAlphabetical.z()\n\n      Fun z.\n')
 
-    def test_autoclass_no_paramnames(self):
-        """Make sure we don't have KeyErrors on naked, memberless objects
-        labeled as classes."""
-        self._file_contents_eq(
-            'autoclass_no_paramnames',
-            "class NoParamnames()\n\n   This doesn't emit a paramnames key in meta.code.\n")
-
     def test_autoclass_private_members(self):
         """Make sure classes list their private members if
         ``:private-members:`` is specified."""
-        self._file_contents_eq(
-            'autoclass_private_members',
-            'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n\n   ContainingClass.secret()\n\n      Private thing.\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n\n   ContainingClass.someVar\n\n      A var\n')
+        contents = self._file_contents('autoclass_private_members')
+        assert_in('secret()', contents)
 
     def test_autoclass_exclude_members(self):
         """Make sure ``exclude-members`` option actually excludes listed
         members."""
-        self._file_contents_eq(
-            'autoclass_exclude_members',
-            'class ClosedClass()\n\n   Closed class.\n\n   ClosedClass.publical()\n\n      Public thing.\n')
+        contents = self._file_contents('autoclass_exclude_members')
+        assert_in('publical()', contents)
+        assert_not_in('publical2', contents)
+        assert_not_in('publical3', contents)
 
     def test_autoattribute(self):
         """Make sure ``autoattribute`` works."""
