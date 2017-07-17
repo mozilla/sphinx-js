@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+from io import open
 from os.path import dirname, join
 from shutil import rmtree
 from unittest import TestCase
@@ -21,7 +23,8 @@ class Tests(TestCase):
                 raise RuntimeError('Sphinx build exploded.')
 
     def _file_contents(self, filename):
-        with open(join(self.docs_dir, '_build', '%s.txt' % filename)) as file:
+        with open(join(self.docs_dir, '_build', '%s.txt' % filename),
+                  encoding='utf8') as file:
             return file.read()
 
     def _file_contents_eq(self, filename, contents):
@@ -72,7 +75,7 @@ class Tests(TestCase):
         """
         self._file_contents_eq(
             'autoclass_members',
-            'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n\n   ContainingClass.someVar\n\n      A var\n')
+            u'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** – A thing\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n\n   ContainingClass.someVar\n\n      A var\n')
 
     def test_autoclass_members_list(self):
         """Make sure including a list of names after ``members`` limits it to
@@ -129,17 +132,17 @@ DESCRIPTION = """
    Return the ratio of the inline text length of the links in an
    element to the inline text length of the entire element."""
 
-FIELDS = """
+FIELDS = u"""
 
    Arguments:
-      * **node** (*Node*) -- Something of a single type
+      * **node** (*Node*) – Something of a single type
 
    Throws:
-      **PartyError|FartyError** -- Something with multiple types and a
+      **PartyError|FartyError** – Something with multiple types and a
       line that wraps
 
    Returns:
-      **Number** -- What a thing
+      **Number** – What a thing
 """
 
 # Oddly enough, the text renderer renders these bullets with a blank line
