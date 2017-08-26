@@ -4,7 +4,8 @@ from os.path import abspath, relpath, sep
 from subprocess import PIPE, Popen
 from tempfile import TemporaryFile
 
-from six import iterkeys, python_2_unicode_compatible
+from six import iterkeys, python_2_unicode_compatible, string_types
+from sphinx.errors import SphinxError
 
 from .parsers import path_and_formal_params, PathVisitor
 from .suffix_tree import PathTaken, SuffixTree
@@ -12,11 +13,21 @@ from .suffix_tree import PathTaken, SuffixTree
 
 def run_jsdoc(app):
     """Run JSDoc across a whole codebase, and squirrel away its results."""
+    source_paths = [app.config.js_source_path] if isinstance(app.config.js_source_path, string_types) else app.config.js_source_path
     # Uses cwd, which Sphinx seems to set to the dir containing conf.py:
-    source_path = abspath(app.config.js_source_path)
+    abs_source_paths = [abspath(path) for path in source_paths]
+
+    root_for_relative_paths = app.config.root_for_relative_js_paths
+    if root_for_relative_paths:
+        root_for_relative_paths = abspath(root_for_relative_paths)
+    else:
+        if len(abs_source_paths) > 1:
+            raise SphinxError('Since more than one js_source_path is specified in conf.py, root_for_relative_js_paths must also be specified. This allows paths beginning with ./ or ../ to be unambiguous.')
+        else:
+            root_for_relative_paths = abs_source_paths[0]
 
     # JSDoc defaults to utf8-encoded output.
-    jsdoc_command = ['jsdoc', source_path, '-X']
+    jsdoc_command = ['jsdoc'] + abs_source_paths + ['-X']
     if app.config.jsdoc_config_path:
         jsdoc_command.extend(['-c', app.config.jsdoc_config_path])
 
@@ -42,7 +53,7 @@ def run_jsdoc(app):
     for d in doclets:
         try:
             app._sphinxjs_doclets_by_path.add(
-                doclet_full_path(d, source_path),
+                doclet_full_path(d, root_for_relative_paths),
                 d)
         except PathTaken as conflict:
             conflicts.append(conflict.segments)
@@ -63,7 +74,7 @@ def run_jsdoc(app):
     for d in doclets:
         of = d.get('memberof')
         if of:  # speed optimization
-            segments = doclet_full_path(d, source_path, longname_field='memberof')
+            segments = doclet_full_path(d, root_for_relative_paths, longname_field='memberof')
             app._sphinxjs_doclets_by_class[tuple(segments)].append(d)
 
 
