@@ -1,10 +1,8 @@
 from collections import defaultdict
 from json import load
-from os.path import abspath, relpath, sep
+from os.path import abspath, relpath
 from subprocess import PIPE, Popen
 from tempfile import TemporaryFile
-
-from six import iterkeys, python_2_unicode_compatible
 
 from .parsers import path_and_formal_params, PathVisitor
 from .suffix_tree import PathTaken, SuffixTree

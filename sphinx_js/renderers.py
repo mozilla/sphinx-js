@@ -1,12 +1,11 @@
 from collections import OrderedDict
-from os.path import dirname, join
 from re import sub
 
 from docutils.parsers.rst import Parser as RstParser
 from docutils.statemachine import StringList
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
-from six import iteritems, text_type
+from six import iteritems
 from sphinx.errors import SphinxError
 
 from .parsers import PathVisitor

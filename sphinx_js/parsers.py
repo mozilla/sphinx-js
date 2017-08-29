@@ -71,4 +71,3 @@ def _backslash_unescape(str):
 
     """
     return sub(r'\\(.)', lambda match: match.group(1), str)
-

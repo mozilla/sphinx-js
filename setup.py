@@ -8,13 +8,12 @@ except ImportError:
 from io import open
 from setuptools import setup, find_packages
 
-long_description=open('README.rst', 'r', encoding='utf8').read()
 
 setup(
     name='sphinx-js',
     version='2.0.1',
     description='Support for using Sphinx on JSDoc-documented JS code',
-    long_description=long_description,
+    long_description=open('README.rst', 'r', encoding='utf8').read(),
     author='Erik Rose',
     author_email='erikrose@grinchcentral.com',
     license='MIT',

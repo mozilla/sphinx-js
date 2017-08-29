@@ -4,7 +4,7 @@ from os.path import dirname, join
 from shutil import rmtree
 from unittest import TestCase
 
-from nose.tools import eq_, ok_, assert_in, assert_not_in
+from nose.tools import eq_, assert_in, assert_not_in
 from sphinx.cmdline import main as sphinx_main
 from sphinx.util.osutil import cd
 

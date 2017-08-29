@@ -7,7 +7,7 @@ JSDoc output, via closure. The renderer classes, able to be top-level classes,
 can access each other and collaborate.
 
 """
-from docutils.parsers.rst import Directive, Parser as RstParser
+from docutils.parsers.rst import Directive
 from docutils.parsers.rst.directives import flag
 
 from .renderers import AutoFunctionRenderer, AutoClassRenderer, AutoAttributeRenderer
