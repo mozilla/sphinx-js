@@ -1,9 +1,9 @@
+from codecs import getwriter
 from collections import defaultdict
 from json import load
 from os.path import abspath, relpath, sep
 from subprocess import PIPE, Popen
 from tempfile import TemporaryFile
-from codecs import getwriter
 
 from six import iterkeys, python_2_unicode_compatible
 
