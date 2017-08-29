@@ -17,14 +17,8 @@ def run_jsdoc(app):
     # Uses cwd, which Sphinx seems to set to the dir containing conf.py:
     abs_source_paths = [abspath(path) for path in source_paths]
 
-    root_for_relative_paths = app.config.root_for_relative_js_paths
-    if root_for_relative_paths:
-        root_for_relative_paths = abspath(root_for_relative_paths)
-    else:
-        if len(abs_source_paths) > 1:
-            raise SphinxError('Since more than one js_source_path is specified in conf.py, root_for_relative_js_paths must also be specified. This allows paths beginning with ./ or ../ to be unambiguous.')
-        else:
-            root_for_relative_paths = abs_source_paths[0]
+    root_for_relative_paths = root_or_fallback(app.config.root_for_relative_js_paths,
+                                               abs_source_paths)
 
     # JSDoc defaults to utf8-encoded output.
     jsdoc_command = ['jsdoc'] + abs_source_paths + ['-X']
@@ -76,6 +70,25 @@ def run_jsdoc(app):
         if of:  # speed optimization
             segments = doclet_full_path(d, root_for_relative_paths, longname_field='memberof')
             app._sphinxjs_doclets_by_class[tuple(segments)].append(d)
+
+
+def root_or_fallback(root_for_relative_paths, abs_source_paths):
+    """Return the path that relative JS entity paths in the docs are relative to.
+
+    Fall back to the sole JS source path if the setting is unspecified.
+
+    :arg root_for_relative_paths: The raw root_for_relative_js_paths setting.
+        None if the user hasn't specified it.
+    :arg abs_source_paths: Absolute paths of dirs to scan for JS code
+
+    """
+    if root_for_relative_paths:
+        return abspath(root_for_relative_paths)
+    else:
+        if len(abs_source_paths) > 1:
+            raise SphinxError('Since more than one js_source_path is specified in conf.py, root_for_relative_js_paths must also be specified. This allows paths beginning with ./ or ../ to be unambiguous.')
+        else:
+            return abs_source_paths[0]
 
 
 def doclet_full_path(d, base_dir, longname_field='longname'):
