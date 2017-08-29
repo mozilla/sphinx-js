@@ -4,9 +4,10 @@ from sphinx_js.jsdoc import doclet_full_path
 
 
 def test_doclet_full_path():
+    """Sanity-check doclet_full_path(), including throwing it a non-.js filename."""
     doclet = {
         "meta": {
-            "filename": "utils.js",
+            "filename": "utils.jsm",
             "path": "/boogie/smoo/Checkouts/fathom",
         },
         "longname": "best#thing~yeah"

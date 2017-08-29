@@ -16,7 +16,7 @@ Setup
 
         npm install -g jsdoc
 
-   We're known to work with jsdoc 3.4.3.
+   We work with jsdoc 3.4.3, 3.5.4, and likely anything between.
 2. Install sphinx-js, which will pull in Sphinx itself as a dependency::
 
         pip install sphinx-js
@@ -248,6 +248,7 @@ Version History
 2.1
   * Aggregate PathTaken errors, and report them all at once. This means you don't have to run JSDoc repeatedly while cleaning up large projects.
   * Fix a bytes-vs-strings issue that crashed on versions of Python 3 before 3.6. (jhkennedy)
+  * Tolerate JS files that have filename extensions other than ".js". Before, when combined with custom jsdoc configuration that ingested such files, incorrect object pathnames were generated, which led to spurious "No JSDoc documentation was found for object ..." errors.
 
 2.0.1
   * Fix spurious syntax errors while loading large JSDoc output by writing it to a temp file first. (jhkennedy)
