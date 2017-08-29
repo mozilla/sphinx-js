@@ -1,3 +1,4 @@
+from codecs import getwriter
 from collections import defaultdict
 from json import load
 from os.path import abspath, relpath
@@ -19,7 +20,7 @@ def run_jsdoc(app):
         jsdoc_command.extend(['-c', app.config.jsdoc_config_path])
 
     # Use a temporary file to handle large output volume
-    with TemporaryFile() as temp:
+    with getwriter('utf-8')(TemporaryFile(mode='w+')) as temp:
         p = Popen(jsdoc_command, stdout=temp, stderr=PIPE)
         p.wait()
         # Once output is finished, move back to beginning of file and load it:
