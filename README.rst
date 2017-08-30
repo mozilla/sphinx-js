@@ -224,6 +224,18 @@ Saving Keystrokes By Setting The Primary Domain
 
 To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and then say (for example) ``autofunction`` rather than ``js:autofunction``.
 
+Configuration Reference
+-----------------------
+
+``js_source_path``
+  A list of directories to scan (non-recursively) for JS files. Can be a string instead if there is only one. If there is more than one, ``root_for_relative_js_paths`` must be specified as well.
+
+``jsdoc_config_path``
+  A conf.py-relative path to a jsdoc config file, which is useful if you want to specify your own jsdoc options, like recursion and custom filename matching.
+
+``root_for_relative_js_paths``
+  The directory relative to which relative pathnames are resolved. Defaults to ``js_source_path`` if it is only one item.
+
 Example
 =======
 
@@ -246,6 +258,7 @@ Version History
 ===============
 
 2.1
+  * Allow multiple folders in ``js_source_path``. This is useful for gradually migrating large projects, one folder at a time, to jsdoc. Introduce ``root_for_relative_js_paths`` to keep relative paths unambiguous in the face of multiple source paths.
   * Aggregate PathTaken errors, and report them all at once. This means you don't have to run JSDoc repeatedly while cleaning up large projects.
   * Fix a bytes-vs-strings issue that crashed on versions of Python 3 before 3.6. (jhkennedy)
   * Tolerate JS files that have filename extensions other than ".js". Before, when combined with custom jsdoc configuration that ingested such files, incorrect object pathnames were generated, which led to spurious "No JSDoc documentation was found for object ..." errors.

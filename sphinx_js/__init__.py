@@ -26,6 +26,12 @@ def setup(app):
     app.add_config_value('js_source_path', '../', 'env')
     app.add_config_value('jsdoc_config_path', None, 'env')
 
+    # We could use a callable as the "default" param here, but then we would
+    # have had to duplicate or build framework around the logic that promotes
+    # js_source_path to a list and calls abspath() on it. It's simpler this way
+    # until we need to access js_source_path from more than one place.
+    app.add_config_value('root_for_relative_js_paths', None, 'env')
+
 
 def read_all_docs(app, env, doc_names):
     """Add all found docs to the to-be-read list, because we have no way of
