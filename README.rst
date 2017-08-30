@@ -16,7 +16,7 @@ Setup
 
         npm install -g jsdoc
 
-   We work with jsdoc 3.4.3, 3.5.4, and likely anything between.
+   We work with jsdoc 3.4.3, 3.5.4, and quite possibly other versions.
 2. Install sphinx-js, which will pull in Sphinx itself as a dependency::
 
         pip install sphinx-js
@@ -88,9 +88,11 @@ Document your JS code using standard JSDoc formatting::
     }
 
 Our directives work much like Sphinx's standard autodoc ones. You can specify
-just a function::
+just a function's name... ::
 
     .. js:autofunction:: someFunction
+
+...and a nicely formatted block of documentation will show up in your docs.
 
 Or you can throw in your own explicit parameter list, if you want to note
 optional parameters::
@@ -119,7 +121,7 @@ extracted documentation::
 autoclass
 ---------
 
-We provide a ``js:autoclass`` directive which documents a class with the concatenation of its class comment and its constructor comment. It shares all the features of ``js:autofunction`` and even takes the same ``:short-name:`` flag, which can come in handy for inner classes. The easiest way to use it is to invoke the ``:members:`` option, which automatically documents all your class's public methods and attributes::
+We provide a ``js:autoclass`` directive which documents a class with the concatenation of its class comment and its constructor comment. It shares all the features of ``js:autofunction`` and even takes the same ``:short-name:`` flag, which can come in handy for inner classes. The easiest way to use it is to invoke its ``:members:`` option, which automatically documents all your class's public methods and attributes::
 
     .. js:autoclass:: SomeEs6Class(constructor, args, if, you[, wish])
        :members:
@@ -241,7 +243,7 @@ Example
 
 A good example using most of sphinx-js's functionality is the Fathom documentation. A particularly juicy page is https://mozilla.github.io/fathom/ruleset.html. Click the "View page source" link to see the raw directives.
 
-Fathom also carries a Travis CI configuration and a deployment script for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them. (ReadTheDocs, which is otherwise the canonical hosting platform for Sphinx docs, doesn't work because it won't run JSDoc for us, nor will it accept uploads of docs built externally.)
+Fathom also carries a Travis CI configuration and a deployment script for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them. However, `ReadTheDocs <https://readthedocs.org/>`_, the canonical hosting platform for Sphinx docs, now supports sphinx-js, so that's likely your best bet.
 
 Caveats
 =======
