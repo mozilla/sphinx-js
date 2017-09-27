@@ -32,7 +32,61 @@ class ContainingClass {
 
     /**
      * Here.
+     * @protected
      */
     someMethod(hi) {
     }
+
+    /**
+     * Setting this also frobs the frobnicator.
+     */
+    get bar() {
+      return this._bar;
+    }
+    set bar(baz) {
+      this._bar = _bar;
+    }
+
+    /**
+     * Private thing.
+     * @private
+     */
+    secret() {}
 }
+
+// We won't add any new members to this class, because it would break some tests.
+/** Closed class. */
+class ClosedClass {
+    /**
+     * Public thing.
+     */
+    publical() {}
+
+    /**
+     * Public thing 2.
+     */
+    publical2() {}
+
+    /**
+     * Public thing 3.
+     */
+    publical3() {}
+}
+
+/** Non-alphabetical class. */
+class NonAlphabetical {
+    /** Fun z. */
+    z() {}
+
+    /** Fun a. */
+    a() {}
+}
+
+/**
+ * This doesn't emit a paramnames key in meta.code.
+ * @class
+ */
+const NoParamnames = {};
+
+/** Thing to be shadowed in more_code.js */
+function shadow() {}
