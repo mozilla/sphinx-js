@@ -1,4 +1,4 @@
-sudo: true
+sudo: false
 language: python
 addons:
   apt:
@@ -8,7 +8,8 @@ python:
   - "2.7"
   - "3.3"
 install:
-  - sudo npm install -g jsdoc
+  - pwd
+  - npm install jsdoc
   - pip install tox-travis
 script:
-  - tox
+  - PATH=$TRAVIS_BUILD_DIR/node_modules/.bin:$PATH tox
