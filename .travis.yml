@@ -1,13 +1,14 @@
-sudo: false
+sudo: true
 language: python
 addons:
   apt:
     packages:
-      - jsdoc-toolkit
+      - npm
 python:
   - "2.7"
   - "3.3"
 install:
+  - sudo npm install -g jsdoc
   - pip install tox-travis
 script:
   - tox
