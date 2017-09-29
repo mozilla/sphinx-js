@@ -32,7 +32,11 @@ def run_jsdoc(app):
         p.wait()
         # Once output is finished, move back to beginning of file and load it:
         temp.seek(0)
-        doclets = load(temp)
+        try:
+            doclets = load(temp)
+        except ValueError:
+            raise SphinxError('jsdoc found no JS files in the directories %s. Make sure js_source_path is set correctly in conf.py. It is also possible (though unlikely) that jsdoc emitted invalid JSON.' % abs_source_paths)
+
 
     # 2 doclets are made for classes, and they are largely redundant: one for
     # the class itself and another for the constructor. However, the
