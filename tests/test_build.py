@@ -62,13 +62,13 @@ class Tests(TestCase):
         """Make that typedef works."""
         self._file_contents_eq(
             'autofunction_typedef',
-            'TypeDefinition()\n\n   Arguments:\n      * **width** (*Number*) – width in pixels\n')
+            u'TypeDefinition()\n\n   Arguments:\n      * **width** (*Number*) – width in pixels\n')
 
     def test_autofunction_callback(self):
         """Make that callback works."""
         self._file_contents_eq(
             'autofunction_callback',
-            'requestCallback()\n\n   Some global callback\n\n   Arguments:\n      * **responseCode** (*number*) –\n')
+            u'requestCallback()\n\n   Some global callback\n\n   Arguments:\n      * **responseCode** (*number*) –\n')
 
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
