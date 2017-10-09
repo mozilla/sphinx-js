@@ -90,3 +90,15 @@ const NoParamnames = {};
 
 /** Thing to be shadowed in more_code.js */
 function shadow() {}
+
+/**
+ * @typedef {Object} TypeDefinition
+ * @property {Number} width - width in pixels
+ */
+
+
+/**
+ * Some global callback
+ * @callback requestCallback
+ * @param {number} responseCode
+ */
