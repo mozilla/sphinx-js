@@ -118,6 +118,7 @@ class JsRenderer(object):
 
         """
         FIELD_TYPES = OrderedDict([('params', _params_formatter),
+                                   ('properties', _params_formatter),
                                    ('exceptions', _exceptions_formatter),
                                    ('returns', _returns_formatter)])
         for field_name, callback in iteritems(FIELD_TYPES):
@@ -168,7 +169,7 @@ class AutoClassRenderer(JsRenderer):
 
         """
         def rst_for(doclet):
-            renderer = (AutoFunctionRenderer if doclet.get('kind') == 'function'
+            renderer = (AutoFunctionRenderer if doclet.get('kind') in ['function', 'typedef']
                         else AutoAttributeRenderer)
             # Pass a dummy arg list with no formal param list so
             # _formal_params() won't find an explicit param list in there and
