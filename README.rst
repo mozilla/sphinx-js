@@ -65,12 +65,12 @@ Setup
 Use
 ===
 
-In short, use the directives below, then build your Sphinx docs by running ``make html`` in your docs directory. (If you have never used Sphinx or written reStructuredText before, here is `where we left off in its tutorial <http://www.sphinx-doc.org/en/stable/tutorial.html#defining-document-structure>`_. For a quick start, just add things to index.rst for now.)
+In short, write a folder full of reStructuredText files, use the following directives to pull in your JSDoc documentation, then tell Sphinx to render it all by running ``make html`` in your docs directory. If you have never used Sphinx or written reStructuredText before, here is `where we left off in its tutorial <http://www.sphinx-doc.org/en/stable/tutorial.html#defining-document-structure>`_. For a quick start, just add things to index.rst for now.
 
 autofunction
 ------------
 
-Document your JS code using standard JSDoc formatting::
+First, document your JS code using standard JSDoc formatting::
 
     /**
      * Return the ratio of the inline text length of the links in an element to
@@ -87,20 +87,18 @@ Document your JS code using standard JSDoc formatting::
         return (length - lengthWithoutLinks) / length;
     }
 
-Our directives work much like Sphinx's standard autodoc ones. You can specify
-just a function's name... ::
+Then, reference your documentation using sphinx-js directives. Our directives work much like Sphinx's standard autodoc ones. You can specify just a function's name... ::
 
     .. js:autofunction:: someFunction
 
 ...and a nicely formatted block of documentation will show up in your docs.
 
-Or you can throw in your own explicit parameter list, if you want to note
+You can also throw in your own explicit parameter list, if you want to note
 optional parameters::
 
     .. js:autofunction:: someFunction(foo, bar[, baz])
 
-You can even add additional content. If you do, it will appear just below any
-extracted documentation::
+You can even add additional content. If you do, it will appear just below any extracted documentation::
 
     .. js:autofunction:: someFunction
 
@@ -117,6 +115,10 @@ extracted documentation::
 
     .. js:autofunction:: someClass#someFunction
        :short-name:
+
+``autofunction`` can also be used on callbacks defined with the `@callback tag <http://usejsdoc.org/tags-callback.html>`_.
+
+There is experimental support for abusing ``autofunction`` to document `@typedef tags <http://usejsdoc.org/tags-typedef.html>`_ as well, though the result will be styled as a function, and ``@property`` tags will fall misleadingly under an "Arguments" heading. Still, it's better than nothing until we can do it properly.
 
 autoclass
 ---------
@@ -258,6 +260,10 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 
 Version History
 ===============
+
+2.2
+  * Add ``autofunction`` support for ``@callback`` tags.
+  * Add experimental ``autofunction`` support for ``@typedef`` tags.
 
 2.1
   * Allow multiple folders in ``js_source_path``. This is useful for gradually migrating large projects, one folder at a time, to jsdoc. Introduce ``root_for_relative_js_paths`` to keep relative paths unambiguous in the face of multiple source paths.
