@@ -48,6 +48,18 @@ class ContainingClass {
     }
 
     /**
+     * Another.
+     */
+    anotherMethod() {
+    }
+
+    /**
+     * More.
+     */
+    yetAnotherMethod() {
+    }
+
+    /**
      * Private thing.
      * @private
      */

@@ -194,6 +194,15 @@ class AutoClassRenderer(JsRenderer):
                 # Specifying none means listing all.
                 return sorted(doclets, key=lambda d: d['name'])
             included_set = set(include)
+
+            # If the special name * is included in the list, include
+            # all other doclets, in sorted order.
+            if '*' in included_set:
+                star_index = include.index('*')
+                not_included = sorted(d['name'] for d in doclets if d['name'] not in included_set)
+                include = include[:star_index] + not_included + include[star_index + 1:]
+                included_set.update(not_included)
+
             # Even if there are 2 doclets with the same short name (e.g. a
             # static member and an instance one), keep them both. This
             # prefiltering step should make the below sort less horrible, even
