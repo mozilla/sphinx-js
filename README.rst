@@ -147,6 +147,11 @@ Or explicitly list the members you want. We will respect your ordering. ::
     .. js:autoclass:: SomeEs6Class
        :members: Qux, qum
 
+When explicitly listing members, you can include ``*`` to include all unmentioned members. This is useful to have control over ordering of some elements, without having to include an exhaustive list. ::
+
+    .. js:autoclass:: SomeEs6Class
+       :members: importMethod, *, uncommonlyUsedMethod
+
 Finally, if you want full control, pull your class members in one at a time by embedding ``js:autofunction`` or ``js:autoattribute``::
 
     .. js:autoclass:: SomeEs6Class
