@@ -266,6 +266,9 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 Version History
 ===============
 
+2.3
+  * Add the ability to say "*" within the ``autoclass :members:`` option, meaning "and all the members that I didn't explicitly list".
+
 2.2
   * Add ``autofunction`` support for ``@callback`` tags. (krassowski)
   * Add experimental ``autofunction`` support for ``@typedef`` tags. (krassowski)
