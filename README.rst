@@ -250,7 +250,7 @@ Example
 
 A good example using most of sphinx-js's functionality is the Fathom documentation. A particularly juicy page is https://mozilla.github.io/fathom/ruleset.html. Click the "View page source" link to see the raw directives.
 
-Fathom also carries a Travis CI configuration and a deployment script for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them. However, `ReadTheDocs <https://readthedocs.org/>`_, the canonical hosting platform for Sphinx docs, now supports sphinx-js, so that's likely your best bet.
+Fathom also carries a Travis CI configuration and a deployment script for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them. However, `ReadTheDocs <https://readthedocs.org/>`_, the canonical hosting platform for Sphinx docs, now supports sphinx-js as an informal opt-in beta. Get ahold of someone by commenting on `this ticket <https://github.com/rtfd/readthedocs.org/issues/3069>`_, and ask them to switch your project to the `latest` Docker image, then wipe your build environment and rebuild.
 
 Caveats
 =======
