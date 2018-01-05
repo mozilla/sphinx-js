@@ -1,6 +1,7 @@
 from codecs import getwriter
 from collections import defaultdict
 from json import load
+import os
 from os.path import abspath, relpath, splitext
 from subprocess import PIPE, Popen
 from tempfile import TemporaryFile
@@ -21,14 +22,15 @@ def run_jsdoc(app):
     root_for_relative_paths = root_or_fallback(app.config.root_for_relative_js_paths,
                                                abs_source_paths)
 
-    jsdoc_command = ['jsdoc'] + abs_source_paths + ['-X']
+    jsdoc_command_name = 'jsdoc.cmd' if os.name == 'nt' else 'jsdoc'
+    jsdoc_command = [jsdoc_command_name] + abs_source_paths + ['-X']
     if app.config.jsdoc_config_path:
         jsdoc_command.extend(['-c', app.config.jsdoc_config_path])
 
     # Use a temporary file to handle large output volume. JSDoc defaults to
     # utf8-encoded output.
     with getwriter('utf-8')(TemporaryFile(mode='w+')) as temp:
-        p = Popen(jsdoc_command, stdout=temp, stderr=PIPE)
+        p = Popen(jsdoc_command, stdout=temp)
         p.wait()
         # Once output is finished, move back to beginning of file and load it:
         temp.seek(0)

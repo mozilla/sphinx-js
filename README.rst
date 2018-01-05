@@ -266,6 +266,10 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 Version History
 ===============
 
+2.3.1
+  * Find the jsdoc command on Windows, where it has a different name. Then
+    patch up process communication so it doesn't hang.
+
 2.3
   * Add the ability to say "*" within the ``autoclass :members:`` option, meaning "and all the members that I didn't explicitly list".
 
