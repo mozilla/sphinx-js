@@ -2,3 +2,4 @@
 /.tox
 /dist
 /tests/source/docs/_build
+/build
