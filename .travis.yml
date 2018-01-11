@@ -6,7 +6,7 @@ addons:
       - npm
 python:
   - "2.7"
-  - "3.3"
+  - "3.6"
 install:
   - npm install jsdoc@3.5.5
   - pip install tox-travis
