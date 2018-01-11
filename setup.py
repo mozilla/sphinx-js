@@ -20,9 +20,9 @@ setup(
     packages=find_packages(exclude=['ez_setup']),
     tests_require=['nose',
                    # Sphinx's plain-text renderer changes behavior slightly
-                   # with regard to how it emits class names and em dashes in
-                   # 1.6, and we test against that renderer's results.
-                   'Sphinx>=1.6'],
+                   # with regard to how it emits class names and em dashes from
+                   # time to time:
+                   'Sphinx==1.6.5'],
     test_suite='nose.collector',
     url='https://github.com/erikrose/sphinx-js',
     include_package_data=True,
