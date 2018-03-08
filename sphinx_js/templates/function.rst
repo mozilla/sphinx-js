@@ -8,8 +8,6 @@
      :{{ heads|join(' ') }}: {{ tail }}
    {% endfor %}
 
-   {{ content|indent(3) }}
-
    {% if examples -%}
    :Examples:
    {% for example in examples -%}
@@ -18,3 +16,5 @@
      {{ example|indent(5) }}
    {% endfor %}
    {%- endif %}
+
+   {{ content|indent(3) }}
