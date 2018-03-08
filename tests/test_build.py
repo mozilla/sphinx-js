@@ -70,6 +70,16 @@ class Tests(TestCase):
             'autofunction_callback',
             u'requestCallback()\n\n   Some global callback\n\n   Arguments:\n      * **responseCode** (*number*) –\n')
 
+    def test_autofunction_example(self):
+        """Make sure @example tags can be documented with autofunction."""
+        self._file_contents_eq(
+            'autofunction_example',
+            u'exampleTag()\n\n'
+            '   JSDoc example tag\n\n'
+            '   Examples:\n'
+            '      // This is the example.\n'
+            '      exampleTag();\n')
+
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
         comment."""
@@ -124,11 +134,31 @@ class Tests(TestCase):
         assert_not_in('publical2', contents)
         assert_not_in('publical3', contents)
 
+    def test_autoclass_example(self):
+        """Make sure @example tags can be documented with autoclass."""
+        self._file_contents_eq(
+            'autoclass_example',
+            u'class ExampleClass()\n\n'
+            '   JSDoc example tag for class\n\n'
+            '   Examples:\n'
+            '      // This is the example.\n'
+            '      new ExampleClass();\n')
+
     def test_autoattribute(self):
         """Make sure ``autoattribute`` works."""
         self._file_contents_eq(
             'autoattribute',
             'ContainingClass.someVar\n\n   A var\n')
+
+    def test_autoattribute_example(self):
+        """Make sure @example tags can be documented with autoattribute."""
+        self._file_contents_eq(
+            'autoattribute_example',
+            u'ExampleAttribute\n\n'
+            '   JSDoc example tag for attribute\n\n'
+            '   Examples:\n'
+            '      // This is the example.\n'
+            '      console.log(ExampleAttribute);\n')
 
     def test_getter_setter(self):
         """Make sure ES6-style getters and setters can be documented."""

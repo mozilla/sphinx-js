@@ -114,3 +114,30 @@ function shadow() {}
  * @callback requestCallback
  * @param {number} responseCode
  */
+
+/**
+ * JSDoc example tag
+ *
+ * @example
+ * // This is the example.
+ * exampleTag();
+ */
+function exampleTag() {}
+
+/**
+ * JSDoc example tag for class
+ *
+ * @example
+ * // This is the example.
+ * new ExampleClass();
+ */
+class ExampleClass {}
+
+/**
+ * JSDoc example tag for attribute
+ *
+ * @example
+ * // This is the example.
+ * console.log(ExampleAttribute);
+ */
+const ExampleAttribute = null;
