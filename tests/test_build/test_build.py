@@ -98,6 +98,16 @@ class Tests(SphinxBuildTestCase):
             '      * **bool** --\n\n'
             '      * **nil** --\n')
 
+    def test_autofunction_example(self):
+        """Make sure @example tags can be documented with autofunction."""
+        self._file_contents_eq(
+            'autofunction_example',
+            u'exampleTag()\n\n'
+            '   JSDoc example tag\n\n'
+            '   Examples:\n'
+            '      // This is the example.\n'
+            '      exampleTag();\n')
+
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
         comment."""
