@@ -18,4 +18,11 @@
      {{ members|indent(3) }}
    {%- endif %}
 
+   {% if examples -%}
+   :Examples:
+   {% for example in examples -%}
+     .. code-block:: js
 
+     {{ example|indent(5) }}
+   {% endfor %}
+   {%- endif %}

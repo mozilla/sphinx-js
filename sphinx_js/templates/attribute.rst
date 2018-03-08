@@ -6,4 +6,11 @@
 
    {{ content|indent(3) }}
 
+   {% if examples -%}
+   :Examples:
+   {% for example in examples -%}
+     .. code-block:: js
 
+     {{ example|indent(5) }}
+   {% endfor %}
+   {%- endif %}
