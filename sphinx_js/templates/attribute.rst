@@ -8,14 +8,13 @@
      {{ description|indent(3) }}
    {%- endif %}
 
+   {{ content|indent(3) }}
+
    {% if examples -%}
-   **Examples:**
-
+   :Examples:
    {% for example in examples -%}
-   .. code-block:: js
+     .. code-block:: js
 
-      {{ example|indent(6) }}
+     {{ example|indent(5) }}
    {% endfor %}
    {%- endif %}
-
-   {{ content|indent(3) }}
