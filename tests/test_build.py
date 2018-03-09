@@ -76,7 +76,7 @@ class Tests(TestCase):
             'autofunction_example',
             u'exampleTag()\n\n'
             '   JSDoc example tag\n\n'
-            '   Examples:\n'
+            '   **Examples:**\n\n'
             '      // This is the example.\n'
             '      exampleTag();\n')
 
@@ -140,7 +140,7 @@ class Tests(TestCase):
             'autoclass_example',
             u'class ExampleClass()\n\n'
             '   JSDoc example tag for class\n\n'
-            '   Examples:\n'
+            '   **Examples:**\n\n'
             '      // This is the example.\n'
             '      new ExampleClass();\n')
 
@@ -156,7 +156,7 @@ class Tests(TestCase):
             'autoattribute_example',
             u'ExampleAttribute\n\n'
             '   JSDoc example tag for attribute\n\n'
-            '   Examples:\n'
+            '   **Examples:**\n\n'
             '      // This is the example.\n'
             '      console.log(ExampleAttribute);\n')
 

@@ -9,7 +9,7 @@
    {% endfor %}
 
    {% if examples -%}
-   :Examples:
+   **Examples:**
 
    {% for example in examples -%}
    .. code-block:: js
