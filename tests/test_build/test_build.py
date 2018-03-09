@@ -104,7 +104,7 @@ class Tests(SphinxBuildTestCase):
             'autofunction_example',
             u'exampleTag()\n\n'
             '   JSDoc example tag\n\n'
-            '   Examples:\n'
+            '   **Examples:**\n\n'
             '      // This is the example.\n'
             '      exampleTag();\n')
 
