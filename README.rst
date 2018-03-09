@@ -266,6 +266,9 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 Version History
 ===============
 
+2.4
+  * Support the ``@example`` tag. (lidavidm)
+
 2.3.1
   * Find the jsdoc command on Windows, where it has a different name. Then
     patch up process communication so it doesn't hang.
