@@ -10,10 +10,12 @@
 
    {% if examples -%}
    :Examples:
-   {% for example in examples -%}
-     .. code-block:: js
 
-     {{ example|indent(5) }}
+   {% for example in examples -%}
+   .. code-block:: js
+
+      {{ example|indent(6) }}
+
    {% endfor %}
    {%- endif %}
 
