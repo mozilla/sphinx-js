@@ -12,10 +12,18 @@
      :{{ heads|join(' ') }}: {{ tail }}
    {% endfor %}
 
+   {% if examples -%}
+   **Examples:**
+
+   {% for example in examples -%}
+   .. code-block:: js
+
+      {{ example|indent(6) }}
+   {% endfor %}
+   {%- endif %}
+
    {{ content|indent(3) }}
 
    {% if members -%}
      {{ members|indent(3) }}
    {%- endif %}
-
-
