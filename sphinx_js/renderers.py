@@ -23,6 +23,8 @@ class JsRenderer(object):
 
     """
     def __init__(self, directive, app, arguments=None, content=None, options=None):
+        if not hasattr(directive.state.document.settings, 'tab_width'):
+            directive.state.document.settings.tab_width = 4
         self._directive = directive
 
         # content, arguments, options, app: all need to be accessible to
