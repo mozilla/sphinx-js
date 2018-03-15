@@ -2,7 +2,8 @@
 /.tox
 /dist
 /tests/source/docs/_build
-/build
-*/__pycache__/*
-/.vscode
 sphinx_js.egg-info/
+# Python 3
+*/__pycache__/*
+# Python 2.7
+*.pyc
