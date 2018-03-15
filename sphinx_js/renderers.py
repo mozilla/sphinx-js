@@ -313,6 +313,7 @@ class AutoAttributeRenderer(JsRenderer):
             examples=doclet.get('examples', ''),
             type='|'.join(doclet.get('type',{}).get('names',[])),
             examples=doclet.get('examples', ''),
+            type='|'.join(doclet.get('type',{}).get('names',[])),
             content='\n'.join(self._content))
 
 
