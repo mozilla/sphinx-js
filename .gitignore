@@ -3,3 +3,6 @@
 /dist
 /tests/source/docs/_build
 /build
+*/__pycache__/*
+/.vscode
+sphinx_js.egg-info/
