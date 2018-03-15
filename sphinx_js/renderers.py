@@ -196,11 +196,13 @@ class JsRenderer(object):
         tail comes after.
 
         """
-        FIELD_TYPES = OrderedDict([('params', _params_formatter),
+        FIELD_TYPES = [('params', _params_formatter),
+                       ('params', _param_type_formatter),
                                    ('properties', _params_formatter),
+                       ('properties', _param_type_formatter),
                                    ('exceptions', _exceptions_formatter),
-                                   ('returns', _returns_formatter)])
-        for field_name, callback in iteritems(FIELD_TYPES):
+                       ('returns', _returns_formatter)]
+        for field_name, callback in FIELD_TYPES:
             for field in doclet.get(field_name, []):
                 description = field.get('description', '')
                 unwrapped = sub(r'[ \t]*[\r\n]+[ \t]*', ' ', description)
@@ -330,6 +332,11 @@ def _params_formatter(field, description):
     tail = description
     return heads, tail
 
+def _param_type_formatter(field, description):
+    """Derive heads and tail from ``@param`` blocks."""
+    heads = ['type', field['name']]
+    tail = _or_types(field)
+    return heads, tail
 
 def _exceptions_formatter(field, description):
     """Derive heads and tail from ``@throws`` blocks."""
