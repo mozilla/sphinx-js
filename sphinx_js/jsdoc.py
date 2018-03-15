@@ -4,14 +4,15 @@ from errno import ENOENT
 from json import load
 import os
 from os.path import abspath, relpath, splitext, sep
-from subprocess import Popen
-from tempfile import TemporaryFile
+from subprocess import PIPE, Popen, run
+from tempfile import TemporaryFile, NamedTemporaryFile
 
 from six import string_types
 from sphinx.errors import SphinxError
 
 from .parsers import path_and_formal_params, PathVisitor
 from .suffix_tree import PathTaken, SuffixTree
+from .typedoc import parse_typedoc
 
 
 def run_jsdoc(app):
@@ -23,14 +24,15 @@ def run_jsdoc(app):
     root_for_relative_paths = root_or_fallback(app.config.root_for_relative_js_paths,
                                                abs_source_paths)
 
-    jsdoc_command_name = 'jsdoc.cmd' if os.name == 'nt' else 'jsdoc'
-    jsdoc_command = [jsdoc_command_name] + abs_source_paths + ['-X']
-    if app.config.jsdoc_config_path:
-        jsdoc_command.extend(['-c', app.config.jsdoc_config_path])
+    if app.config.json_generator=='jsdoc':
+        jsdoc_command_name = 'jsdoc.cmd' if os.name == 'nt' else 'jsdoc'
+        jsdoc_command = [jsdoc_command_name] + abs_source_paths + ['-X']
+        if app.config.jsdoc_config_path:
+            jsdoc_command.extend(['-c', app.config.jsdoc_config_path])
 
-    # Use a temporary file to handle large output volume. JSDoc defaults to
-    # utf8-encoded output.
-    with getwriter('utf-8')(TemporaryFile(mode='w+')) as temp:
+        # Use a temporary file to handle large output volume. JSDoc defaults to
+        # utf8-encoded output.
+        with getwriter('utf-8')(TemporaryFile(mode='w+')) as temp:
         try:
             p = Popen(jsdoc_command, stdout=temp)
         except OSError as exc:
@@ -38,13 +40,27 @@ def run_jsdoc(app):
                 raise SphinxError('%s was not found. Install it using "npm install -g jsdoc".' % jsdoc_command_name)
             else:
                 raise
-        p.wait()
-        # Once output is finished, move back to beginning of file and load it:
-        temp.seek(0)
-        try:
-            doclets = load(temp)
-        except ValueError:
-            raise SphinxError('jsdoc found no JS files in the directories %s. Make sure js_source_path is set correctly in conf.py. It is also possible (though unlikely) that jsdoc emitted invalid JSON.' % abs_source_paths)
+            p.wait()
+            # Once output is finished, move back to beginning of file and load it:
+            temp.seek(0)
+            try:
+                doclets = load(temp)
+            except ValueError:
+                raise SphinxError('jsdoc found no JS files in the directories %s. Make sure js_source_path is set correctly in conf.py. It is also possible (though unlikely) that jsdoc emitted invalid JSON.' % abs_source_paths)
+
+    elif app.config.json_generator=='typedoc':
+        with getwriter('utf-8')(NamedTemporaryFile(mode='w+')) as temp:
+            jsdoc_command_name = 'typedoc.cmd' if os.name == 'nt' else 'typedoc'
+            jsdoc_command = [jsdoc_command_name] + ['--json'] + [temp.name] + abs_source_paths
+            run(jsdoc_command)
+
+            try:
+                doclets = parse_typedoc(temp)
+            except ValueError:
+                raise SphinxError('typedoc found no TS files in the directories %s. Make sure js_source_path is set correctly in conf.py. It is also possible (though unlikely) that typedoc emitted invalid JSON.' % abs_source_paths)
+
+    else:
+        raise SphinxError('unknown JSON generator: ' + app.config.json_generator)
 
     # 2 doclets are made for classes, and they are largely redundant: one for
     # the class itself and another for the constructor. However, the
