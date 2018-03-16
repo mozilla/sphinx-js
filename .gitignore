@@ -3,7 +3,5 @@
 /dist
 /tests/source/docs/_build
 sphinx_js.egg-info/
-# Python 3
-*/__pycache__/*
-# Python 2.7
+__pycache__/
 *.pyc
