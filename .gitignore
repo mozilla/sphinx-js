@@ -2,4 +2,6 @@
 /.tox
 /dist
 /tests/source/docs/_build
-/build
+sphinx_js.egg-info/
+__pycache__/
+*.pyc
