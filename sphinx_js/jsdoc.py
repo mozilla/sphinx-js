@@ -4,7 +4,7 @@ from errno import ENOENT
 from json import load
 import os
 from os.path import abspath, relpath, splitext, sep
-from subprocess import PIPE, Popen, run
+from subprocess import PIPE, Popen, call as SubCall
 from tempfile import TemporaryFile, NamedTemporaryFile
 
 from six import string_types
@@ -52,7 +52,7 @@ def run_jsdoc(app):
         with getwriter('utf-8')(NamedTemporaryFile(mode='w+')) as temp:
             jsdoc_command_name = 'typedoc.cmd' if os.name == 'nt' else 'typedoc'
             jsdoc_command = [jsdoc_command_name] + ['--json'] + [temp.name] + abs_source_paths
-            run(jsdoc_command)
+            SubCall(jsdoc_command)
 
             try:
                 doclets = parse_typedoc(temp)
