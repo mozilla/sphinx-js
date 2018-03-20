@@ -2,7 +2,7 @@ from codecs import getwriter
 from collections import defaultdict
 from json import load
 import os
-from os.path import abspath, relpath, splitext
+from os.path import abspath, relpath, splitext, sep
 from subprocess import PIPE, Popen
 from tempfile import TemporaryFile
 
@@ -111,6 +111,7 @@ def doclet_full_path(d, base_dir, longname_field='longname'):
     """
     meta = d['meta']
     rel = relpath(meta['path'], base_dir)
+    rel = "/".join(rel.split(sep))
     if not rel.startswith(('../', './')) and rel not in ('..', '.'):
         # It just starts right out with the name of a folder in the cwd.
         rooted_rel = './%s' % rel
