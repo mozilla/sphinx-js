@@ -1,9 +1,6 @@
 import os
 import sys
 import json
-from sphinx.util import logging
-
-logger = logging.getLogger(__name__)
 
 # JSDoc JSON schema: https://github.com/jsdoc3/jsdoc/blob/master/lib/jsdoc/schema.js
 # JSDoc entries used in sphinx-js:

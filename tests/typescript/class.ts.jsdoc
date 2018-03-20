@@ -1,0 +1,32 @@
+[
+  {
+    "comment": "<empty>", 
+    "kind": "external", 
+    "description": "", 
+    "meta": {
+      "path": "./", 
+      "code": {}, 
+      "lineno": 1, 
+      "filename": "class.ts"
+    }, 
+    "longname": "external:class", 
+    "name": "\"class\""
+  }, 
+  {
+    "comment": "<empty>", 
+    "kind": "class", 
+    "name": "ClassDefinition", 
+    "memberof": "external:class", 
+    "meta": {
+      "path": "./", 
+      "code": {}, 
+      "lineno": 4, 
+      "filename": "class.ts"
+    }, 
+    "params": [], 
+    "longname": "external:class~ClassDefinition", 
+    "extends": [], 
+    "classdesc": "", 
+    "description": "A definition of a class\n\n"
+  }
+]
