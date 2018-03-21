@@ -80,6 +80,17 @@ class Tests(TestCase):
             '      // This is the example.\n'
             '      exampleTag();\n')
 
+    def test_autofunction_destructured_params(self):
+        """Make shure that all documented params appears in the function definition"""
+        self._file_contents_eq(
+            'autofunction_destructured_params',
+            u'destructuredParams(p1, p2)\n\n'
+            u'   Arguments:\n'
+            u'      * **p1** (*Number*) –\n\n'
+            u'      * **p2** (*Object*) –\n\n'
+            u'      * **p2.foo** (*String*) –\n\n'
+            u'      * **p2.bar** (*String*) –\n')
+
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
         comment."""
