@@ -81,7 +81,8 @@ class Tests(TestCase):
             '      exampleTag();\n')
 
     def test_autofunction_destructured_params(self):
-        """Make shure that all documented params appears in the function definition"""
+        """Make shure that all documented params appears in the function
+        definition."""
         self._file_contents_eq(
             'autofunction_destructured_params',
             u'destructuredParams(p1, p2)\n\n'
