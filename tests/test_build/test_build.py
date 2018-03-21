@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-from io import open
-from os.path import join
-
-from nose.tools import eq_, assert_in, assert_not_in
+from nose.tools import assert_in, assert_not_in
 
 from tests.testing import SphinxBuildTestCase
 
@@ -13,14 +10,6 @@ class Tests(SphinxBuildTestCase):
     Yes, it's too coupled.
 
     """
-    def _file_contents(self, filename):
-        with open(join(self.docs_dir, '_build', '%s.txt' % filename),
-                  encoding='utf8') as file:
-            return file.read()
-
-    def _file_contents_eq(self, filename, contents):
-        eq_(self._file_contents(filename), contents)
-
     def test_autofunction_minimal(self):
         """Make sure we render correctly and pull the params out of the JS code
         when only the function name is provided."""

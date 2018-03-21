@@ -19,6 +19,7 @@ setup(
     license='MIT',
     packages=find_packages(exclude=['ez_setup']),
     tests_require=['nose',
+                   'recommonmark==0.4.0',
                    # Sphinx's plain-text renderer changes behavior slightly
                    # with regard to how it emits class names and em dashes from
                    # time to time:
