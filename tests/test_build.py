@@ -68,7 +68,7 @@ class Tests(TestCase):
         """Make sure @callback uses can be documented with autofunction."""
         self._file_contents_eq(
             'autofunction_callback',
-            u'requestCallback()\n\n   Some global callback\n\n   Arguments:\n      * **responseCode** (*number*) –\n')
+            u'requestCallback(responseCode)\n\n   Some global callback\n\n   Arguments:\n      * **responseCode** (*number*) –\n')
 
     def test_autofunction_example(self):
         """Make sure @example tags can be documented with autofunction."""
