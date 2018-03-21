@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from re import sub
+from functools import reduce
 
 from docutils.parsers.rst import Parser as RstParser
 from docutils.statemachine import StringList
