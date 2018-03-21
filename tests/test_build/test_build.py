@@ -1,35 +1,15 @@
 # -*- coding: utf-8 -*-
-from io import open
-from os.path import dirname, join
-from shutil import rmtree
-from unittest import TestCase
+from nose.tools import assert_in, assert_not_in
 
-from nose.tools import eq_, assert_in, assert_not_in
-from sphinx.cmdline import main as sphinx_main
-from sphinx.util.osutil import cd
+from tests.testing import SphinxBuildTestCase
 
 
-class Tests(TestCase):
+class Tests(SphinxBuildTestCase):
     """Tests which require our one big Sphinx tree to be built.
 
     Yes, it's too coupled.
 
     """
-    @classmethod
-    def setup_class(cls):
-        cls.docs_dir = join(dirname(__file__), 'source', 'docs')
-        with cd(cls.docs_dir):
-            if sphinx_main(['dummy', '-b', 'text', '-E', '.', '_build']):
-                raise RuntimeError('Sphinx build exploded.')
-
-    def _file_contents(self, filename):
-        with open(join(self.docs_dir, '_build', '%s.txt' % filename),
-                  encoding='utf8') as file:
-            return file.read()
-
-    def _file_contents_eq(self, filename, contents):
-        eq_(self._file_contents(filename), contents)
-
     def test_autofunction_minimal(self):
         """Make sure we render correctly and pull the params out of the JS code
         when only the function name is provided."""
@@ -62,13 +42,13 @@ class Tests(TestCase):
         """Make sure @typedef uses can be documented with autofunction."""
         self._file_contents_eq(
             'autofunction_typedef',
-            u'TypeDefinition()\n\n   Arguments:\n      * **width** (*Number*) – width in pixels\n')
+            u'TypeDefinition()\n\n   Arguments:\n      * **width** (*Number*) -- width in pixels\n')
 
     def test_autofunction_callback(self):
         """Make sure @callback uses can be documented with autofunction."""
         self._file_contents_eq(
             'autofunction_callback',
-            u'requestCallback()\n\n   Some global callback\n\n   Arguments:\n      * **responseCode** (*number*) –\n')
+            u'requestCallback()\n\n   Some global callback\n\n   Arguments:\n      * **responseCode** (*number*) --\n')
 
     def test_autofunction_example(self):
         """Make sure @example tags can be documented with autofunction."""
@@ -97,7 +77,7 @@ class Tests(TestCase):
         """
         self._file_contents_eq(
             'autoclass_members',
-            u'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** – A thing\n\n   ContainingClass.anotherMethod()\n\n      Another.\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n\n   ContainingClass.someVar\n\n      A var\n\n   ContainingClass.yetAnotherMethod()\n\n      More.\n')
+            u'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n\n   ContainingClass.anotherMethod()\n\n      Another.\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n\n   ContainingClass.someVar\n\n      A var\n\n   ContainingClass.yetAnotherMethod()\n\n      More.\n')
 
     def test_autoclass_members_list(self):
         """Make sure including a list of names after ``members`` limits it to
@@ -112,7 +92,7 @@ class Tests(TestCase):
         at that point."""
         self._file_contents_eq(
             'autoclass_members_list_star',
-            u'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** – A thing\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n\n   ContainingClass.anotherMethod()\n\n      Another.\n\n   ContainingClass.someVar\n\n      A var\n\n   ContainingClass.yetAnotherMethod()\n\n      More.\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n')
+            u'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n\n   ContainingClass.anotherMethod()\n\n      Another.\n\n   ContainingClass.someVar\n\n      A var\n\n   ContainingClass.yetAnotherMethod()\n\n      More.\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n')
 
     def test_autoclass_alphabetical(self):
         """Make sure members sort alphabetically when not otherwise specified."""
@@ -172,10 +152,6 @@ class Tests(TestCase):
             'avoid_shadowing',
             'more_code.shadow()\n\n   Another thing named shadow, to threaten to shadow the one in\n   code.js\n')
 
-    @classmethod
-    def teardown_class(cls):
-        rmtree(join(cls.docs_dir, '_build'))
-
 
 DESCRIPTION = """
 
@@ -185,14 +161,14 @@ DESCRIPTION = """
 FIELDS = u"""
 
    Arguments:
-      * **node** (*Node*) – Something of a single type
+      * **node** (*Node*) -- Something of a single type
 
    Throws:
-      **PartyError|FartyError** – Something with multiple types and a
+      **PartyError|FartyError** -- Something with multiple types and a
       line that wraps
 
    Returns:
-      **Number** – What a thing
+      **Number** -- What a thing
 """
 
 # Oddly enough, the text renderer renders these bullets with a blank line
