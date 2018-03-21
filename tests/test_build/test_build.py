@@ -1,27 +1,18 @@
 # -*- coding: utf-8 -*-
 from io import open
-from os.path import dirname, join
-from shutil import rmtree
-from unittest import TestCase
+from os.path import join
 
 from nose.tools import eq_, assert_in, assert_not_in
-from sphinx.cmdline import main as sphinx_main
-from sphinx.util.osutil import cd
+
+from tests.testing import SphinxBuildTestCase
 
 
-class Tests(TestCase):
+class Tests(SphinxBuildTestCase):
     """Tests which require our one big Sphinx tree to be built.
 
     Yes, it's too coupled.
 
     """
-    @classmethod
-    def setup_class(cls):
-        cls.docs_dir = join(dirname(__file__), 'source', 'docs')
-        with cd(cls.docs_dir):
-            if sphinx_main(['.', '-b', 'text', '-E', '_build']):
-                raise RuntimeError('Sphinx build exploded.')
-
     def _file_contents(self, filename):
         with open(join(self.docs_dir, '_build', '%s.txt' % filename),
                   encoding='utf8') as file:
@@ -171,10 +162,6 @@ class Tests(TestCase):
         self._file_contents_eq(
             'avoid_shadowing',
             'more_code.shadow()\n\n   Another thing named shadow, to threaten to shadow the one in\n   code.js\n')
-
-    @classmethod
-    def teardown_class(cls):
-        rmtree(join(cls.docs_dir, '_build'))
 
 
 DESCRIPTION = """
