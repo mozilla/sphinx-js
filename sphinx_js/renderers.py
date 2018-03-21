@@ -105,8 +105,20 @@ class JsRenderer(object):
         """Return the JS function or class params, looking first to any
         explicit params written into the directive and falling back to
         those in the JS code."""
-        return (self._explicit_formal_params or
-                ('(%s)' % ', '.join(doclet['meta']['code'].get('paramnames', []))))
+        if self._explicit_formal_params:
+            return self._explicit_formal_params
+
+        # Try to use documented params (@param) first
+        params = reduce(
+                lambda l, v: l + [v] if not v in l else l,
+                [param['name'].split(".")[0] for param in doclet.get('params', [])],
+                [])
+
+        # Use params from js code if there is no documented params
+        if not params:
+            params = doclet['meta']['code'].get('paramnames', [])
+
+        return '(%s)' % ', '.join(params)
 
     def _fields(self, doclet):
         """Return an iterable of "info fields" to be included in the directive,
