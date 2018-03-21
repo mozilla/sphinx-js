@@ -126,7 +126,7 @@ class JsRenderer(object):
         for field_name, callback in iteritems(FIELD_TYPES):
             for field in doclet.get(field_name, []):
                 description = field.get('description', '')
-                unwrapped = sub(r'[ \t]*\n[ \t]*', ' ', description)
+                unwrapped = sub(r'[ \t]*[\r\n]+[ \t]*', ' ', description)
                 yield callback(field, unwrapped)
 
 
