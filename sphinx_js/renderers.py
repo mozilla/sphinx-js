@@ -24,6 +24,10 @@ class JsRenderer(object):
 
     """
     def __init__(self, directive, app, arguments=None, content=None, options=None):
+        # Fix crash when calling eval_rst with CommonMarkParser:
+        if not hasattr(directive.state.document.settings, 'tab_width'):
+            directive.state.document.settings.tab_width = 8
+
         self._directive = directive
 
         # content, arguments, options, app: all need to be accessible to

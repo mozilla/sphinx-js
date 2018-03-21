@@ -3,7 +3,7 @@ from collections import defaultdict
 from json import load
 import os
 from os.path import abspath, relpath, splitext, sep
-from subprocess import PIPE, Popen
+from subprocess import Popen
 from tempfile import TemporaryFile
 
 from six import string_types
