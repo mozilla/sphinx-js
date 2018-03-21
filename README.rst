@@ -268,6 +268,10 @@ Version History
 
 2.4
   * Support the ``@example`` tag. (lidavidm)
+  * Work under Windows. Before, we could hardly find any documentation. (flozz)
+  * Properly unwrap multiple-line JSDoc tags, even if they have Windows line endings. (Wim Yedema)
+  * Drop support for Python 3.3, since Sphinx has also done so.
+  * Fix build-time crash when using recommonmark (for Markdown support) under Sphinx >=1.7.1. (jamrizzi)
 
 2.3.1
   * Find the jsdoc command on Windows, where it has a different name. Then
