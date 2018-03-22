@@ -98,6 +98,32 @@ optional parameters::
 
     .. js:autofunction:: someFunction(foo, bar[, baz])
 
+Parametter's properties and destructuring parameters can also be documented::
+
+    /**
+     * Export an image from the given canvas and save it to the disk.
+     *
+     * @param {string} filename The name of the output file.
+     * @param {Object} options Output options.
+     * @param {string} options.format The output format (``jpeg``, ``png`` or ``webp``).
+     * @param {number} options.quality The output quality when format is ``jpeg`` or ``webp`` (from ``0.00`` to ``1.00``).
+     */
+    function saveCanvas(filename, options) {
+        // ...
+    }
+
+    /**
+     * Export an image from the given canvas and save it to the disk.
+     *
+     * @param {string} filename The name of the output file.
+     * @param {Object} options Output options.
+     * @param {string} options.format The output format (``jpeg``, ``png`` or ``webp``).
+     * @param {number} options.quality The output quality when format is ``jpeg`` or ``webp`` (from ``0.00`` to ``1.00``).
+     */
+    function saveCanvas(filename, { format, quality }) {
+        // ...
+    }
+
 You can even add additional content. If you do, it will appear just below any extracted documentation::
 
     .. js:autofunction:: someFunction
