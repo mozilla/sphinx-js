@@ -48,7 +48,7 @@ class Tests(SphinxBuildTestCase):
         """Make sure @callback uses can be documented with autofunction."""
         self._file_contents_eq(
             'autofunction_callback',
-            u'requestCallback()\n\n   Some global callback\n\n   Arguments:\n      * **responseCode** (*number*) --\n')
+            u'requestCallback(responseCode)\n\n   Some global callback\n\n   Arguments:\n      * **responseCode** (*number*) --\n')
 
     def test_autofunction_example(self):
         """Make sure @example tags can be documented with autofunction."""
@@ -59,6 +59,18 @@ class Tests(SphinxBuildTestCase):
             '   **Examples:**\n\n'
             '      // This is the example.\n'
             '      exampleTag();\n')
+
+    def test_autofunction_destructured_params(self):
+        """Make shure that all documented params appears in the function
+        definition."""
+        self._file_contents_eq(
+            'autofunction_destructured_params',
+            u'destructuredParams(p1, p2)\n\n'
+            '   Arguments:\n'
+            '      * **p1** (*Number*) --\n\n'
+            '      * **p2** (*Object*) --\n\n'
+            '      * **p2.foo** (*String*) --\n\n'
+            '      * **p2.bar** (*String*) --\n')
 
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor

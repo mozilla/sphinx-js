@@ -141,3 +141,11 @@ class ExampleClass {}
  * console.log(ExampleAttribute);
  */
 const ExampleAttribute = null;
+
+/**
+ * @param {Number} p1
+ * @param {Object} p2
+ * @param {String} p2.foo
+ * @param {String} p2.bar
+ */
+function destructuredParams(p1, {foo, bar}) {}

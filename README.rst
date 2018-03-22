@@ -98,6 +98,19 @@ optional parameters::
 
     .. js:autofunction:: someFunction(foo, bar[, baz])
 
+Parameter properties and destructuring parameters also work fine, using `standard JSDoc syntax <http://usejsdoc.org/tags-param.html#parameters-with-properties>`_::
+
+    /**
+     * Export an image from the given canvas and save it to the disk.
+     *
+     * @param {Object} options Output options
+     * @param {string} options.format The output format (``jpeg``, ``png``, or ``webp``)
+     * @param {number} options.quality The output quality when format is ``jpeg`` or ``webp`` (from ``0.00`` to ``1.00``)
+     */
+    function saveCanvas({ format, quality }) {
+        // ...
+    }
+
 You can even add additional content. If you do, it will appear just below any extracted documentation::
 
     .. js:autofunction:: someFunction
@@ -265,6 +278,10 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 
 Version History
 ===============
+
+2.4.1
+  * Use documented ``@params`` to help fill out the formal param list for a
+    function. This keeps us from missing params that use destructuring. (flozz)
 
 2.4
   * Support the ``@example`` tag. (lidavidm)
