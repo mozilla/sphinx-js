@@ -66,11 +66,11 @@ class Tests(SphinxBuildTestCase):
         self._file_contents_eq(
             'autofunction_destructured_params',
             u'destructuredParams(p1, p2)\n\n'
-            u'   Arguments:\n'
-            u'      * **p1** (*Number*) --\n\n'
-            u'      * **p2** (*Object*) --\n\n'
-            u'      * **p2.foo** (*String*) --\n\n'
-            u'      * **p2.bar** (*String*) --\n')
+            '   Arguments:\n'
+            '      * **p1** (*Number*) --\n\n'
+            '      * **p2** (*Object*) --\n\n'
+            '      * **p2.foo** (*String*) --\n\n'
+            '      * **p2.bar** (*String*) --\n')
 
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
