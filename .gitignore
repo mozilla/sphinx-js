@@ -1,5 +1,6 @@
 /.eggs
 /.tox
+/build
 /dist
 /tests/source/docs/_build
 sphinx_js.egg-info/
