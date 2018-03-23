@@ -115,11 +115,12 @@ class JsRenderer(object):
 
         # Harvest params from the @param tag unless they collide with an
         # explicit formal param. Even look at params that are really
-        # documenting subproperties of formal params.
-        params = reduce(
-            lambda l, v: l + [v] if not v in l else l,
-            [param['name'].split('.')[0] for param in doclet.get('params', [])],
-            [])
+        # documenting subproperties of formal params. Also handles params
+        # default values.
+        params = ["%s=%s" % (param, value) if value else param for param, value in reduce(
+            lambda params, param: params + [param] if not param[0] in [i[0] for i in params] else params,
+            [(param['name'].split(".")[0], param.get('defaultvalue')) for param in doclet.get('params', [])],
+            [])]
 
         # Use params from JS code if there are no documented params:
         if not params:

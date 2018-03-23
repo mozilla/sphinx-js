@@ -72,6 +72,15 @@ class Tests(SphinxBuildTestCase):
             '      * **p2.foo** (*String*) --\n\n'
             '      * **p2.bar** (*String*) --\n')
 
+    def test_autofunction_defaut_values(self):
+        "Make shure params default values appear in the function definition."""
+        self._file_contents_eq(
+            'autofunction_default_values',
+            u'defaultValues(p1=42, p2="foobar")\n\n'
+            '   Arguments:\n'
+            '      * **p1** (*number*) --\n\n'
+            '      * **p2** (*string*) --\n')
+
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
         comment."""

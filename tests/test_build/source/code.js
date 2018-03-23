@@ -149,3 +149,9 @@ const ExampleAttribute = null;
  * @param {String} p2.bar
  */
 function destructuredParams(p1, {foo, bar}) {}
+
+/**
+ * @param {number} [p1=42]
+ * @param {string} [p2="foobar"]
+ */
+function defaultValues(p1=42, p2="foobar") {}
