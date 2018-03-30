@@ -1,5 +1,6 @@
 from codecs import getwriter
 from collections import defaultdict
+from errno import ENOENT
 from json import load
 import os
 from os.path import abspath, relpath, splitext, sep
@@ -30,7 +31,13 @@ def run_jsdoc(app):
     # Use a temporary file to handle large output volume. JSDoc defaults to
     # utf8-encoded output.
     with getwriter('utf-8')(TemporaryFile(mode='w+')) as temp:
-        p = Popen(jsdoc_command, stdout=temp)
+        try:
+            p = Popen(jsdoc_command, stdout=temp)
+        except OSError as exc:
+            if exc.errno == ENOENT:
+                raise SphinxError('%s was not found. Install it using "npm install -g jsdoc".' % jsdoc_command_name)
+            else:
+                raise
         p.wait()
         # Once output is finished, move back to beginning of file and load it:
         temp.seek(0)

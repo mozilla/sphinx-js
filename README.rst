@@ -282,6 +282,7 @@ Version History
 2.4.1
   * Use documented ``@params`` to help fill out the formal param list for a
     function. This keeps us from missing params that use destructuring. (flozz)
+  * Improve error reporting when jsdoc is missing.
 
 2.4
   * Support the ``@example`` tag. (lidavidm)
