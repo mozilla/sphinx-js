@@ -61,7 +61,7 @@ class Tests(SphinxBuildTestCase):
             '      exampleTag();\n')
 
     def test_autofunction_destructured_params(self):
-        """Make shure that all documented params appears in the function
+        """Make sure that all documented params appears in the function
         definition."""
         self._file_contents_eq(
             'autofunction_destructured_params',
@@ -73,7 +73,7 @@ class Tests(SphinxBuildTestCase):
             '      * **p2.bar** (*String*) --\n')
 
     def test_autofunction_defaut_values(self):
-        "Make shure params default values appear in the function definition."""
+        "Make sure params default values appear in the function definition."""
         self._file_contents_eq(
             'autofunction_default_values',
             u'defaultValues(p1=42, p2="foobar")\n\n'
