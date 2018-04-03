@@ -155,3 +155,15 @@ function destructuredParams(p1, {foo, bar}) {}
  * @param {string} [p2="foobar"]
  */
 function defaultValues(p1=42, p2="foobar") {}
+
+/**
+ * @param {number} [p1=42]
+ * @param {string} [p2="foobar"]
+ */
+function defaultValuesOnlyInDoc(p1, p2) {}
+
+/**
+ * @param {number} p1
+ * @param {string} p2
+ */
+function defaultValuesOnlyInJs(p1=42, p2="foobar") {}

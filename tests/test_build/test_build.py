@@ -73,10 +73,30 @@ class Tests(SphinxBuildTestCase):
             '      * **p2.bar** (*String*) --\n')
 
     def test_autofunction_defaut_values(self):
-        "Make sure params default values appear in the function definition."""
+        """Make sure params default values appear in the function definition."""
         self._file_contents_eq(
             'autofunction_default_values',
             u'defaultValues(p1=42, p2="foobar")\n\n'
+            '   Arguments:\n'
+            '      * **p1** (*number*) --\n\n'
+            '      * **p2** (*string*) --\n')
+
+    def test_autofunction_defaut_values_only_in_doc(self):
+        """Make sure params default values appear in the function definition when
+        the default values only appears in JSdoc comment."""
+        self._file_contents_eq(
+            'autofunction_default_values_only_in_doc',
+            u'defaultValuesOnlyInDoc(p1=42, p2="foobar")\n\n'
+            '   Arguments:\n'
+            '      * **p1** (*number*) --\n\n'
+            '      * **p2** (*string*) --\n')
+
+    def test_autofunction_defaut_values_only_in_js(self):
+        """Make sure params default values appear in the function definition when
+        the default values only appears in Javascript Code (ES2015)."""
+        self._file_contents_eq(
+            'autofunction_default_values_only_in_js',
+            u'defaultValuesOnlyInJs(p1=42, p2=foobar)\n\n'
             '   Arguments:\n'
             '      * **p1** (*number*) --\n\n'
             '      * **p2** (*string*) --\n')
