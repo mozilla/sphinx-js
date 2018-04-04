@@ -206,8 +206,9 @@ class AutoClassRenderer(JsRenderer):
             access specifiers are taken into account).
 
             This will either be the doclets explicitly listed after the
-            ``:members:`` option, in that order, or all doclets that are
-            members of the class.
+            ``:members:`` option, in that order; all doclets that are
+            members of the class; or listed members with remaining ones
+            inserted at the placeholder "*".
 
             """
             doclets = self._app._sphinxjs_doclets_by_class[tuple(full_path)]
