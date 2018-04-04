@@ -1,6 +1,5 @@
 from collections import OrderedDict
 from re import sub
-from functools import reduce
 
 from docutils.parsers.rst import Parser as RstParser
 from docutils.statemachine import StringList
@@ -115,11 +114,16 @@ class JsRenderer(object):
 
         # Harvest params from the @param tag unless they collide with an
         # explicit formal param. Even look at params that are really
-        # documenting subproperties of formal params.
-        params = reduce(
-            lambda l, v: l + [v] if not v in l else l,
-            [param['name'].split('.')[0] for param in doclet.get('params', [])],
-            [])
+        # documenting subproperties of formal params. Also handles params
+        # default values.
+        params = []
+        used_names = []
+
+        for name, default in [(param['name'].split('.')[0], param.get('defaultvalue'))
+                              for param in doclet.get('params', [])]:
+            if name not in used_names:
+                params.append('%s=%s' % (name, default) if default is not None else name)
+                used_names.append(name)
 
         # Use params from JS code if there are no documented params:
         if not params:
