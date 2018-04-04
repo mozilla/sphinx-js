@@ -279,9 +279,10 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 Version History
 ===============
 
-2.4.1
+2.5
   * Use documented ``@params`` to help fill out the formal param list for a
     function. This keeps us from missing params that use destructuring. (flozz)
+  * Add extracted default values to generated formal param lists. (flozz)
 
 2.4
   * Support the ``@example`` tag. (lidavidm)

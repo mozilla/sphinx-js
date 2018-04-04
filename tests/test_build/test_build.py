@@ -72,34 +72,26 @@ class Tests(SphinxBuildTestCase):
             '      * **p2.foo** (*String*) --\n\n'
             '      * **p2.bar** (*String*) --\n')
 
-    def test_autofunction_defaut_values(self):
-        """Make sure params default values appear in the function definition."""
+    def test_autofunction_default_values(self):
+        """Make sure params default values appear in the function definition,
+        whether the defaults are defined in JSDoc or JS.
+
+        Unfortunately, there is no way to disambiguate strings from symbolic
+        values used as default args in JS code: for instance, ``true`` vs.
+        ``"true"``. JSDoc's doclets render them both without quotes. However,
+        you can work around this by specifying your defaults in the JSDoc
+        comment rather than the JS code, as we do with p3. It would be lovely
+        if JSDoc changed its behavior someday so we could know to put quotes
+        around "foobar" as well.
+
+        """
         self._file_contents_eq(
             'autofunction_default_values',
-            u'defaultValues(p1=42, p2="foobar")\n\n'
+            u'defaultValues(p1=42, p2=foobar, p3="true")\n\n'
             '   Arguments:\n'
             '      * **p1** (*number*) --\n\n'
-            '      * **p2** (*string*) --\n')
-
-    def test_autofunction_defaut_values_only_in_doc(self):
-        """Make sure params default values appear in the function definition when
-        the default values only appears in JSdoc comment."""
-        self._file_contents_eq(
-            'autofunction_default_values_only_in_doc',
-            u'defaultValuesOnlyInDoc(p1=42, p2="foobar")\n\n'
-            '   Arguments:\n'
-            '      * **p1** (*number*) --\n\n'
-            '      * **p2** (*string*) --\n')
-
-    def test_autofunction_defaut_values_only_in_js(self):
-        """Make sure params default values appear in the function definition when
-        the default values only appears in Javascript Code (ES2015)."""
-        self._file_contents_eq(
-            'autofunction_default_values_only_in_js',
-            u'defaultValuesOnlyInJs(p1=42, p2=foobar)\n\n'
-            '   Arguments:\n'
-            '      * **p1** (*number*) --\n\n'
-            '      * **p2** (*string*) --\n')
+            '      * **p2** (*string*) --\n\n'
+            '      * **p3** (*string*) --\n')
 
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor

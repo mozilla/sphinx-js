@@ -119,9 +119,10 @@ class JsRenderer(object):
         params = []
         used_names = []
 
-        for name, default in [(param['name'].split(".")[0], param.get('defaultvalue')) for param in doclet.get('params', [])]:
+        for name, default in [(param['name'].split('.')[0], param.get('defaultvalue'))
+                              for param in doclet.get('params', [])]:
             if name not in used_names:
-                params.append("%s=%s" % (name, default) if default is not None else name)
+                params.append('%s=%s' % (name, default) if default is not None else name)
                 used_names.append(name)
 
         # Use params from JS code if there are no documented params:
