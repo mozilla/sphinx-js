@@ -74,24 +74,16 @@ class Tests(SphinxBuildTestCase):
 
     def test_autofunction_default_values(self):
         """Make sure params default values appear in the function definition,
-        whether the defaults are defined in JSDoc or JS.
-
-        Unfortunately, there is no way to disambiguate strings from symbolic
-        values used as default args in JS code: for instance, ``true`` vs.
-        ``"true"``. JSDoc's doclets render them both without quotes. However,
-        you can work around this by specifying your defaults in the JSDoc
-        comment rather than the JS code, as we do with p3. It would be lovely
-        if JSDoc changed its behavior someday so we could know to put quotes
-        around "foobar" as well.
-
-        """
+        whether the defaults are defined in JSDoc or JS."""
         self._file_contents_eq(
             'autofunction_default_values',
-            u'defaultValues(p1=42, p2=foobar, p3="true")\n\n'
+            'defaultValues(a=42, b="a string", c="true", d=true, e=null)\n\n'
             '   Arguments:\n'
-            '      * **p1** (*number*) --\n\n'
-            '      * **p2** (*string*) --\n\n'
-            '      * **p3** (*string*) --\n')
+            '      * **a** --\n\n'
+            '      * **b** --\n\n'
+            '      * **c** --\n\n'
+            '      * **d** --\n\n'
+            '      * **e** --\n')
 
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor

@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from json import dumps
 from re import sub
 
 from docutils.parsers.rst import Parser as RstParser
@@ -118,11 +119,12 @@ class JsRenderer(object):
         # default values.
         params = []
         used_names = []
+        MARKER = object()
 
-        for name, default in [(param['name'].split('.')[0], param.get('defaultvalue'))
+        for name, default in [(param['name'].split('.')[0], param.get('defaultvalue', MARKER))
                               for param in doclet.get('params', [])]:
             if name not in used_names:
-                params.append('%s=%s' % (name, default) if default is not None else name)
+                params.append('%s=%s' % (name, dumps(default)) if default is not MARKER else name)
                 used_names.append(name)
 
         # Use params from JS code if there are no documented params:
