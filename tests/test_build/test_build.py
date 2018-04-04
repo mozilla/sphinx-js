@@ -67,10 +67,10 @@ class Tests(SphinxBuildTestCase):
             'autofunction_destructured_params',
             u'destructuredParams(p1, p2)\n\n'
             '   Arguments:\n'
-            '      * **p1** (*Number*) --\n\n'
+            '      * **p1** (*number*) --\n\n'
             '      * **p2** (*Object*) --\n\n'
-            '      * **p2.foo** (*String*) --\n\n'
-            '      * **p2.bar** (*String*) --\n')
+            '      * **p2.foo** (*string*) --\n\n'
+            '      * **p2.bar** (*string*) --\n')
 
     def test_autofunction_default_values(self):
         """Make sure params default values appear in the function definition,
