@@ -156,3 +156,10 @@ function destructuredParams(p1, {foo, bar}) {}
  * @param {string} [p3="true"]
  */
 function defaultValues(p1, p2="foobar", p3="true") {}
+
+/**
+ * @param a_
+ * @param {type_} b
+ * @returns {rtype_}
+ */
+function injection() {}

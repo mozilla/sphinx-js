@@ -185,6 +185,18 @@ class Tests(SphinxBuildTestCase):
             'avoid_shadowing',
             'more_code.shadow()\n\n   Another thing named shadow, to threaten to shadow the one in\n   code.js\n')
 
+    def test_restructuredtext_injection(self):
+        """Make sure param names and types are escaped and cannot be
+        interpreted as RestructuredText."""
+        self._file_contents_eq(
+            'injection',
+            u'injection(a_, b)\n\n'
+            '   Arguments:\n'
+            '      * **a_** --\n\n'
+            '      * **b** (*type_*) --\n\n'
+            '   Returns:\n'
+            '      **rtype_** --\n')
+
 
 DESCRIPTION = """
 
