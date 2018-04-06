@@ -187,8 +187,7 @@ class Tests(SphinxBuildTestCase):
 
     def test_restructuredtext_injection(self):
         """Make sure param names and types are escaped and cannot be
-        interpreted as RestructuredText.
-        """
+        interpreted as RestructuredText."""
         self._file_contents_eq(
             'injection',
             u'injection(a_, b)\n\n'

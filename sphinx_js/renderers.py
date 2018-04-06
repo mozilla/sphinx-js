@@ -289,7 +289,11 @@ def _exceptions_formatter(field, description):
 
 def _or_types(field):
     """Return all the types in a doclet subfield like "params" or "returns"
-    with vertical bars between them, like "number|string"."""
+    with vertical bars between them, like "number|string".
+
+    ReST-escape the types.
+
+    """
     return rst.escape('|'.join(field.get('type', {}).get('names', [])))
 
 
