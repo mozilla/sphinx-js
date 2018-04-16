@@ -151,17 +151,26 @@ const ExampleAttribute = null;
 function destructuredParams(p1, {foo, bar}) {}
 
 /**
- * @param [a=42]
- * @param [b=a string]
- * @param [c]
- * @param [d]
- * @param [e]
- */
-function defaultValues(a, b, c="true", d=true, e=null) {}
-
-/**
  * @param a_
  * @param {type_} b
  * @returns {rtype_}
  */
 function injection() {}
+
+/**
+ * @param {function} [func=() => 5]
+ * @param [str=a string with " quote]
+ * @param {string} [strNum=42]
+ * @param {string} [strBool=true]
+ * @param [num=5]
+ * @param [nil=null]
+ */
+function defaultsDocumentedInDoclet(func, strNum, strBool, num, nil) {}
+
+/**
+ * @param [num]
+ * @param [str]
+ * @param [bool]
+ * @param [nil]
+ */
+function defaultsDocumentedInCode(num=5, str="true", bool=true, nil=null) {}

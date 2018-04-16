@@ -72,18 +72,31 @@ class Tests(SphinxBuildTestCase):
             '      * **p2.foo** (*string*) --\n\n'
             '      * **p2.bar** (*string*) --\n')
 
-    def test_autofunction_default_values(self):
-        """Make sure params default values appear in the function definition,
-        whether the defaults are defined in JSDoc or JS."""
+    def test_autofunction_defaults_in_doclet(self):
+        """Make sure param default values appear in the function definition,
+        when defined in JSDoc."""
         self._file_contents_eq(
-            'autofunction_default_values',
-            'defaultValues(a=42, b="a string", c="true", d=true, e=null)\n\n'
+            'autofunction_defaults_doclet',
+            'defaultsDocumentedInDoclet(func=() => 5, str="a string with \\" quote", strNum="42", strBool="true", num=5, nil=null)\n\n'
             '   Arguments:\n'
-            '      * **a** --\n\n'
-            '      * **b** --\n\n'
-            '      * **c** --\n\n'
-            '      * **d** --\n\n'
-            '      * **e** --\n')
+            '      * **func** (*function*) --\n\n'
+            '      * **str** --\n\n'
+            '      * **strNum** (*string*) --\n\n'
+            '      * **strBool** (*string*) --\n\n'
+            '      * **num** --\n\n'
+            '      * **nil** --\n')
+
+    def test_autofunction_defaults_in_code(self):
+        """Make sure param default values appear in the function definition,
+        when defined in code."""
+        self._file_contents_eq(
+            'autofunction_defaults_code',
+            'defaultsDocumentedInCode(num=5, str="true", bool=true, nil=null)\n\n'
+            '   Arguments:\n'
+            '      * **num** --\n\n'
+            '      * **str** --\n\n'
+            '      * **bool** --\n\n'
+            '      * **nil** --\n')
 
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor

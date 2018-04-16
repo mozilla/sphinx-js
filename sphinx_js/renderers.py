@@ -6,7 +6,7 @@ from docutils.parsers.rst import Parser as RstParser
 from docutils.statemachine import StringList
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
-from six import iteritems
+from six import iteritems, string_types
 from sphinx.errors import SphinxError
 from sphinx.util import rst
 
@@ -109,28 +109,81 @@ class JsRenderer(object):
 
     def _formal_params(self, doclet):
         """Return the JS function or class params, looking first to any
-        explicit params written into the directive and falling back to
-        those in the JS code."""
+        explicit params written into the directive and falling back to those in
+        the JS code.
+
+        Return a ReST-escaped string ready for substitution into the template.
+
+        """
+        def format_default_according_to_type_hints(value, declared_types):
+            """Return the default value for a param, formatted as a string
+            ready to be used in a formal parameter list.
+
+            JSDoc is a mess at extracting default values. It can unambiguously
+            extract only a few simple types from the function signature, and
+            ambiguity is even more rife when extracting from doclets. So we use
+            any declared types to resolve the ambiguity.
+
+            :arg value: The extracted value, which may be of the right or wrong type
+            :arg declared_types: A list of types declared in the doclet for
+                this param. For example ``{string|number}`` would yield ['string',
+                'number'].
+
+            """
+            def first(list, default):
+                try:
+                    return list[0]
+                except IndexError:
+                    return default
+
+            declared_type_implies_string = first(declared_types, '') == 'string'
+
+            # If the first item of the type disjunction is "string", we treat
+            # the default value as a string. Otherwise, we don't. So, if you
+            # want your ambiguously documented default like ``@param
+            # {string|Array} [foo=[]]`` to be treated as a string, make sure
+            # "string" comes first.
+            if isinstance(value, string_types):  # JSDoc threw it to us as a string in the JSON.
+                if declared_types and not declared_type_implies_string:
+                    # It's a spurious string, like ``() => 5`` or a variable name.
+                    # Let it through verbatim.
+                    return value
+                else:
+                    # It's a real string.
+                    return dumps(value)  # Escape any contained quotes.
+            else:  # It came in as a non-string.
+                if declared_type_implies_string:
+                    # It came in as an int, null, or bool, and we have to
+                    # convert it back to a string.
+                    return '"%s"' % (dumps(value),)
+                else:
+                    # It's fine as the type it is.
+                    return dumps(value)
+
         if self._explicit_formal_params:
             return self._explicit_formal_params
 
         # Harvest params from the @param tag unless they collide with an
         # explicit formal param. Even look at params that are really
-        # documenting subproperties of formal params. Also handles params
-        # default values.
+        # documenting subproperties of formal params. Also handle param default
+        # values.
         params = []
         used_names = []
         MARKER = object()
 
-        for name, default in [(param['name'].split('.')[0], param.get('defaultvalue', MARKER))
-                              for param in doclet.get('params', [])]:
+        for name, default, type in [(param['name'].split('.')[0],
+                                     param.get('defaultvalue', MARKER),
+                                     param.get('type', {'names': []}))
+                                    for param in doclet.get('params', [])]:
             if name not in used_names:
-                params.append('%s=%s' % (name, dumps(default)) if default is not MARKER else name)
+                params.append(rst.escape(name) if default is MARKER else
+                              '%s=%s' % (rst.escape(name),
+                                         rst.escape(format_default_according_to_type_hints(default, type['names']))))
                 used_names.append(name)
 
         # Use params from JS code if there are no documented params:
         if not params:
-            params = doclet['meta']['code'].get('paramnames', [])
+            params = [rst.escape(p) for p in doclet['meta']['code'].get('paramnames', [])]
 
         return '(%s)' % ', '.join(params)
 
