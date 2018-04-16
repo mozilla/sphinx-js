@@ -8,6 +8,7 @@ from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
 from six import iteritems
 from sphinx.errors import SphinxError
+from sphinx.util import rst
 
 from .parsers import PathVisitor
 from .suffix_tree import SuffixAmbiguous, SuffixNotFound
@@ -273,7 +274,7 @@ def _params_formatter(field, description):
     types = _or_types(field)
     if types:
         heads.append(types)
-    heads.append(field['name'])
+    heads.append(rst.escape(field['name']))
     tail = description
     return heads, tail
 
@@ -290,8 +291,12 @@ def _exceptions_formatter(field, description):
 
 def _or_types(field):
     """Return all the types in a doclet subfield like "params" or "returns"
-    with vertical bars between them, like "number|string"."""
-    return '|'.join(field.get('type', {}).get('names', []))
+    with vertical bars between them, like "number|string".
+
+    ReST-escape the types.
+
+    """
+    return rst.escape('|'.join(field.get('type', {}).get('names', [])))
 
 
 def _dotted_path(segments):
