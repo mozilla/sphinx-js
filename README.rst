@@ -104,12 +104,45 @@ Parameter properties and destructuring parameters also work fine, using `standar
      * Export an image from the given canvas and save it to the disk.
      *
      * @param {Object} options Output options
-     * @param {string} options.format The output format (``jpeg``, ``png``, or ``webp``)
-     * @param {number} options.quality The output quality when format is ``jpeg`` or ``webp`` (from ``0.00`` to ``1.00``)
+     * @param {string} options.format The output format (``jpeg``,  ``png``, or
+     *     ``webp``)
+     * @param {number} options.quality The output quality when format is
+     *     ``jpeg`` or ``webp`` (from ``0.00`` to ``1.00``)
      */
     function saveCanvas({ format, quality }) {
         // ...
     }
+
+Extraction of default parameter values works as well. These act as expected, with a few caveats::
+
+    /**
+     * You must declare the params, even if you have nothing else to say, so
+     * JSDoc will extract the default values.
+     *
+     * @param [num]
+     * @param [str]
+     * @param [bool]
+     * @param [nil]
+     */
+    function defaultsDocumentedInCode(num=5, str="true", bool=true, nil=null) {}
+
+    /**
+     * JSDoc guesses types for things like "42". If you have a string-typed
+     * default value that looks like a number or boolean, you'll need to
+     * specify its type explicitly. Conversely, if you have a more complex
+     * value like an arrow function, specify a non-string type on it so it
+     * isn't interpreted as a string. Finally, if you have a disjoint type like
+     * {string|Array} specify string first if you want your default to be
+     * interpreted as a string.
+     *
+     * @param {function} [func=() => 5]
+     * @param [str=some string]
+     * @param {string} [strNum=42]
+     * @param {string|Array} [strBool=true]
+     * @param [num=5]
+     * @param [nil=null]
+     */
+    function defaultsDocumentedInDoclet(func, strNum, strBool, num, nil) {}
 
 You can even add additional content. If you do, it will appear just below any extracted documentation::
 
@@ -283,7 +316,7 @@ Version History
   * Use documented ``@params`` to help fill out the formal param list for a
     function. This keeps us from missing params that use destructuring. (flozz)
   * Improve error reporting when jsdoc is missing.
-  * Add extracted default values to generated formal param lists. (flozz)
+  * Add extracted default values to generated formal param lists. (flozz and erikrose)
 
 2.4
   * Support the ``@example`` tag. (lidavidm)
