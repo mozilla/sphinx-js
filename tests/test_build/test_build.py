@@ -72,26 +72,31 @@ class Tests(SphinxBuildTestCase):
             '      * **p2.foo** (*string*) --\n\n'
             '      * **p2.bar** (*string*) --\n')
 
-    def test_autofunction_default_values(self):
-        """Make sure params default values appear in the function definition,
-        whether the defaults are defined in JSDoc or JS.
-
-        Unfortunately, there is no way to disambiguate strings from symbolic
-        values used as default args in JS code: for instance, ``true`` vs.
-        ``"true"``. JSDoc's doclets render them both without quotes. However,
-        you can work around this by specifying your defaults in the JSDoc
-        comment rather than the JS code, as we do with p3. It would be lovely
-        if JSDoc changed its behavior someday so we could know to put quotes
-        around "foobar" as well.
-
-        """
+    def test_autofunction_defaults_in_doclet(self):
+        """Make sure param default values appear in the function definition,
+        when defined in JSDoc."""
         self._file_contents_eq(
-            'autofunction_default_values',
-            u'defaultValues(p1=42, p2=foobar, p3="true")\n\n'
+            'autofunction_defaults_doclet',
+            'defaultsDocumentedInDoclet(func=() => 5, str="a string with \\" quote", strNum="42", strBool="true", num=5, nil=null)\n\n'
             '   Arguments:\n'
-            '      * **p1** (*number*) --\n\n'
-            '      * **p2** (*string*) --\n\n'
-            '      * **p3** (*string*) --\n')
+            '      * **func** (*function*) --\n\n'
+            '      * **str** --\n\n'
+            '      * **strNum** (*string*) --\n\n'
+            '      * **strBool** (*string*) --\n\n'
+            '      * **num** --\n\n'
+            '      * **nil** --\n')
+
+    def test_autofunction_defaults_in_code(self):
+        """Make sure param default values appear in the function definition,
+        when defined in code."""
+        self._file_contents_eq(
+            'autofunction_defaults_code',
+            'defaultsDocumentedInCode(num=5, str="true", bool=true, nil=null)\n\n'
+            '   Arguments:\n'
+            '      * **num** --\n\n'
+            '      * **str** --\n\n'
+            '      * **bool** --\n\n'
+            '      * **nil** --\n')
 
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
