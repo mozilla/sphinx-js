@@ -97,7 +97,10 @@ class Typedoc:
         elif type.get('type')=='typeOperator':
             names = [type.get('operator'), self.make_type_name(type.get('target'))]
         elif type.get('type')=='typeParameter':
-            names = [type.get('name'), "extends", self.make_type_name(type.get('constraint'))]
+            names = [type.get('name')]
+            constraint = type.get('constraint')
+            if constraint!=None:
+                names.extend(["extends", self.make_type_name(constraint)])
         elif type.get('type')=='reflection':
             names = ['<TODO>']
         return ' '.join(names)
@@ -114,11 +117,18 @@ class Typedoc:
             return '\n\n'.join([comment.get('shortText',''),comment.get('text','')])
 
     def make_param(self, param):
-        return self.make_doclet(
-            name = param.get('name'),
-            type = self.make_type(param.get('type')),
-            description = self.make_description(param.get('comment'))
-        )
+        typeEntry = param.get('type')
+        if typeEntry==None:
+            return self.make_doclet(
+                name = param.get('name'),
+                description = self.make_description(param.get('comment'))
+            )
+        else:
+            return self.make_doclet(
+                name = param.get('name'),
+                type = self.make_type(typeEntry),
+                description = self.make_description(param.get('comment'))
+            )
 
     def make_result(self, param):
         type = param.get('type')
