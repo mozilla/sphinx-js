@@ -1,0 +1,72 @@
+[
+    {
+        "comment": "<empty>",
+        "description": "",
+        "kind": "external",
+        "longname": "external:generic-method",
+        "meta": {
+            "code": {},
+            "filename": "generic-method.ts",
+            "lineno": 1,
+            "path": "./"
+        },
+        "name": "\"generic-method\""
+    },
+    {
+        "classdesc": "",
+        "comment": "<empty>",
+        "description": "A definition of a class\n\n",
+        "extends": [],
+        "kind": "class",
+        "longname": "external:generic-method~ClassWithGenericMethod",
+        "memberof": "external:generic-method",
+        "meta": {
+            "code": {},
+            "filename": "generic-method.ts",
+            "lineno": 4,
+            "path": "./"
+        },
+        "name": "ClassWithGenericMethod",
+        "params": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "A generic method\n\n",
+        "kind": "function",
+        "longname": "external:generic-method~ClassWithGenericMethod.method",
+        "memberof": "external:generic-method~ClassWithGenericMethod",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "arg"
+                ]
+            },
+            "filename": "generic-method.ts",
+            "lineno": 10,
+            "path": "./"
+        },
+        "name": "method",
+        "params": [
+            {
+                "description": "\n\na generic argument",
+                "name": "arg",
+                "type": {
+                    "names": [
+                        "T"
+                    ]
+                }
+            }
+        ],
+        "returns": [
+            {
+                "description": "a value of the generic type\n",
+                "name": "method",
+                "type": {
+                    "names": [
+                        "T"
+                    ]
+                }
+            }
+        ]
+    }
+]

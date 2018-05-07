@@ -21,17 +21,16 @@ class Tests(TestCase):
         
     def typedoc(self,source):
         outfile = os.path.join(self.tmpdir,source+'.json')
+        typedoc_command_name = 'typedoc.cmd' if os.name == 'nt' else 'typedoc'
+
         sub.call([
-            'typedoc.cmd', 
+            typedoc_command_name, 
             '--out', self.tmpdir, 
             '--ignoreCompilerErrors', 
             '--json', outfile, 
             os.path.join(self.source_dir,source)
         ])
         return outfile
-
-    # Running typedoc:
-    #  typedoc --out TYPEDOC --json foo.json --ignoreCompilerErrors typescript/class.ts
 
     def test_empty(self):
         json={}
@@ -44,6 +43,14 @@ class Tests(TestCase):
                 with open(self.typedoc(source),"r") as typedocfile:
                     jsdoc = parse_typedoc(typedocfile)
                 jsdoc_ref_file = os.path.join(self.source_dir,source+'.jsdoc')
-                with open(jsdoc_ref_file,"r") as jsdocfile:
-                    jsdoc_ref = json.load(jsdocfile)
-                eq_(jsdoc,jsdoc_ref)
+                if not os.path.exists(jsdoc_ref_file):
+                    with open(jsdoc_ref_file+".ref","w") as jsdocfile:
+                        json.dump(jsdoc,jsdocfile,
+                            sort_keys=True,
+                            indent=4, 
+                            separators=(',', ': '))
+                    print("wrote %s"%jsdoc_ref_file)
+                else:
+                    with open(jsdoc_ref_file,"r") as jsdocfile:
+                        jsdoc_ref = json.load(jsdocfile)
+                    eq_(jsdoc,jsdoc_ref)
