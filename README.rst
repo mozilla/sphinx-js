@@ -283,7 +283,7 @@ To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and th
 Typescript support
 ------------------
 
-There is experimental typescript support in sphinx-js.  You can enable this by setting the sphinx variable ``json_generator = 'typedoc'``.
+There is experimental typescript support in sphinx-js.  You can enable this by setting the sphinx variable ``js_language = 'typescript'``.
 You will not need to install jsdoc, but you do need to install typedoc::
 
   npm install -g typedoc
@@ -293,8 +293,8 @@ Version 0.11.1 is known to work.
 Configuration Reference
 -----------------------
 
-``json_generator``
-  Use 'jsdoc' or 'typedoc' depending on whether you use javascript or typescript.
+``js_language``
+  Use 'javascript' or 'typescript' depending on the language you use. The default is 'javascript'.
 
 ``js_source_path``
   A list of directories to scan (non-recursively) for JS files, relative to Sphinx's conf.py file. Can be a string instead if there is only one. If there is more than one, ``root_for_relative_js_paths`` must be specified as well.

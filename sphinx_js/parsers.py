@@ -7,11 +7,13 @@ path_and_formal_params = Grammar(r"""
     path_and_formal_params = path formal_params
 
     # Invalid JS symbol names and wild-and-crazy placement of slashes later in
-    # the path (after the FS path is over) will be caught at name-resolution time.
+    # the path (after the FS path is over) will be caught at name-resolution
+    # time.
     # Note that "." is a non-separator char only when used at the very front.
     path = maybe_cur_dir middle_segments name
 
-    # A name is a series of non-separator (not ~#/.), non-(, and backslashed chars.
+    # A name is a series of non-separator (not ~#/.), non-(, and backslashed
+    # characters.
     name = ~r"(?:[^(/#~.\\]|\\.)+"
 
     sep = ~r"[#~/.]"

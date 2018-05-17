@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from json import dumps
 from re import sub
 
@@ -6,7 +5,8 @@ from docutils.parsers.rst import Parser as RstParser
 from docutils.statemachine import StringList
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
-from six import iteritems, string_types
+from six import string_types
+
 from sphinx.errors import SphinxError
 from sphinx.util import rst
 
@@ -198,9 +198,9 @@ class JsRenderer(object):
         """
         FIELD_TYPES = [('params', _params_formatter),
                        ('params', _param_type_formatter),
-                                   ('properties', _params_formatter),
+                       ('properties', _params_formatter),
                        ('properties', _param_type_formatter),
-                                   ('exceptions', _exceptions_formatter),
+                       ('exceptions', _exceptions_formatter),
                        ('returns', _returns_formatter)]
         for field_name, callback in FIELD_TYPES:
             for field in doclet.get(field_name, []):
@@ -311,7 +311,7 @@ class AutoAttributeRenderer(JsRenderer):
             name=name,
             description=doclet.get('description', ''),
             examples=doclet.get('examples', ''),
-            type='|'.join(doclet.get('type',{}).get('names',[])),
+            type='|'.join(doclet.get('type', {}).get('names', [])),
             content='\n'.join(self._content))
 
 
@@ -334,7 +334,7 @@ def _params_formatter(field, description):
     return heads, tail
 
 def _param_type_formatter(field, description):
-    """Derive heads and tail from ``@param`` blocks."""
+    """Generate types for function parameters specified in field."""
     heads = ['type', field['name']]
     tail = _or_types(field)
     return heads, tail

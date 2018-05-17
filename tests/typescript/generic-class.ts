@@ -20,5 +20,6 @@ class GenericClass<T> {
      * @returns 42
      */
     method2() : T {
+        return null
     }
 }

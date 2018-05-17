@@ -23,7 +23,7 @@ def setup(app):
                                 auto_attribute_directive_bound_to_app(app))
     # TODO: We could add a js:module with app.add_directive_to_domain().
 
-    app.add_config_value('json_generator', 'jsdoc', 'env')
+    app.add_config_value('js_language', 'javascript', 'env')
     app.add_config_value('js_source_path', '../', 'env')
     app.add_config_value('jsdoc_config_path', None, 'env')
 

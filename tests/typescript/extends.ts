@@ -6,7 +6,7 @@ interface ISuper {
      * A method
      * @param arg A value
      */
-    method1(arg:number) { }
+    method1(arg:number);
 }
 
 /**
