@@ -1,5 +1,12 @@
 .. js:attribute:: {{ name }}
 
+   {% if deprecated -%}
+   .. note::
+
+      This attribute is deprecated.
+      {% if deprecated is string -%}{{ deprecated }}{% endif -%}
+   {%- endif %}
+
    {% if description -%}
      {{ description|indent(3) }}
    {%- endif %}

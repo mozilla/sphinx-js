@@ -1,5 +1,12 @@
 .. js:function:: {{ name }}{{ params }}
 
+   {% if deprecated -%}
+   .. note::
+
+      This function is deprecated.
+      {% if deprecated is string -%}{{ deprecated }}{% endif -%}
+   {%- endif %}
+
    {% if description -%}
      {{ description|indent(3) }}
    {%- endif %}

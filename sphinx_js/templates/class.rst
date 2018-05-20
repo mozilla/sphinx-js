@@ -1,5 +1,12 @@
 .. js:class:: {{ name }}{{ params }}
 
+   {% if deprecated -%}
+   .. note::
+
+      This class is deprecated.
+      {% if deprecated is string -%}{{ deprecated }}{% endif -%}
+   {%- endif %}
+
    {% if class_comment -%}
      {{ class_comment|indent(3) }}
    {%- endif %}
