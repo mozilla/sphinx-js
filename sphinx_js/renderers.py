@@ -171,10 +171,15 @@ class JsRenderer(object):
         used_names = []
         MARKER = object()
 
-        for name, default, type in [(param['name'].split('.')[0],
-                                     param.get('defaultvalue', MARKER),
-                                     param.get('type', {'names': []}))
-                                    for param in doclet.get('params', [])]:
+        for param in doclet.get('params', []):
+            name = param['name'].split('.')[0]
+            default = param.get('defaultvalue', MARKER)
+            type = param.get('type', {'names': []})
+
+            # Add '*' to the parameter name if it's a variadic argument
+            if param.get('variable'):
+                name = '*' + name
+
             if name not in used_names:
                 params.append(rst.escape(name) if default is MARKER else
                               '%s=%s' % (rst.escape(name),
