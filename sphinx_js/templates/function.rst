@@ -27,3 +27,11 @@
    {%- endif %}
 
    {{ content|indent(3) }}
+
+   {% if seealso -%}
+   .. seealso::
+
+      {% for reference in seealso -%}
+      - :any:`{{ reference }}`
+      {% endfor %}
+   {%- endif %}

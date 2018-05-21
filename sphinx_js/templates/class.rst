@@ -34,3 +34,11 @@
    {% if members -%}
      {{ members|indent(3) }}
    {%- endif %}
+
+   {% if seealso -%}
+   .. seealso::
+
+      {% for reference in seealso -%}
+      - :any:`{{ reference }}`
+      {% endfor %}
+   {%- endif %}
