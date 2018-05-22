@@ -118,7 +118,7 @@ def doclet_full_path(d, base_dir, longname_field='longname'):
     """
     meta = d['meta']
     rel = relpath(meta['path'], base_dir)
-    rel = "/".join(rel.split(sep))
+    rel = '/'.join(rel.split(sep))
     if not rel.startswith(('../', './')) and rel not in ('..', '.'):
         # It just starts right out with the name of a folder in the cwd.
         rooted_rel = './%s' % rel
