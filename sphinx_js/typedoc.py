@@ -171,6 +171,12 @@ class Typedoc(object):
     def convert_node(self, node):
         if node.get('inheritedFrom'):
             return
+        if node.get('sources'):
+            # Ignore nodes with a reference to absolute paths (like /usr/lib)
+            source = node.get('sources')[0]
+            if source.get('fileName','.')[0]=="/":
+                return
+            
         kindString = node.get('kindString')
         if kindString == 'External module':
             doclet = self.simple_doclet('external', node)

@@ -69,6 +69,8 @@ class TypedocGenerator(Generator):
             jsdoc_command = Command('typedoc')
             jsdoc_command.add('--json', temp.name)
             jsdoc_command.add(*self.abs_source_paths)
+            if self.app.config.jsdoc_config_path:
+                jsdoc_command.add('--tsconfig', self.app.config.jsdoc_config_path)
             subprocess.call(jsdoc_command.make())
 
             try:
