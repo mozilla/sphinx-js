@@ -232,12 +232,11 @@ class AutoClassRenderer(JsRenderer):
             class_comment=doclet.get('classdesc', ''),
             constructor_comment=doclet.get('description', ''),
             content='\n'.join(self._content),
-            members=self._members_of(
-                full_path,
-                include=self._options['members'],
-                exclude=self._options.get('exclude-members', set()),
-                should_include_private='private-members' in self._options)
-                if 'members' in self._options else '')
+            members=self._members_of(full_path,
+                                     include=self._options['members'],
+                                     exclude=self._options.get('exclude-members', set()),
+                                     should_include_private='private-members' in self._options)
+                    if 'members' in self._options else '')
 
     def _members_of(self, full_path, include, exclude, should_include_private):
         """Return RST describing the members of the named class.
