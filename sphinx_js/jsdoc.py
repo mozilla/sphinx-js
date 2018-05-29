@@ -145,8 +145,8 @@ class PathsTaken(Exception):
         self.conflicts = conflicts
 
     def __str__(self):
-        return ("Your JS code contains multiple documented objects at each of "
+        return ('Your JS code contains multiple documented objects at each of '
                 "these paths:\n\n  %s\n\nWe won't know which one you're "
-                "talking about. Using JSDoc tags like @class might help you "
-                "differentiate them." %
+                'talking about. Using JSDoc tags like @class might help you '
+                'differentiate them.' %
                 '\n  '.join(''.join(c) for c in self.conflicts))
