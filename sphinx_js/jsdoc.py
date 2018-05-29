@@ -46,7 +46,6 @@ def run_jsdoc(app):
         except ValueError:
             raise SphinxError('jsdoc found no JS files in the directories %s. Make sure js_source_path is set correctly in conf.py. It is also possible (though unlikely) that jsdoc emitted invalid JSON.' % abs_source_paths)
 
-
     # 2 doclets are made for classes, and they are largely redundant: one for
     # the class itself and another for the constructor. However, the
     # constructor one gets merged into the class one and is intentionally
