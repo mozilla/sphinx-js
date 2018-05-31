@@ -81,15 +81,15 @@ class Typedoc(object):
             # Should be: names = [ self.make_longname(node)]
             parent = self.nodelist[node.get('__parentId')]
             if parent.get('kindString') == 'External module':
-                names = [parent['name'][1:-1]+"."+node['name']]
+                names = [parent['name'][1:-1] + "." + node['name']]
             else:
                 names = [node['name']]
         elif type.get('type') in ['intrinsic', 'reference']:
             names = [type.get('name')]
         elif type.get('type') == 'stringLiteral':
-            names = ['"'+type.get('value')+'"']
+            names = ['"' + type.get('value') + '"']
         elif type.get('type') == 'array':
-            names = [self.make_type_name(type.get('elementType'))+'[]']
+            names = [self.make_type_name(type.get('elementType')) + '[]']
         elif type.get('type') == 'tuple':
             types = [self.make_type_name(t) for t in type.get('elements')]
             names = ['[' + ','.join(types) + ']']
@@ -118,9 +118,9 @@ class Typedoc(object):
             return ""
         else:
             return '\n\n'.join([
-                    comment.get('shortText', ''),
-                    comment.get('text', '')
-                ])
+                comment.get('shortText', ''),
+                comment.get('text', '')
+            ])
 
     def make_param(self, param):
         typeEntry = param.get('type')
@@ -174,9 +174,9 @@ class Typedoc(object):
         if node.get('sources'):
             # Ignore nodes with a reference to absolute paths (like /usr/lib)
             source = node.get('sources')[0]
-            if source.get('fileName','.')[0]=="/":
+            if source.get('fileName', '.')[0] == "/":
                 return
-            
+
         kindString = node.get('kindString')
         if kindString == 'External module':
             doclet = self.simple_doclet('external', node)
@@ -196,7 +196,7 @@ class Typedoc(object):
                 specifiers.append('*abstract*')
             if node.get('flags', {}).get('isExported'):
                 module_name = self.get_parent(node).get('name')[1:-1]
-                specifiers.append('*exported from* :js:mod:`'+module_name+'`')
+                specifiers.append('*exported from* :js:mod:`' + module_name + '`')
             doclet['classdesc'] += ', '.join(specifiers)
             if node.get('extendedTypes'):
                 doclet['classdesc'] += '\n\n**Extends:**\n'

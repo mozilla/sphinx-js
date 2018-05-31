@@ -333,11 +333,13 @@ def _params_formatter(field, description):
     tail = description
     return heads, tail
 
+
 def _param_type_formatter(field, description):
     """Generate types for function parameters specified in field."""
     heads = ['type', field['name']]
     tail = _or_types(field)
     return heads, tail
+
 
 def _exceptions_formatter(field, description):
     """Derive heads and tail from ``@throws`` blocks."""

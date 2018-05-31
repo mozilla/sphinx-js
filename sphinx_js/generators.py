@@ -15,7 +15,7 @@ logger = getLogger(__name__)
 
 class Command(object):
     def __init__(self, program):
-        self.program = program+".cmd" if os.name == 'nt' else program
+        self.program = program + ".cmd" if os.name == 'nt' else program
         self.args = []
 
     def add(self, *args):
@@ -51,7 +51,7 @@ class JSDocGenerator(Generator):
                 p = subprocess.Popen(jsdoc_command.make(), stdout=temp)
             except OSError as exc:
                 if exc.errno == ENOENT:
-                    raise SphinxError('%s was not found. Install it using "npm install -g jsdoc".' % jsdoc_command_name)
+                    raise SphinxError('%s was not found. Install it using "npm install -g jsdoc".' % jsdoc_command.program)
                 else:
                     raise
             p.wait()
