@@ -181,3 +181,18 @@ function defaultsDocumentedInCode(num=5, str="true", bool=true, nil=null) {}
  * @param args
  */
 function variadicParameter(a, ...args) {}
+
+/** @deprecated */
+function deprecatedFunction() {}
+/** @deprecated don't use anymore */
+function deprecatedExplanatoryFunction() {}
+
+/** @deprecated */
+const DeprecatedAttribute = null;
+/** @deprecated don't use anymore */
+const DeprecatedExplanatoryAttribute = null;
+
+/** @deprecated */
+class DeprecatedClass {}
+/** @deprecated don't use anymore */
+class DeprecatedExplanatoryClass {}

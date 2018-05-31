@@ -108,6 +108,15 @@ class Tests(SphinxBuildTestCase):
             '      * **a** --\n\n'
             '      * **args** --\n')
 
+    def test_autofunction_deprecated(self):
+        """Make sure @deprecated tags can be documented with autofunction."""
+        self._file_contents_eq(
+            'autofunction_deprecated',
+            u'deprecatedFunction()\n\n'
+            '   Note: Deprecated.\n\n'
+            'deprecatedExplanatoryFunction()\n\n'
+            '   Note: Deprecated: don\'t use anymore\n')
+
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
         comment."""
@@ -172,6 +181,15 @@ class Tests(SphinxBuildTestCase):
             '      // This is the example.\n'
             '      new ExampleClass();\n')
 
+    def test_autoclass_deprecated(self):
+        """Make sure @deprecated tags can be documented with autoclass."""
+        self._file_contents_eq(
+            'autoclass_deprecated',
+            u'class DeprecatedClass()\n\n'
+            '   Note: Deprecated.\n\n'
+            'class DeprecatedExplanatoryClass()\n\n'
+            '   Note: Deprecated: don\'t use anymore\n')
+
     def test_autoattribute(self):
         """Make sure ``autoattribute`` works."""
         self._file_contents_eq(
@@ -187,6 +205,15 @@ class Tests(SphinxBuildTestCase):
             '   **Examples:**\n\n'
             '      // This is the example.\n'
             '      console.log(ExampleAttribute);\n')
+
+    def test_autoattribute_deprecated(self):
+        """Make sure @deprecated tags can be documented with autoattribute."""
+        self._file_contents_eq(
+            'autoattribute_deprecated',
+            u'DeprecatedAttribute\n\n'
+            '   Note: Deprecated.\n\n'
+            'DeprecatedExplanatoryAttribute\n\n'
+            '   Note: Deprecated: don\'t use anymore\n')
 
     def test_getter_setter(self):
         """Make sure ES6-style getters and setters can be documented."""
