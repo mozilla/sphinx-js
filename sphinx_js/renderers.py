@@ -176,9 +176,9 @@ class JsRenderer(object):
             default = param.get('defaultvalue', MARKER)
             type = param.get('type', {'names': []})
 
-            # Add '*' to the parameter name if it's a variadic argument
+            # Add '...' to the parameter name if it's a variadic argument
             if param.get('variable'):
-                name = '*' + name
+                name = '...' + name
 
             if name not in used_names:
                 params.append(rst.escape(name) if default is MARKER else
