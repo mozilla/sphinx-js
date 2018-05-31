@@ -1,11 +1,8 @@
+{% import 'common.rst' as common %}
+
 .. js:class:: {{ name }}{{ params }}
 
-   {% if deprecated -%}
-   .. note::
-
-      This class is deprecated.
-      {% if deprecated is string -%}{{ deprecated }}{% endif -%}
-   {%- endif %}
+   {{ common.deprecated(deprecated)|indent(3) }}
 
    {% if class_comment -%}
      {{ class_comment|indent(3) }}
@@ -19,15 +16,7 @@
      :{{ heads|join(' ') }}: {{ tail }}
    {% endfor %}
 
-   {% if examples -%}
-   **Examples:**
-
-   {% for example in examples -%}
-   .. code-block:: js
-
-      {{ example|indent(6) }}
-   {% endfor %}
-   {%- endif %}
+   {{ common.examples(examples)|indent(3) }}
 
    {{ content|indent(3) }}
 
@@ -35,10 +24,4 @@
      {{ members|indent(3) }}
    {%- endif %}
 
-   {% if see_also -%}
-   .. seealso::
-
-      {% for reference in see_also -%}
-      - :any:`{{ reference }}`
-      {% endfor %}
-   {%- endif %}
+   {{ common.see_also(see_also)|indent(3) }}
