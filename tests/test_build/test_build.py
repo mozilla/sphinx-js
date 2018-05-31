@@ -98,6 +98,16 @@ class Tests(SphinxBuildTestCase):
             '      * **bool** --\n\n'
             '      * **nil** --\n')
 
+    def test_autofunction_variadic(self):
+        """Make sure variadic parameters are rendered as ellipses."""
+        self._file_contents_eq(
+            'autofunction_variadic',
+            'variadicParameter(a, ...args)\n\n'
+            '   Variadic parameter\n\n'
+            '   Arguments:\n'
+            '      * **a** --\n\n'
+            '      * **args** --\n')
+
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
         comment."""

@@ -174,3 +174,10 @@ function defaultsDocumentedInDoclet(func, strNum, strBool, num, nil) {}
  * @param [nil]
  */
 function defaultsDocumentedInCode(num=5, str="true", bool=true, nil=null) {}
+
+/**
+ * Variadic parameter
+ * @param a
+ * @param args
+ */
+function variadicParameter(a, ...args) {}
