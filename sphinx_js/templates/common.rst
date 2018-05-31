@@ -11,11 +11,11 @@
 {% if items -%}
 **Examples:**
 
-{% for example in items -%}
-.. code-block:: js
+   {% for example in items -%}
+   .. code-block:: js
 
-   {{ example|indent(6) }}
-{% endfor %}
+      {{ example|indent(6) }}
+   {% endfor %}
 {%- endif %}
 {% endmacro %}
 
