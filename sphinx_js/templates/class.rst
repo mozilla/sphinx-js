@@ -35,10 +35,10 @@
      {{ members|indent(3) }}
    {%- endif %}
 
-   {% if seealso -%}
+   {% if see_also -%}
    .. seealso::
 
-      {% for reference in seealso -%}
+      {% for reference in see_also -%}
       - :any:`{{ reference }}`
       {% endfor %}
    {%- endif %}
