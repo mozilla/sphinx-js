@@ -222,7 +222,7 @@ class AutoFunctionRenderer(JsRenderer):
             fields=self._fields(doclet),
             description=doclet.get('description', ''),
             examples=doclet.get('examples', ''),
-            deprecated=doclet.get('deprecated', ''),
+            deprecated=doclet.get('deprecated', False),
             see_also=doclet.get('see', []),
             content='\n'.join(self._content))
 
@@ -236,7 +236,7 @@ class AutoClassRenderer(JsRenderer):
             params=self._formal_params(doclet),
             fields=self._fields(doclet),
             examples=doclet.get('examples', ''),
-            deprecated=doclet.get('deprecated', ''),
+            deprecated=doclet.get('deprecated', False),
             see_also=doclet.get('see', []),
             class_comment=doclet.get('classdesc', ''),
             constructor_comment=doclet.get('description', ''),
@@ -318,7 +318,7 @@ class AutoAttributeRenderer(JsRenderer):
         return dict(
             name=name,
             description=doclet.get('description', ''),
-            deprecated=doclet.get('deprecated', ''),
+            deprecated=doclet.get('deprecated', False),
             see_also=doclet.get('see', []),
             examples=doclet.get('examples', ''),
             content='\n'.join(self._content))
