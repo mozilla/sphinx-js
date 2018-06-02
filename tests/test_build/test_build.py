@@ -54,7 +54,7 @@ class Tests(SphinxBuildTestCase):
         """Make sure @example tags can be documented with autofunction."""
         self._file_contents_eq(
             'autofunction_example',
-            u'exampleTag()\n\n'
+            'exampleTag()\n\n'
             '   JSDoc example tag\n\n'
             '   **Examples:**\n\n'
             '      // This is the example.\n'
@@ -112,10 +112,10 @@ class Tests(SphinxBuildTestCase):
         """Make sure @deprecated tags can be documented with autofunction."""
         self._file_contents_eq(
             'autofunction_deprecated',
-            u'deprecatedFunction()\n\n'
+            'deprecatedFunction()\n\n'
             '   Note: Deprecated.\n\n'
             'deprecatedExplanatoryFunction()\n\n'
-            '   Note: Deprecated: don\'t use anymore\n')
+            "   Note: Deprecated: don't use anymore\n")
 
     def test_autofunction_see(self):
         """Make sure @see tags work with autofunction."""
@@ -185,7 +185,7 @@ class Tests(SphinxBuildTestCase):
         """Make sure @example tags can be documented with autoclass."""
         self._file_contents_eq(
             'autoclass_example',
-            u'class ExampleClass()\n\n'
+            'class ExampleClass()\n\n'
             '   JSDoc example tag for class\n\n'
             '   **Examples:**\n\n'
             '      // This is the example.\n'
@@ -195,10 +195,10 @@ class Tests(SphinxBuildTestCase):
         """Make sure @deprecated tags can be documented with autoclass."""
         self._file_contents_eq(
             'autoclass_deprecated',
-            u'class DeprecatedClass()\n\n'
+            'class DeprecatedClass()\n\n'
             '   Note: Deprecated.\n\n'
             'class DeprecatedExplanatoryClass()\n\n'
-            '   Note: Deprecated: don\'t use anymore\n')
+            "   Note: Deprecated: don't use anymore\n")
 
     def test_autoclass_see(self):
         """Make sure @see tags work with autoclass."""
@@ -220,7 +220,7 @@ class Tests(SphinxBuildTestCase):
         """Make sure @example tags can be documented with autoattribute."""
         self._file_contents_eq(
             'autoattribute_example',
-            u'ExampleAttribute\n\n'
+            'ExampleAttribute\n\n'
             '   JSDoc example tag for attribute\n\n'
             '   **Examples:**\n\n'
             '      // This is the example.\n'
@@ -230,10 +230,10 @@ class Tests(SphinxBuildTestCase):
         """Make sure @deprecated tags can be documented with autoattribute."""
         self._file_contents_eq(
             'autoattribute_deprecated',
-            u'DeprecatedAttribute\n\n'
+            'DeprecatedAttribute\n\n'
             '   Note: Deprecated.\n\n'
             'DeprecatedExplanatoryAttribute\n\n'
-            '   Note: Deprecated: don\'t use anymore\n')
+            "   Note: Deprecated: don't use anymore\n")
 
     def test_autoattribute_see(self):
         """Make sure @see tags work with autoattribute."""
