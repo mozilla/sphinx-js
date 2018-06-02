@@ -196,3 +196,22 @@ const DeprecatedExplanatoryAttribute = null;
 class DeprecatedClass {}
 /** @deprecated don't use anymore */
 class DeprecatedExplanatoryClass {}
+
+/**
+ * @see DeprecatedClass
+ * @see deprecatedFunction
+ * @see DeprecatedAttribute
+ */
+function seeFunction() {}
+/**
+ * @see DeprecatedClass
+ * @see deprecatedFunction
+ * @see DeprecatedAttribute
+ */
+const SeeAttribute = null;
+/**
+ * @see DeprecatedClass
+ * @see deprecatedFunction
+ * @see DeprecatedAttribute
+ */
+class SeeClass {}
