@@ -34,12 +34,12 @@ class Typedoc(object):
 
     def make_longname(self, node):
         parent = self.get_parent(node)
-        longname = self.make_longname(parent) if parent is not None else ""
+        longname = self.make_longname(parent) if parent is not None else ''
 
         kindString = node.get('kindString')
         if kindString in [None, 'Function', 'Constructor', 'Method']:
             return longname
-        if longname != "":
+        if longname != '':
             flags = node.get('flags')
             if (parent.get('kindString') in ['Class', 'Interface'] and
                     flags.get('isStatic') is not True):
@@ -49,11 +49,11 @@ class Typedoc(object):
             else:
                 longname += '~'
         if kindString == 'Module':
-            return longname + "module:" + node.get("name")[1:-1]
+            return longname + 'module:' + node.get('name')[1:-1]
         elif kindString == 'External module':
-            return longname + "external:" + node.get("name")[1:-1]
+            return longname + 'external:' + node.get('name')[1:-1]
         else:
-            return longname + node.get("name")
+            return longname + node.get('name')
 
     def make_meta(self, node):
         source = node.get('sources')[0]
@@ -81,7 +81,7 @@ class Typedoc(object):
             # Should be: names = [ self.make_longname(node)]
             parent = self.nodelist[node.get('__parentId')]
             if parent.get('kindString') == 'External module':
-                names = [parent['name'][1:-1] + "." + node['name']]
+                names = [parent['name'][1:-1] + '.' + node['name']]
             else:
                 names = [node['name']]
         elif type.get('type') in ['intrinsic', 'reference']:
@@ -103,7 +103,7 @@ class Typedoc(object):
             names = [type.get('name')]
             constraint = type.get('constraint')
             if constraint is not None:
-                names.extend(["extends", self.make_type_name(constraint)])
+                names.extend(['extends', self.make_type_name(constraint)])
         elif type.get('type') == 'reflection':
             names = ['<TODO>']
         return ' '.join(names)
@@ -115,7 +115,7 @@ class Typedoc(object):
 
     def make_description(self, comment):
         if not comment:
-            return ""
+            return ''
         else:
             return '\n\n'.join([
                 comment.get('shortText', ''),
@@ -148,7 +148,7 @@ class Typedoc(object):
 
     def simple_doclet(self, kind, node):
         memberof = self.make_longname(self.get_parent(node))
-        if memberof == "":
+        if memberof == '':
             memberof = None
         if node.get('flags').get('isPrivate'):
             access = 'private'
@@ -174,7 +174,7 @@ class Typedoc(object):
         if node.get('sources'):
             # Ignore nodes with a reference to absolute paths (like /usr/lib)
             source = node.get('sources')[0]
-            if source.get('fileName', '.')[0] == "/":
+            if source.get('fileName', '.')[0] == '/':
                 return
 
         kindString = node.get('kindString')
@@ -291,9 +291,9 @@ def parse_typedoc(inputfile):
 
 
 def typedoc(inputname):
-    with open(inputname, "r") as inputfile:
+    with open(inputname, 'r') as inputfile:
         json.dump(parse_typedoc(inputfile), sys.stdout, indent=2)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     typedoc(sys.argv[1])

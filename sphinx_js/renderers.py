@@ -6,7 +6,6 @@ from docutils.statemachine import StringList
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
 from six import string_types
-
 from sphinx.errors import SphinxError
 from sphinx.util import rst
 

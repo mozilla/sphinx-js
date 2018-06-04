@@ -5,9 +5,11 @@ import os
 from os.path import abspath
 from tempfile import TemporaryFile, NamedTemporaryFile
 from json import load
+
+from six import string_types
 from sphinx.errors import SphinxError
 from sphinx.util.logging import getLogger
-from six import string_types
+
 from .typedoc import parse_typedoc
 
 logger = getLogger(__name__)
@@ -15,7 +17,7 @@ logger = getLogger(__name__)
 
 class Command(object):
     def __init__(self, program):
-        self.program = program + ".cmd" if os.name == 'nt' else program
+        self.program = program + '.cmd' if os.name == 'nt' else program
         self.args = []
 
     def add(self, *args):
