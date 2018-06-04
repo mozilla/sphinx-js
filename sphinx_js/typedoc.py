@@ -2,8 +2,8 @@ import os
 import sys
 import json
 
-# JSDoc JSON schema:
-#   https://github.com/jsdoc3/jsdoc/blob/master/lib/jsdoc/schema.js
+from six import iteritems
+
 # JSDoc entries used in sphinx-js:
 # - optional access of [ public, private, protected ]
 # - optional classdesc
@@ -27,12 +27,61 @@ import json
 
 
 class Typedoc(object):
+    """
+    Encapsulation of the Typedoc to JSDoc conversion process.
+    Upon construction this class will convert the typedoc JSON
+    object to a list of JSDoc doclets in :py:attr:`jsdoc`.
+
+    This class holds all the state used during the conversion making
+    it easy to do multiple (sequential) conversions.
+
+    :ivar jsdoc: the list of generated doclets
+    :ivar nodelist: the flattened typedoc entries indexed by 'id'
+
+    JSDoc JSON schema: https://github.com/jsdoc3/jsdoc/blob/master/lib/jsdoc/schema.js
+    """
+
+    def __init__(self, root):
+        """
+        Construct a list of jsdoc entries from the typedoc JSON object.
+
+        :param root: a JSON object from a typedoc JSON file
+        """
+        self.jsdoc = []
+        self.nodelist = {}
+        self.make_node_list(root)
+        self.convert_node(root)
 
     def get_parent(self, node):
+        """
+        Get the parent of a node.
+
+        :param node: A Typedoc node
+        :return: The parent Typedoc node, or None if node was the root.
+        """
         parentId = node.get('__parentId')
         return self.nodelist[parentId] if parentId is not None else None
 
+    def extend_doclet(self, result, **kwargs):
+        """
+        Extend a jsdoc entry.
+
+        .. note::
+
+           Filters out keywords with value None. This is used
+           explicitely, for example in :py:func:`simple_doclet`, and
+           implicitely when typedoc may lack an entry, for example in
+           the description field in :py:func:`make_result`.
+        """
+        result.update(**kwargs)
+        return {k: v for k, v in iteritems(result) if v is not None}
+
+    def make_doclet(self, **kwargs):
+        """Create a new jsdoc entry"""
+        return self.extend_doclet({}, **kwargs)
+
     def make_longname(self, node):
+        """Construct the jsdoc longname entry for a typedoc node"""
         parent = self.get_parent(node)
         longname = self.make_longname(parent) if parent is not None else ''
 
@@ -56,6 +105,7 @@ class Typedoc(object):
             return longname + node.get('name')
 
     def make_meta(self, node):
+        """Construct the jsdoc meta entry for a typedoc node"""
         source = node.get('sources')[0]
         return {
             'path': os.path.dirname(source.get('fileName')) or './',
@@ -64,17 +114,8 @@ class Typedoc(object):
             'code': {}
         }
 
-    def extend_doclet(self, result, **kwargs):
-        for name in kwargs:
-            if kwargs[name] is None:
-                continue
-            result[name] = kwargs[name]
-        return result
-
-    def make_doclet(self, **kwargs):
-        return self.extend_doclet({}, **kwargs)
-
     def make_type_name(self, type):
+        """Construct the name of a type from a Typedoc type entry"""
         names = []
         if type.get('type') == 'reference' and type.get('id'):
             node = self.nodelist[type.get('id')]
@@ -109,11 +150,13 @@ class Typedoc(object):
         return ' '.join(names)
 
     def make_type(self, type):
+        """Construct a jsdoc type entry"""
         return {
             'names': [self.make_type_name(type)]
         }
 
     def make_description(self, comment):
+        """Construct a jsdoc description entry"""
         if not comment:
             return ''
         else:
@@ -123,6 +166,7 @@ class Typedoc(object):
             ])
 
     def make_param(self, param):
+        """Construct a jsdoc parameter entry"""
         typeEntry = param.get('type')
         if typeEntry is None:
             return self.make_doclet(
@@ -137,6 +181,7 @@ class Typedoc(object):
             )
 
     def make_result(self, param):
+        """Construct a jsdoc function result entry"""
         type = param.get('type')
         if type is None or type.get('name') == 'void':
             return []
@@ -147,6 +192,7 @@ class Typedoc(object):
         )]
 
     def simple_doclet(self, kind, node):
+        """Construct a jsdoc entry with some frequently used fields."""
         memberof = self.make_longname(self.get_parent(node))
         if memberof == '':
             memberof = None
@@ -169,6 +215,17 @@ class Typedoc(object):
         )
 
     def convert_node(self, node):
+        """
+        Convert a typedoc entry to a jsdoc entry. Typedoc entries are
+        hierarchical, so this function will recurse.
+        New entries are added to :py:attr:`self.jsdoc`.
+
+        .. rubric:: To do
+
+           Some entries generate restructured text. Preferably this
+           information should be captured in the jsdoc entries and
+           used in the templates.
+        """
         if node.get('inheritedFrom'):
             return
         if node.get('sources'):
@@ -265,6 +322,7 @@ class Typedoc(object):
             self.convert_node(child)
 
     def make_node_list(self, node, parent=None):
+        """Flatten the tree of Typedoc entries to a list indexed by 'id'"""
         if node is None:
             return
         if node.get('id') is not None:
@@ -278,19 +336,21 @@ class Typedoc(object):
             self.make_node_list(typetag, parent)
         self.make_node_list(node.get('declaration'), None)
 
-    def __init__(self, root):
-        self.jsdoc = []
-        self.nodelist = {}
-        self.make_node_list(root)
-        self.convert_node(root)
-
 
 def parse_typedoc(inputfile):
+    """Parse and convert the typedoc JSON file to a list jsdoc entries"""
     typedoc = Typedoc(json.load(inputfile))
     return typedoc.jsdoc
 
 
 def typedoc(inputname):
+    """
+    Read a typedoc file and print the resulting jsdoc list.
+
+    .. note::
+
+       This function only exists to test this module in isolation.
+    """
     with open(inputname, 'r') as inputfile:
         json.dump(parse_typedoc(inputfile), sys.stdout, indent=2)
 

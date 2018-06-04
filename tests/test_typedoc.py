@@ -47,6 +47,9 @@ class Tests(TestCase):
                     jsdoc = parse_typedoc(typedocfile)
                 jsdoc_ref_file = os.path.join(self.source_dir, source + '.jsdoc')
                 if not os.path.exists(jsdoc_ref_file):
+                    # When a reference file is missing, this is probably a new test.
+                    # Generate a reference file for the developer to review.  If the
+                    # generated reference is good, just remove the '.ref' extension.
                     with open(jsdoc_ref_file + '.ref', 'w') as jsdocfile:
                         json.dump(
                             jsdoc,
