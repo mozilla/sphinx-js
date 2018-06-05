@@ -174,3 +174,44 @@ function defaultsDocumentedInDoclet(func, strNum, strBool, num, nil) {}
  * @param [nil]
  */
 function defaultsDocumentedInCode(num=5, str="true", bool=true, nil=null) {}
+
+/**
+ * Variadic parameter
+ * @param a
+ * @param args
+ */
+function variadicParameter(a, ...args) {}
+
+/** @deprecated */
+function deprecatedFunction() {}
+/** @deprecated don't use anymore */
+function deprecatedExplanatoryFunction() {}
+
+/** @deprecated */
+const DeprecatedAttribute = null;
+/** @deprecated don't use anymore */
+const DeprecatedExplanatoryAttribute = null;
+
+/** @deprecated */
+class DeprecatedClass {}
+/** @deprecated don't use anymore */
+class DeprecatedExplanatoryClass {}
+
+/**
+ * @see DeprecatedClass
+ * @see deprecatedFunction
+ * @see DeprecatedAttribute
+ */
+function seeFunction() {}
+/**
+ * @see DeprecatedClass
+ * @see deprecatedFunction
+ * @see DeprecatedAttribute
+ */
+const SeeAttribute = null;
+/**
+ * @see DeprecatedClass
+ * @see deprecatedFunction
+ * @see DeprecatedAttribute
+ */
+class SeeClass {}

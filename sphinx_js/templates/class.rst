@@ -1,4 +1,8 @@
+{% import 'common.rst' as common %}
+
 .. js:class:: {{ name }}{{ params }}
+
+   {{ common.deprecated(deprecated)|indent(3) }}
 
    {% if class_comment -%}
      {{ class_comment|indent(3) }}
@@ -12,18 +16,12 @@
      :{{ heads|join(' ') }}: {{ tail }}
    {% endfor %}
 
-   {% if examples -%}
-   **Examples:**
-
-   {% for example in examples -%}
-   .. code-block:: js
-
-      {{ example|indent(6) }}
-   {% endfor %}
-   {%- endif %}
+   {{ common.examples(examples)|indent(3) }}
 
    {{ content|indent(3) }}
 
    {% if members -%}
      {{ members|indent(3) }}
    {%- endif %}
+
+   {{ common.see_also(see_also)|indent(3) }}

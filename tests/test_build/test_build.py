@@ -54,7 +54,7 @@ class Tests(SphinxBuildTestCase):
         """Make sure @example tags can be documented with autofunction."""
         self._file_contents_eq(
             'autofunction_example',
-            u'exampleTag()\n\n'
+            'exampleTag()\n\n'
             '   JSDoc example tag\n\n'
             '   **Examples:**\n\n'
             '      // This is the example.\n'
@@ -97,6 +97,35 @@ class Tests(SphinxBuildTestCase):
             '      * **str** --\n\n'
             '      * **bool** --\n\n'
             '      * **nil** --\n')
+
+    def test_autofunction_variadic(self):
+        """Make sure variadic parameters are rendered as ellipses."""
+        self._file_contents_eq(
+            'autofunction_variadic',
+            'variadicParameter(a, ...args)\n\n'
+            '   Variadic parameter\n\n'
+            '   Arguments:\n'
+            '      * **a** --\n\n'
+            '      * **args** --\n')
+
+    def test_autofunction_deprecated(self):
+        """Make sure @deprecated tags can be documented with autofunction."""
+        self._file_contents_eq(
+            'autofunction_deprecated',
+            'deprecatedFunction()\n\n'
+            '   Note: Deprecated.\n\n'
+            'deprecatedExplanatoryFunction()\n\n'
+            "   Note: Deprecated: don't use anymore\n")
+
+    def test_autofunction_see(self):
+        """Make sure @see tags work with autofunction."""
+        self._file_contents_eq(
+            'autofunction_see',
+            'seeFunction()\n\n'
+            '   See also:\n\n'
+            '     * "DeprecatedClass"\n\n'
+            '     * "deprecatedFunction"\n\n'
+            '     * "DeprecatedAttribute"\n')
 
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
@@ -156,11 +185,30 @@ class Tests(SphinxBuildTestCase):
         """Make sure @example tags can be documented with autoclass."""
         self._file_contents_eq(
             'autoclass_example',
-            u'class ExampleClass()\n\n'
+            'class ExampleClass()\n\n'
             '   JSDoc example tag for class\n\n'
             '   **Examples:**\n\n'
             '      // This is the example.\n'
             '      new ExampleClass();\n')
+
+    def test_autoclass_deprecated(self):
+        """Make sure @deprecated tags can be documented with autoclass."""
+        self._file_contents_eq(
+            'autoclass_deprecated',
+            'class DeprecatedClass()\n\n'
+            '   Note: Deprecated.\n\n'
+            'class DeprecatedExplanatoryClass()\n\n'
+            "   Note: Deprecated: don't use anymore\n")
+
+    def test_autoclass_see(self):
+        """Make sure @see tags work with autoclass."""
+        self._file_contents_eq(
+            'autoclass_see',
+            'class SeeClass()\n\n'
+            '   See also:\n\n'
+            '     * "DeprecatedClass"\n\n'
+            '     * "deprecatedFunction"\n\n'
+            '     * "DeprecatedAttribute"\n')
 
     def test_autoattribute(self):
         """Make sure ``autoattribute`` works."""
@@ -172,11 +220,30 @@ class Tests(SphinxBuildTestCase):
         """Make sure @example tags can be documented with autoattribute."""
         self._file_contents_eq(
             'autoattribute_example',
-            u'ExampleAttribute\n\n'
+            'ExampleAttribute\n\n'
             '   JSDoc example tag for attribute\n\n'
             '   **Examples:**\n\n'
             '      // This is the example.\n'
             '      console.log(ExampleAttribute);\n')
+
+    def test_autoattribute_deprecated(self):
+        """Make sure @deprecated tags can be documented with autoattribute."""
+        self._file_contents_eq(
+            'autoattribute_deprecated',
+            'DeprecatedAttribute\n\n'
+            '   Note: Deprecated.\n\n'
+            'DeprecatedExplanatoryAttribute\n\n'
+            "   Note: Deprecated: don't use anymore\n")
+
+    def test_autoattribute_see(self):
+        """Make sure @see tags work with autoattribute."""
+        self._file_contents_eq(
+            'autoattribute_see',
+            'SeeAttribute\n\n'
+            '   See also:\n\n'
+            '     * "DeprecatedClass"\n\n'
+            '     * "deprecatedFunction"\n\n'
+            '     * "DeprecatedAttribute"\n')
 
     def test_getter_setter(self):
         """Make sure ES6-style getters and setters can be documented."""
