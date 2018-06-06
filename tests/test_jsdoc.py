@@ -1,4 +1,5 @@
 from os.path import abspath
+from unittest import TestCase
 
 from nose.tools import assert_raises, eq_
 from sphinx.errors import SphinxError
@@ -6,17 +7,35 @@ from sphinx.errors import SphinxError
 from sphinx_js.jsdoc import doclet_full_path, root_or_fallback
 
 
-def test_doclet_full_path():
-    """Sanity-check doclet_full_path(), including throwing it a non-.js filename."""
-    doclet = {
-        'meta': {
-            'filename': 'utils.jsm',
-            'path': '/boogie/smoo/Checkouts/fathom',
-        },
-        'longname': 'best#thing~yeah'
-    }
-    eq_(doclet_full_path(doclet, '/boogie/smoo/Checkouts'),
-        ['./', 'fathom/', 'utils.', 'best#', 'thing~', 'yeah'])
+class DocletFullPathTests(TestCase):
+    def test_sanity(self):
+        """Sanity-check doclet_full_path(), including throwing it a non-.js filename."""
+        doclet = {
+            'meta': {
+                'filename': 'utils.jsm',
+                'path': '/boogie/smoo/Checkouts/fathom',
+            },
+            'longname': 'best#thing~yeah'
+        }
+        eq_(doclet_full_path(doclet, '/boogie/smoo/Checkouts'),
+            ['./', 'fathom/', 'utils.', 'best#', 'thing~', 'yeah'])
+
+    def test_escapes(self):
+        """Make sure we escape special chars in generated paths so the parser
+        can make sense of them later."""
+        doclet = {
+            'meta': {
+                'filename': 'utils.anotherExtension.js',
+                # TODO: jsdoc -X actually emits \\ when \ is in a path. Compensate.
+                'path': r'/boogie/smoo/Checkouts#num/fathom~tilde\Backslash',
+            },
+            'longname': 'best#thing~yeah'
+        }
+        path = doclet_full_path(doclet, '/boogie/smoo')
+        eq_(path,
+            ['./', 'Checkouts#num/', r'fathom~tilde\Backslash/', 'utils.anotherExtension.',
+             'best#', 'thing~', 'yeah'])
+        # Then maybe test running it through the parser.
 
 
 def test_relative_path_root():

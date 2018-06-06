@@ -10,7 +10,7 @@ from tempfile import TemporaryFile
 from six import string_types
 from sphinx.errors import SphinxError
 
-from .parsers import path_and_formal_params, PathVisitor
+from .parsers import path_and_formal_params, PathVisitor, path_escape
 from .suffix_tree import PathTaken, SuffixTree
 
 
@@ -114,10 +114,15 @@ def doclet_full_path(d, base_dir, longname_field='longname'):
     :arg base_dir: Absolutized value of the jsdoc_source_path option
     :arg longname_field: The field to look in at the top level of the doclet
         for the long name of the object to emit a path to
+
+    We don't make the mistake of taking namepath separator chars like #.~ that
+    occur in path segments as actual namepath separators.
+
     """
     meta = d['meta']
     rel = relpath(meta['path'], base_dir)
-    rel = '/'.join(rel.split(sep))
+
+    rel = '/'.join(map(path_escape, rel.split(sep)))  # Standardize on / as path separator, because namepaths use / no matter what OS they're on.
     if not rel.startswith(('../', './')) and rel not in ('..', '.'):
         # It just starts right out with the name of a folder in the cwd.
         rooted_rel = './%s' % rel
@@ -128,10 +133,13 @@ def doclet_full_path(d, base_dir, longname_field='longname'):
     # not the fastest approach, but it means knowledge of path format is in
     # one place: the parser.
     path = '%s/%s.%s' % (rooted_rel,
-                         splitext(meta['filename'])[0],
-                         d[longname_field])
-    return PathVisitor().visit(
-        path_and_formal_params['path'].parse(path))
+                         path_escape(splitext(meta['filename'])[0]),
+                         path_escape(d[longname_field]))
+    try:
+        return PathVisitor().visit(path_and_formal_params['path'].parse(path))
+    except:
+        import pdb;pdb.set_trace()
+
 
 
 class PathsTaken(Exception):

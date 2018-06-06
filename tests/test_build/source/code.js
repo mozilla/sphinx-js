@@ -174,3 +174,9 @@ function defaultsDocumentedInDoclet(func, strNum, strBool, num, nil) {}
  * @param [nil]
  */
 function defaultsDocumentedInCode(num=5, str="true", bool=true, nil=null) {}
+
+/**
+ * @name this#thing.is~nasty\ndude
+ * @event module:foo/bar.event:MyEvent
+ */
+const nastyName = 3;

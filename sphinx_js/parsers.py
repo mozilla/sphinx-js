@@ -30,14 +30,20 @@ class PathVisitor(NodeVisitor):
         return children
 
     def visit_name(self, node, children):
-        # This, for better or worse, also makes Python string escape sequences,
-        # like \n for newline, work.
+        """Unescape namespace separator chars like ~#. which, when escaped, act
+        as their normal selves and not namepath separators.
+
+        This, for better or worse, also makes Python string escape sequences,
+        like \n for newline, work.
+
+        """
         return _backslash_unescape(node.text)
 
     def visit_sep(self, node, children):
         return node.text
 
     def visit_path(self, node, children):
+        """Turn a path into a list of segments."""
         cur_dir, middle_segments, name = children
         segments = cur_dir[:]
         segments.extend(middle_segments)
@@ -71,3 +77,15 @@ def _backslash_unescape(str):
 
     """
     return sub(r'\\(.)', lambda match: match.group(1), str)
+
+
+def path_escape(str):
+    """Return ``str`` with ~#/. (which are namepath separators), ( (which
+    delimits the formal param list from the namepath), and \
+    backslash-escaped."""
+    return (str.replace('\\', r'\\')
+               .replace('~', r'\~')
+               .replace('#', r'\#')
+               .replace('/', r'\/')
+               .replace('.', r'\.')
+               .replace('(', r'\('))
