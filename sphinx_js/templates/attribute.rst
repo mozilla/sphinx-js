@@ -1,4 +1,8 @@
+{% import 'common.rst' as common %}
+
 .. js:attribute:: {{ name }}
+
+   {{ common.deprecated(deprecated)|indent(3) }}
 
    {% if type -%}
      **type:** {{ type|indent(3) }}
@@ -8,14 +12,8 @@
      {{ description|indent(3) }}
    {%- endif %}
 
-   {% if examples -%}
-   **Examples:**
-
-   {% for example in examples -%}
-   .. code-block:: js
-
-      {{ example|indent(6) }}
-   {% endfor %}
-   {%- endif %}
+   {{ common.examples(examples)|indent(3) }}
 
    {{ content|indent(3) }}
+
+   {{ common.see_also(see_also)|indent(3) }}

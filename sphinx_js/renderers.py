@@ -170,10 +170,15 @@ class JsRenderer(object):
         used_names = []
         MARKER = object()
 
-        for name, default, type in [(param['name'].split('.')[0],
-                                     param.get('defaultvalue', MARKER),
-                                     param.get('type', {'names': []}))
-                                    for param in doclet.get('params', [])]:
+        for param in doclet.get('params', []):
+            name = param['name'].split('.')[0]
+            default = param.get('defaultvalue', MARKER)
+            type = param.get('type', {'names': []})
+
+            # Add '...' to the parameter name if it's a variadic argument
+            if param.get('variable'):
+                name = '...' + name
+
             if name not in used_names:
                 params.append(rst.escape(name) if default is MARKER else
                               '%s=%s' % (rst.escape(name),
@@ -218,6 +223,8 @@ class AutoFunctionRenderer(JsRenderer):
             fields=self._fields(doclet),
             description=doclet.get('description', ''),
             examples=doclet.get('examples', ''),
+            deprecated=doclet.get('deprecated', False),
+            see_also=doclet.get('see', []),
             content='\n'.join(self._content))
 
 
@@ -230,6 +237,8 @@ class AutoClassRenderer(JsRenderer):
             params=self._formal_params(doclet),
             fields=self._fields(doclet),
             examples=doclet.get('examples', ''),
+            deprecated=doclet.get('deprecated', False),
+            see_also=doclet.get('see', []),
             class_comment=doclet.get('classdesc', ''),
             constructor_comment=doclet.get('description', ''),
             content='\n'.join(self._content),
@@ -309,6 +318,8 @@ class AutoAttributeRenderer(JsRenderer):
         return dict(
             name=name,
             description=doclet.get('description', ''),
+            deprecated=doclet.get('deprecated', False),
+            see_also=doclet.get('see', []),
             examples=doclet.get('examples', ''),
             type='|'.join(doclet.get('type', {}).get('names', [])),
             content='\n'.join(self._content))
