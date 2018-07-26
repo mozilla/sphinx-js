@@ -312,7 +312,7 @@ Caveats
 =======
 
 * We don't understand the inline JSDoc constructs like ``{@link foo}``; you have to use Sphinx-style equivalents for now, like ``:js:func:`foo``` (or simply ``:func:`foo``` if you have set ``primary_domain = 'js'`` in conf.py.
-* So far, we understand and convert only the JSDoc block tags ``@param``, ``@returns``, ``@throws``, ``@example`` (without the optional ``<caption>``), and their synonyms. Other ones will go *poof* into the ether.
+* So far, we understand and convert the JSDoc block tags ``@param``, ``@returns``, ``@throws``, ``@example`` (without the optional ``<caption>``), ``@deprecated``, ``@see``, and their synonyms. Other ones will go *poof* into the ether.
 
 Tests
 =====
@@ -321,6 +321,11 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 
 Version History
 ===============
+
+2.6
+  * Add support for ``@deprecated`` and ``@see``. (David Li)
+  * Notice and document JS variadic params nicely. (David Li)
+  * Add linter to codebase.
 
 2.5
   * Use documented ``@params`` to help fill out the formal param list for a
