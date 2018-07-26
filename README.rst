@@ -296,7 +296,17 @@ Example
 
 A good example using most of sphinx-js's functionality is the Fathom documentation. A particularly juicy page is https://mozilla.github.io/fathom/ruleset.html. Click the "View page source" link to see the raw directives.
 
-Fathom also carries a Travis CI configuration and a deployment script for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them. However, `ReadTheDocs <https://readthedocs.org/>`_, the canonical hosting platform for Sphinx docs, now supports sphinx-js as an informal opt-in beta. Get ahold of someone by commenting on `this ticket <https://github.com/rtfd/readthedocs.org/issues/3069>`_, and ask them to switch your project to the `latest` Docker image, then wipe your build environment and rebuild.
+`ReadTheDocs <https://readthedocs.org/>`_ is the canonical hosting platform for Sphinx docs and now supports sphinx-js as an opt-in beta. Put this in the ``.readthedocs.yml`` file at the root of your repo::
+
+    requirements_file: docs/requirements.txt
+    build:
+      image: latest
+
+Then put the version of sphinx-js you want in ``docs/requirements.txt``. For example... ::
+
+    sphinx-js==2.5
+
+Or, if you prefer, the Fathom repo carries a `Travis CI configuration <https://github.com/mozilla/fathom/blob/master/.travis.yml>`_ and a `deployment script <https://github.com/mozilla/fathom/blob/master/docs/tooling/travis-deploy-docs>`_ for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them.
 
 Caveats
 =======
