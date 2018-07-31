@@ -280,15 +280,14 @@ Saving Keystrokes By Setting The Primary Domain
 
 To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and then say (for example) ``autofunction`` rather than ``js:autofunction``.
 
-Typescript support
+TypeScript support
 ------------------
 
-There is experimental typescript support in sphinx-js.  You can enable this by setting the sphinx variable ``js_language = 'typescript'``.
-You will not need to install jsdoc, but you do need to install typedoc::
+There is experimental TypeScript support in sphinx-js. Enable it by setting the config variable ``js_language = 'typescript'``. Then, instead of installing JSDoc, install TypeDoc (version 0.11.1 is known to work)::
 
-  npm install -g typedoc
+    npm install -g typedoc
 
-Version 0.11.1 is known to work.
+The main difference you'll notice is additional **type** fields in function documentation.
 
 Configuration Reference
 -----------------------
@@ -335,6 +334,9 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 
 Version History
 ===============
+
+2.7
+  * Add experimental TypeScript support. (Wim Yedema)
 
 2.6
   * Add support for ``@deprecated`` and ``@see``. (David Li)
