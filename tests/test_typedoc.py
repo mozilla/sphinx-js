@@ -8,7 +8,7 @@ from tempfile import mkdtemp
 from nose.tools import eq_
 
 from sphinx_js.doclets import program_name_on_this_platform
-from sphinx_js.typedoc import Typedoc, parse_typedoc
+from sphinx_js.typedoc import TypeDoc, parse_typedoc
 
 
 class Tests(TestCase):
@@ -38,7 +38,7 @@ class Tests(TestCase):
 
     def test_empty(self):
         json = {}
-        jsdoc = Typedoc(json).jsdoc
+        jsdoc = TypeDoc(json).jsdoc
         eq_(jsdoc, [])
 
     def test_references(self):

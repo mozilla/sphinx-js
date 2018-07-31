@@ -28,7 +28,7 @@ from six import iteritems
 # - optional undocumented
 
 
-class Typedoc(object):
+class TypeDoc(object):
     """
     Encapsulation of the Typedoc to JSDoc conversion process.
     Upon construction this class will convert the typedoc JSON
@@ -341,7 +341,7 @@ class Typedoc(object):
 
 def parse_typedoc(inputfile):
     """Parse and convert the typedoc JSON file to a list jsdoc entries"""
-    typedoc = Typedoc(json.load(inputfile))
+    typedoc = TypeDoc(json.load(inputfile))
     return typedoc.jsdoc
 
 
