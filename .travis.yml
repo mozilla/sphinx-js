@@ -9,6 +9,7 @@ python:
   - "3.6"
 install:
   - npm install jsdoc@3.5.5
+  - npm install typedoc@0.11.1
   - pip install tox-travis
 script:
   - PATH=$TRAVIS_BUILD_DIR/node_modules/.bin:$PATH tox

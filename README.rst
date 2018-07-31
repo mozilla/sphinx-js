@@ -17,6 +17,7 @@ Setup
         npm install -g jsdoc
 
    We work with jsdoc 3.4.3, 3.5.4, and quite possibly other versions.
+
 2. Install sphinx-js, which will pull in Sphinx itself as a dependency::
 
         pip install sphinx-js
@@ -279,14 +280,26 @@ Saving Keystrokes By Setting The Primary Domain
 
 To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and then say (for example) ``autofunction`` rather than ``js:autofunction``.
 
+TypeScript support
+------------------
+
+There is experimental TypeScript support in sphinx-js. Enable it by setting the config variable ``js_language = 'typescript'``. Then, instead of installing JSDoc, install TypeDoc (version 0.11.1 is known to work)::
+
+    npm install -g typedoc
+
+The main difference you'll notice is additional **type** fields in function documentation.
+
 Configuration Reference
 -----------------------
+
+``js_language``
+  Use 'javascript' or 'typescript' depending on the language you use. The default is 'javascript'.
 
 ``js_source_path``
   A list of directories to scan (non-recursively) for JS files, relative to Sphinx's conf.py file. Can be a string instead if there is only one. If there is more than one, ``root_for_relative_js_paths`` must be specified as well.
 
 ``jsdoc_config_path``
-  A conf.py-relative path to a jsdoc config file, which is useful if you want to specify your own jsdoc options, like recursion and custom filename matching.
+  A conf.py-relative path to a jsdoc or typedoc config file, which is useful if you want to specify your own jsdoc options, like recursion and custom filename matching.
 
 ``root_for_relative_js_paths``
   The directory relative to which relative pathnames are resolved. Defaults to ``js_source_path`` if it is only one item.
@@ -321,6 +334,9 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 
 Version History
 ===============
+
+2.7
+  * Add experimental TypeScript support. (Wim Yedema)
 
 2.6
   * Add support for ``@deprecated`` and ``@see``. (David Li)

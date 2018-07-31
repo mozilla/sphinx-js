@@ -1,4 +1,3 @@
-from collections import OrderedDict
 from json import dumps
 from re import sub
 
@@ -6,7 +5,7 @@ from docutils.parsers.rst import Parser as RstParser
 from docutils.statemachine import StringList
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
-from six import iteritems, string_types
+from six import string_types
 from sphinx.errors import SphinxError
 from sphinx.util import rst
 
@@ -201,11 +200,13 @@ class JsRenderer(object):
         tail comes after.
 
         """
-        FIELD_TYPES = OrderedDict([('params', _params_formatter),
-                                   ('properties', _params_formatter),
-                                   ('exceptions', _exceptions_formatter),
-                                   ('returns', _returns_formatter)])
-        for field_name, callback in iteritems(FIELD_TYPES):
+        FIELD_TYPES = [('params', _params_formatter),
+                       ('params', _param_type_formatter),
+                       ('properties', _params_formatter),
+                       ('properties', _param_type_formatter),
+                       ('exceptions', _exceptions_formatter),
+                       ('returns', _returns_formatter)]
+        for field_name, callback in FIELD_TYPES:
             for field in doclet.get(field_name, []):
                 description = field.get('description', '')
                 unwrapped = sub(r'[ \t]*[\r\n]+[ \t]*', ' ', description)
@@ -320,6 +321,7 @@ class AutoAttributeRenderer(JsRenderer):
             deprecated=doclet.get('deprecated', False),
             see_also=doclet.get('see', []),
             examples=doclet.get('examples', ''),
+            type='|'.join(doclet.get('type', {}).get('names', [])),
             content='\n'.join(self._content))
 
 
@@ -339,6 +341,13 @@ def _params_formatter(field, description):
         heads.append(types)
     heads.append(rst.escape(field['name']))
     tail = description
+    return heads, tail
+
+
+def _param_type_formatter(field, description):
+    """Generate types for function parameters specified in field."""
+    heads = ['type', field['name']]
+    tail = _or_types(field)
     return heads, tail
 
 

@@ -4,6 +4,10 @@
 
    {{ common.deprecated(deprecated)|indent(3) }}
 
+   {% if type -%}
+     **type:** {{ type|indent(3) }}
+   {%- endif %}
+
    {% if description -%}
      {{ description|indent(3) }}
    {%- endif %}

@@ -1,0 +1,188 @@
+[
+    {
+        "comment": "<empty>",
+        "description": "",
+        "kind": "external",
+        "longname": "external:implements",
+        "meta": {
+            "code": {},
+            "filename": "implements.ts",
+            "lineno": 1,
+            "path": "./"
+        },
+        "name": "\"implements\""
+    },
+    {
+        "classdesc": "\n\n**Implements:**\n * :js:class:`implements.Interface`\n",
+        "comment": "<empty>",
+        "description": "An implementation of an interface\n\n",
+        "extends": [],
+        "kind": "class",
+        "longname": "external:implements~Implementation",
+        "memberof": "external:implements",
+        "meta": {
+            "code": {},
+            "filename": "implements.ts",
+            "lineno": 22,
+            "path": "./"
+        },
+        "name": "Implementation",
+        "params": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "",
+        "kind": "function",
+        "longname": "external:implements~Implementation.documented",
+        "memberof": "external:implements~Implementation",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "arg"
+                ]
+            },
+            "filename": "implements.ts",
+            "lineno": 30,
+            "path": "./"
+        },
+        "name": "documented",
+        "params": [
+            {
+                "description": "",
+                "name": "arg",
+                "type": {
+                    "names": [
+                        "string"
+                    ]
+                }
+            }
+        ],
+        "returns": [
+            {
+                "name": "documented",
+                "type": {
+                    "names": [
+                        "string"
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "comment": "<empty>",
+        "description": "A method implementation\n\n",
+        "kind": "function",
+        "longname": "external:implements~Implementation.method",
+        "memberof": "external:implements~Implementation",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "arg"
+                ]
+            },
+            "filename": "implements.ts",
+            "lineno": 27,
+            "path": "./"
+        },
+        "name": "method",
+        "params": [
+            {
+                "description": "\n\nA value\n",
+                "name": "arg",
+                "type": {
+                    "names": [
+                        "number"
+                    ]
+                }
+            }
+        ],
+        "returns": []
+    },
+    {
+        "classdesc": "*interface*",
+        "comment": "<empty>",
+        "description": "A definition of an interface\n\n",
+        "extends": [],
+        "kind": "interface",
+        "longname": "external:implements~Interface",
+        "memberof": "external:implements",
+        "meta": {
+            "code": {},
+            "filename": "implements.ts",
+            "lineno": 4,
+            "path": "./"
+        },
+        "name": "Interface",
+        "params": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "Another documented method\n\n",
+        "kind": "function",
+        "longname": "external:implements~Interface.documented",
+        "memberof": "external:implements~Interface",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "arg"
+                ]
+            },
+            "filename": "implements.ts",
+            "lineno": 16,
+            "path": "./"
+        },
+        "name": "documented",
+        "params": [
+            {
+                "description": "\n\nA string",
+                "name": "arg",
+                "type": {
+                    "names": [
+                        "string"
+                    ]
+                }
+            }
+        ],
+        "returns": [
+            {
+                "description": "A string\n",
+                "name": "documented",
+                "type": {
+                    "names": [
+                        "string"
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "comment": "<empty>",
+        "description": "A method specification\n\n",
+        "kind": "function",
+        "longname": "external:implements~Interface.method",
+        "memberof": "external:implements~Interface",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "arg"
+                ]
+            },
+            "filename": "implements.ts",
+            "lineno": 9,
+            "path": "./"
+        },
+        "name": "method",
+        "params": [
+            {
+                "description": "\n\nA value\n",
+                "name": "arg",
+                "type": {
+                    "names": [
+                        "number"
+                    ]
+                }
+            }
+        ],
+        "returns": []
+    }
+]

@@ -1,0 +1,179 @@
+[
+    {
+        "comment": "<empty>",
+        "description": "",
+        "kind": "external",
+        "longname": "external:interface",
+        "meta": {
+            "code": {},
+            "filename": "interface.ts",
+            "lineno": 1,
+            "path": "./"
+        },
+        "name": "\"interface\""
+    },
+    {
+        "classdesc": "*interface*",
+        "comment": "<empty>",
+        "description": "A definition of an interface\n\n",
+        "extends": [],
+        "kind": "interface",
+        "longname": "external:interface~IDefinition",
+        "memberof": "external:interface",
+        "meta": {
+            "code": {},
+            "filename": "interface.ts",
+            "lineno": 4,
+            "path": "./"
+        },
+        "name": "IDefinition",
+        "params": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "Read/write property/variable\n\n",
+        "kind": "member",
+        "longname": "external:interface~IDefinition#property",
+        "memberof": "external:interface~IDefinition",
+        "meta": {
+            "code": {},
+            "filename": "interface.ts",
+            "lineno": 21,
+            "path": "./"
+        },
+        "name": "property",
+        "type": {
+            "names": [
+                "any"
+            ]
+        }
+    },
+    {
+        "comment": "<empty>",
+        "description": "Read-only  or getter property\n\n",
+        "kind": "member",
+        "longname": "external:interface~IDefinition#property2",
+        "memberof": "external:interface~IDefinition",
+        "meta": {
+            "code": {},
+            "filename": "interface.ts",
+            "lineno": 24,
+            "path": "./"
+        },
+        "name": "property2",
+        "type": {
+            "names": [
+                "any"
+            ]
+        }
+    },
+    {
+        "comment": "<empty>",
+        "description": "This is a method without return type\n\n",
+        "kind": "function",
+        "longname": "external:interface~IDefinition.method1",
+        "memberof": "external:interface~IDefinition",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "simple",
+                    "complex",
+                    "args"
+                ]
+            },
+            "filename": "interface.ts",
+            "lineno": 11,
+            "path": "./"
+        },
+        "name": "method1",
+        "params": [
+            {
+                "description": "\n\nA parameter with a simple type",
+                "name": "simple",
+                "type": {
+                    "names": [
+                        "number"
+                    ]
+                }
+            },
+            {
+                "description": "\n\nA parameter with a complex type",
+                "name": "complex",
+                "type": {
+                    "names": [
+                        "<TODO>"
+                    ]
+                }
+            },
+            {
+                "description": "\n\nrest arguments\n",
+                "name": "args",
+                "type": {
+                    "names": [
+                        "any[]"
+                    ]
+                }
+            }
+        ],
+        "returns": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "This is a method with a simple return type\n\n",
+        "kind": "function",
+        "longname": "external:interface~IDefinition.method2",
+        "memberof": "external:interface~IDefinition",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "simple",
+                    "complex",
+                    "args"
+                ]
+            },
+            "filename": "interface.ts",
+            "lineno": 18,
+            "path": "./"
+        },
+        "name": "method2",
+        "params": [
+            {
+                "description": "\n\nA parameter with a simple type",
+                "name": "simple",
+                "type": {
+                    "names": [
+                        "number"
+                    ]
+                }
+            },
+            {
+                "description": "\n\nA parameter with a complex type",
+                "name": "complex",
+                "type": {
+                    "names": [
+                        "<TODO>"
+                    ]
+                }
+            },
+            {
+                "description": "\n\nrest arguments\n",
+                "name": "args",
+                "type": {
+                    "names": [
+                        "any[]"
+                    ]
+                }
+            }
+        ],
+        "returns": [
+            {
+                "name": "method2",
+                "type": {
+                    "names": [
+                        "number"
+                    ]
+                }
+            }
+        ]
+    }
+]

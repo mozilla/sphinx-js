@@ -3,7 +3,7 @@ from os.path import abspath
 from nose.tools import assert_raises, eq_
 from sphinx.errors import SphinxError
 
-from sphinx_js.jsdoc import doclet_full_path, root_or_fallback
+from sphinx_js.doclets import doclet_full_path, root_or_fallback
 
 
 def test_doclet_full_path():

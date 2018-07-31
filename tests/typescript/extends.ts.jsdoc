@@ -1,0 +1,283 @@
+[
+    {
+        "comment": "<empty>",
+        "description": "",
+        "kind": "external",
+        "longname": "external:extends",
+        "meta": {
+            "code": {},
+            "filename": "extends.ts",
+            "lineno": 1,
+            "path": "./"
+        },
+        "name": "\"extends\""
+    },
+    {
+        "classdesc": "\n\n**Extends:**\n * :js:class:`extends.Super`\n",
+        "comment": "<empty>",
+        "description": "A sub class\n\n",
+        "extends": [
+            "Super"
+        ],
+        "kind": "class",
+        "longname": "external:extends~Sub",
+        "memberof": "external:extends",
+        "meta": {
+            "code": {},
+            "filename": "extends.ts",
+            "lineno": 26,
+            "path": "./"
+        },
+        "name": "Sub",
+        "params": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "Another method\n\n",
+        "kind": "function",
+        "longname": "external:extends~Sub.method2",
+        "memberof": "external:extends~Sub",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "arg"
+                ]
+            },
+            "filename": "extends.ts",
+            "lineno": 31,
+            "path": "./"
+        },
+        "name": "method2",
+        "params": [
+            {
+                "description": "\n\nA string\n",
+                "name": "arg",
+                "type": {
+                    "names": [
+                        "string"
+                    ]
+                }
+            }
+        ],
+        "returns": []
+    },
+    {
+        "classdesc": "",
+        "comment": "<empty>",
+        "description": "A super class\n\n",
+        "extends": [],
+        "kind": "class",
+        "longname": "external:extends~Super",
+        "memberof": "external:extends",
+        "meta": {
+            "code": {},
+            "filename": "extends.ts",
+            "lineno": 15,
+            "path": "./"
+        },
+        "name": "Super",
+        "params": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "A method\n\n",
+        "kind": "function",
+        "longname": "external:extends~Super.method1",
+        "memberof": "external:extends~Super",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "arg"
+                ]
+            },
+            "filename": "extends.ts",
+            "lineno": 20,
+            "path": "./"
+        },
+        "name": "method1",
+        "params": [
+            {
+                "description": "\n\nA value\n",
+                "name": "arg",
+                "type": {
+                    "names": [
+                        "number"
+                    ]
+                }
+            }
+        ],
+        "returns": []
+    },
+    {
+        "classdesc": "*interface*\n\n**Extends:**\n * :js:class:`extends.Super`\n",
+        "comment": "<empty>",
+        "description": "An interface extending a class\n\n",
+        "extends": [
+            "Super"
+        ],
+        "kind": "interface",
+        "longname": "external:extends~ISub1",
+        "memberof": "external:extends",
+        "meta": {
+            "code": {},
+            "filename": "extends.ts",
+            "lineno": 37,
+            "path": "./"
+        },
+        "name": "ISub1",
+        "params": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "Another method\n\n",
+        "kind": "function",
+        "longname": "external:extends~ISub1.method2",
+        "memberof": "external:extends~ISub1",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "arg"
+                ]
+            },
+            "filename": "extends.ts",
+            "lineno": 42,
+            "path": "./"
+        },
+        "name": "method2",
+        "params": [
+            {
+                "description": "\n\nA string\n",
+                "name": "arg",
+                "type": {
+                    "names": [
+                        "string"
+                    ]
+                }
+            }
+        ],
+        "returns": [
+            {
+                "name": "method2",
+                "type": {
+                    "names": [
+                        "any"
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "classdesc": "*interface*\n\n**Extends:**\n * :js:class:`extends.ISuper`\n",
+        "comment": "<empty>",
+        "description": "An interface extending another interface\n\n",
+        "extends": [
+            "ISuper"
+        ],
+        "kind": "interface",
+        "longname": "external:extends~ISub2",
+        "memberof": "external:extends",
+        "meta": {
+            "code": {},
+            "filename": "extends.ts",
+            "lineno": 48,
+            "path": "./"
+        },
+        "name": "ISub2",
+        "params": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "Another method\n\n",
+        "kind": "function",
+        "longname": "external:extends~ISub2.method2",
+        "memberof": "external:extends~ISub2",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "arg"
+                ]
+            },
+            "filename": "extends.ts",
+            "lineno": 53,
+            "path": "./"
+        },
+        "name": "method2",
+        "params": [
+            {
+                "description": "\n\nA string\n",
+                "name": "arg",
+                "type": {
+                    "names": [
+                        "string"
+                    ]
+                }
+            }
+        ],
+        "returns": [
+            {
+                "name": "method2",
+                "type": {
+                    "names": [
+                        "any"
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "classdesc": "*interface*",
+        "comment": "<empty>",
+        "description": "A super interface\n\n",
+        "extends": [],
+        "kind": "interface",
+        "longname": "external:extends~ISuper",
+        "memberof": "external:extends",
+        "meta": {
+            "code": {},
+            "filename": "extends.ts",
+            "lineno": 4,
+            "path": "./"
+        },
+        "name": "ISuper",
+        "params": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "A method\n\n",
+        "kind": "function",
+        "longname": "external:extends~ISuper.method1",
+        "memberof": "external:extends~ISuper",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "arg"
+                ]
+            },
+            "filename": "extends.ts",
+            "lineno": 9,
+            "path": "./"
+        },
+        "name": "method1",
+        "params": [
+            {
+                "description": "\n\nA value\n",
+                "name": "arg",
+                "type": {
+                    "names": [
+                        "number"
+                    ]
+                }
+            }
+        ],
+        "returns": [
+            {
+                "name": "method1",
+                "type": {
+                    "names": [
+                        "any"
+                    ]
+                }
+            }
+        ]
+    }
+]
