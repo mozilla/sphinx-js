@@ -1,14 +1,14 @@
 from .directives import (auto_class_directive_bound_to_app,
                          auto_function_directive_bound_to_app,
                          auto_attribute_directive_bound_to_app)
-from .jsdoc import run_jsdoc
+from .doclets import gather_doclets
 
 
 def setup(app):
     # I believe this is the best place to run jsdoc. I was tempted to use
     # app.add_source_parser(), but I think the kind of source it's referring to
     # is RSTs.
-    app.connect('builder-inited', run_jsdoc)
+    app.connect('builder-inited', gather_doclets)
 
     app.connect('env-before-read-docs', read_all_docs)
 

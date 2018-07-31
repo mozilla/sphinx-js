@@ -1,3 +1,5 @@
+"""Converter from typedoc output to jsdoc doclet format"""
+
 import os
 import sys
 import json

@@ -1,5 +1,5 @@
 import os
-import subprocess as sub
+import subprocess
 import shutil
 import json
 from unittest import TestCase
@@ -7,6 +7,7 @@ from tempfile import mkdtemp
 
 from nose.tools import eq_
 
+from sphinx_js.doclets import program_name_on_this_platform
 from sphinx_js.typedoc import Typedoc, parse_typedoc
 
 
@@ -24,9 +25,9 @@ class Tests(TestCase):
 
     def typedoc(self, source):
         outfile = os.path.join(self.tmpdir, source + '.json')
-        typedoc_command_name = 'typedoc.cmd' if os.name == 'nt' else 'typedoc'
+        typedoc_command_name = program_name_on_this_platform('typedoc')
 
-        sub.call([
+        subprocess.call([
             typedoc_command_name,
             '--out', self.tmpdir,
             '--ignoreCompilerErrors',

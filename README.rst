@@ -300,7 +300,7 @@ Configuration Reference
   A list of directories to scan (non-recursively) for JS files, relative to Sphinx's conf.py file. Can be a string instead if there is only one. If there is more than one, ``root_for_relative_js_paths`` must be specified as well.
 
 ``jsdoc_config_path``
-  A conf.py-relative path to a jsdoc config file, which is useful if you want to specify your own jsdoc options, like recursion and custom filename matching.
+  A conf.py-relative path to a jsdoc or typedoc config file, which is useful if you want to specify your own jsdoc options, like recursion and custom filename matching.
 
 ``root_for_relative_js_paths``
   The directory relative to which relative pathnames are resolved. Defaults to ``js_source_path`` if it is only one item.
