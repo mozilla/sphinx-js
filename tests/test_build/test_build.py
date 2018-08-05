@@ -125,7 +125,8 @@ class Tests(SphinxBuildTestCase):
             '   See also:\n\n'
             '     * "DeprecatedClass"\n\n'
             '     * "deprecatedFunction"\n\n'
-            '     * "DeprecatedAttribute"\n')
+            '     * "DeprecatedAttribute"\n\n'
+            '     * Freeform text see note.\n')
 
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
@@ -208,7 +209,8 @@ class Tests(SphinxBuildTestCase):
             '   See also:\n\n'
             '     * "DeprecatedClass"\n\n'
             '     * "deprecatedFunction"\n\n'
-            '     * "DeprecatedAttribute"\n')
+            '     * "DeprecatedAttribute"\n\n'
+            '     * Freeform text see note.\n')
 
     def test_autoattribute(self):
         """Make sure ``autoattribute`` works."""
@@ -243,7 +245,8 @@ class Tests(SphinxBuildTestCase):
             '   See also:\n\n'
             '     * "DeprecatedClass"\n\n'
             '     * "deprecatedFunction"\n\n'
-            '     * "DeprecatedAttribute"\n')
+            '     * "DeprecatedAttribute"\n\n'
+            '     * Freeform text see note.\n')
 
     def test_getter_setter(self):
         """Make sure ES6-style getters and setters can be documented."""

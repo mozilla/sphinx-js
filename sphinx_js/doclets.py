@@ -65,6 +65,9 @@ def gather_doclets(app):
             segments = doclet_full_path(d, root_for_relative_paths, longname_field='memberof')
             app._sphinxjs_doclets_by_class[tuple(segments)].append(d)
 
+    # Process @see tags
+    process_see(doclets, app._sphinxjs_doclets_by_path)
+
 
 def program_name_on_this_platform(program):
     """Return the name of the executable file on the current platform, given a
@@ -139,6 +142,23 @@ def analyzer_for(language):
     except KeyError:
         raise SphinxError('Unsupported value of js_language in config: %s' % language)
 
+def process_see(doclets, suffix_tree):
+    """Process @see tags for all doclets."""
+    for doclet in doclets:
+        if 'see' in doclet:
+            see = doclet['see']
+            process_see_list(see, suffix_tree)
+
+def process_see_list(see, suffix_tree):
+    """Process a list of @see tag values.
+
+    Leaves any value with a space as freeform text.
+    Translates other values into RST crossreferences.
+    """
+    for i, item in enumerate(see):
+        if ' ' not in item:
+            item = ':any:`%s`' % item
+            see[i] = item
 
 def root_or_fallback(root_for_relative_paths, abs_source_paths):
     """Return the path that relative JS entity paths in the docs are relative to.

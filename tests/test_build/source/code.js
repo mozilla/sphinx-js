@@ -201,17 +201,20 @@ class DeprecatedExplanatoryClass {}
  * @see DeprecatedClass
  * @see deprecatedFunction
  * @see DeprecatedAttribute
+ * @see Freeform text see note.
  */
 function seeFunction() {}
 /**
  * @see DeprecatedClass
  * @see deprecatedFunction
  * @see DeprecatedAttribute
+ * @see Freeform text see note.
  */
 const SeeAttribute = null;
 /**
  * @see DeprecatedClass
  * @see deprecatedFunction
  * @see DeprecatedAttribute
+ * @see Freeform text see note.
  */
 class SeeClass {}

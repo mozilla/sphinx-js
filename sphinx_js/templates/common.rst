@@ -23,8 +23,8 @@
 {% if items -%}
 .. seealso::
 
-   {% for reference in items -%}
-   - :any:`{{ reference }}`
+   {% for item in items -%}
+   - {{ item }}
    {% endfor %}
 {%- endif %}
 {% endmacro %}
