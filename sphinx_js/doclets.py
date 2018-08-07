@@ -161,7 +161,7 @@ def process_see_list(see):
         if ' ' in item:
             item = process_see_item_text(item)
         else:
-            item = ':any:`%s`' % item
+            item = ':any:`%s`' % item.strip()
         see[i] = item
 
 
