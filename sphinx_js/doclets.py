@@ -142,12 +142,14 @@ def analyzer_for(language):
     except KeyError:
         raise SphinxError('Unsupported value of js_language in config: %s' % language)
 
+
 def process_see(doclets):
     """Process @see tags for all doclets."""
     for doclet in doclets:
         if 'see' in doclet:
             see = doclet['see']
             process_see_list(see)
+
 
 def process_see_list(see):
     """Process a list of @see tag values.
@@ -159,6 +161,7 @@ def process_see_list(see):
         if ' ' not in item:
             item = ':any:`%s`' % item
             see[i] = item
+
 
 def root_or_fallback(root_for_relative_paths, abs_source_paths):
     """Return the path that relative JS entity paths in the docs are relative to.
