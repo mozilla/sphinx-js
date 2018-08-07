@@ -66,7 +66,7 @@ def gather_doclets(app):
             app._sphinxjs_doclets_by_class[tuple(segments)].append(d)
 
     # Process @see tags
-    process_see(doclets, app._sphinxjs_doclets_by_path)
+    process_see(doclets)
 
 
 def program_name_on_this_platform(program):
@@ -142,14 +142,14 @@ def analyzer_for(language):
     except KeyError:
         raise SphinxError('Unsupported value of js_language in config: %s' % language)
 
-def process_see(doclets, suffix_tree):
+def process_see(doclets):
     """Process @see tags for all doclets."""
     for doclet in doclets:
         if 'see' in doclet:
             see = doclet['see']
-            process_see_list(see, suffix_tree)
+            process_see_list(see)
 
-def process_see_list(see, suffix_tree):
+def process_see_list(see):
     """Process a list of @see tag values.
 
     Leaves any value with a space as freeform text.
