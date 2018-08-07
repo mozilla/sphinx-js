@@ -158,10 +158,23 @@ def process_see_list(see):
     Translates other values into RST crossreferences.
     """
     for i, item in enumerate(see):
-        if ' ' not in item:
+        if ' ' in item:
+            item = process_see_item_text(item)
+        else:
             item = ':any:`%s`' % item
-            see[i] = item
+        see[i] = item
 
+
+def process_see_item_text(item):
+    """Process a single @see tag text value.
+    
+    Rolls up into a single line text value.
+    """
+    lines = item.splitlines()
+    lines = [line.strip() for line in lines]
+    item = ' '.join(lines)
+    return item
+    
 
 def root_or_fallback(root_for_relative_paths, abs_source_paths):
     """Return the path that relative JS entity paths in the docs are relative to.

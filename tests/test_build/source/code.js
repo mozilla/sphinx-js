@@ -202,6 +202,9 @@ class DeprecatedExplanatoryClass {}
  * @see deprecatedFunction
  * @see DeprecatedAttribute
  * @see Freeform text see note.
+ * @see Multiline freeform
+ *     text see
+ *     note.
  */
 function seeFunction() {}
 /**
@@ -209,6 +212,9 @@ function seeFunction() {}
  * @see deprecatedFunction
  * @see DeprecatedAttribute
  * @see Freeform text see note.
+ * @see Multiline freeform
+ *     text see
+ *     note.
  */
 const SeeAttribute = null;
 /**
@@ -216,5 +222,8 @@ const SeeAttribute = null;
  * @see deprecatedFunction
  * @see DeprecatedAttribute
  * @see Freeform text see note.
+ * @see Multiline freeform
+ *     text see
+ *     note.
  */
 class SeeClass {}
