@@ -100,9 +100,9 @@ class TypeDoc(object):
             else:
                 longname += '~'
         if kindString == 'Module':
-            return longname + 'module:' + node.get('name')[1:-1]
+            return longname + 'module:' + node.get('name').strip("'\"")
         elif kindString == 'External module':
-            return longname + 'external:' + node.get('name')[1:-1]
+            return longname + 'external:' + node.get('name').strip("'\"")
         else:
             return longname + node.get('name')
 
@@ -124,7 +124,7 @@ class TypeDoc(object):
             # Should be: names = [ self.make_longname(node)]
             parent = self.nodelist[node.get('__parentId')]
             if parent.get('kindString') == 'External module':
-                names = [parent['name'][1:-1] + '.' + node['name']]
+                names = [parent['name'].strip("'\"") + '.' + node['name']]
             else:
                 names = [node['name']]
         elif type.get('type') in ['intrinsic', 'reference']:
@@ -254,7 +254,7 @@ class TypeDoc(object):
             if node.get('flags', {}).get('isAbstract'):
                 specifiers.append('*abstract*')
             if node.get('flags', {}).get('isExported'):
-                module_name = self.get_parent(node).get('name')[1:-1]
+                module_name = self.get_parent(node).get('name').strip("'\"")
                 specifiers.append('*exported from* :js:mod:`' + module_name + '`')
             doclet['classdesc'] += ', '.join(specifiers)
             if node.get('extendedTypes'):
