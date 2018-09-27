@@ -92,7 +92,7 @@ def analyze_jsdoc(abs_source_paths, app):
 
     # Use a temporary file to handle large output volume. JSDoc defaults to
     # utf8-encoded output.
-    with getwriter('utf-8')(TemporaryFile(mode='w+')) as temp:
+    with getwriter('utf-8')(TemporaryFile(mode='w+b')) as temp:
         try:
             p = subprocess.Popen(command.make(), stdout=temp)
         except OSError as exc:
@@ -114,7 +114,7 @@ def analyze_typescript(abs_source_paths, app):
     if app.config.jsdoc_config_path:
         command.add('--tsconfig', app.config.jsdoc_config_path)
 
-    with getwriter('utf-8')(NamedTemporaryFile(mode='w+')) as temp:
+    with getwriter('utf-8')(NamedTemporaryFile(mode='w+b')) as temp:
         command.add('--json', temp.name, *abs_source_paths)
         try:
             subprocess.call(command.make())
