@@ -94,7 +94,7 @@ def analyze_jsdoc(abs_source_paths, app):
     # utf8-encoded output.
     with getwriter('utf-8')(TemporaryFile(mode='w+b')) as temp:
         try:
-            p = subprocess.Popen(command.make(), stdout=temp)
+            p = subprocess.Popen(command.make(), cwd=app.confdir, stdout=temp)
         except OSError as exc:
             if exc.errno == ENOENT:
                 raise SphinxError('%s was not found. Install it using "npm install -g jsdoc".' % command.program)
