@@ -335,6 +335,10 @@ Run ``python setup.py test``. Run ``tox`` to test across Python versions.
 Version History
 ===============
 
+2.7.1
+  * Fix a crash that would happen sometimes with UTF-8 on Windows. #67.
+  * Always use conf.py's dir for jsdoc's working dir. #78. (Thomas Khyn)
+
 2.7
   * Add experimental TypeScript support. (Wim Yedema)
 
