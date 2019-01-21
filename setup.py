@@ -25,7 +25,7 @@ setup(
                    # time to time:
                    'Sphinx==1.7.2'],
     test_suite='nose.collector',
-    url='https://github.com/erikrose/sphinx-js',
+    url='https://github.com/mozilla/sphinx-js',
     include_package_data=True,
     install_requires=['docutils', 'Jinja2>2.0,<3.0', 'parsimonious>=0.7.0,<0.8.0', 'six>=1.9.0,<2.0', 'Sphinx<2.0'],
     classifiers=[
