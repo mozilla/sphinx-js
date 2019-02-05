@@ -45,9 +45,13 @@ class SuffixTree(object):
 
         # Follow all the 1-key dicts. These are the paths that are unambiguous.
         while len(tree) == 1:
-            key = next(iterkeys(tree))
-            value = tree[key]
-            full_path.append(key)
+            if isinstance(tree, Value):
+                value = tree
+            else:
+                key = next(iterkeys(tree))
+                value = tree[key]
+                full_path.append(key)
+
             if isinstance(value, Value):
                 full_path.reverse()
                 return value.value, full_path
