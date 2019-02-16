@@ -133,7 +133,7 @@ class TypeDoc(object):
             names = ['"' + type.get('value') + '"']
         elif type.get('type') == 'array':
             names = [self.make_type_name(type.get('elementType')) + '[]']
-        elif type.get('type') == 'tuple':
+        elif type.get('type') == 'tuple' and type.get('elements'):
             types = [self.make_type_name(t) for t in type.get('elements')]
             names = ['[' + ','.join(types) + ']']
         elif type.get('type') == 'union':
