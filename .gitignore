@@ -12,3 +12,4 @@ sphinx_js.egg-info/
 .idea
 # VsCode config
 .vscode
+.DS_Store

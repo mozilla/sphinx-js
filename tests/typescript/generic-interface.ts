@@ -5,11 +5,11 @@ interface GenericInterface<T> {
     /**
      * Generic member type
      */
-    member:T
+    member: T
 
     /**
      * This is a method with a generic return type
      * @returns 42
      */
-    method2() : T
+    method2(): T
 }

@@ -283,14 +283,18 @@ class AutoClassRenderer(JsRenderer):
             doclets = self._app._sphinxjs_doclets_by_class[tuple(full_path)]
             if not include:
                 # Specifying none means listing all.
-                return sorted(doclets, key=lambda d: d['name'])
+                return sorted(doclets, key=lambda d: d.get('longname', d['name']))
             included_set = set(include)
 
             # If the special name * is included in the list, include
             # all other doclets, in sorted order.
             if '*' in included_set:
                 star_index = include.index('*')
-                not_included = sorted(d['name'] for d in doclets if d['name'] not in included_set)
+                sorted_not_included_doclets = sorted(
+                    [d for d in doclets if d['name'] not in included_set],
+                    key=lambda d: d.get('longname', d['name'])
+                )
+                not_included = [d['name'] for d in sorted_not_included_doclets]
                 include = include[:star_index] + not_included + include[star_index + 1:]
                 included_set.update(not_included)
 
