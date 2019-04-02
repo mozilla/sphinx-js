@@ -140,7 +140,7 @@ class TypeDoc(object):
             names = [self.make_type_name(t)[0] for t in type.get('types') if self.make_type_name(t)]
         elif type.get('type') == 'typeOperator':
             target_name = self.make_type_name(type.get('target'))
-            names = [type.get('operator') + ":" + ":".join(target_name)]
+            names = [type.get('operator') + ':' + ':'.join(target_name)]
         elif type.get('type') == 'typeParameter':
             names = [type.get('name')]
             constraint = type.get('constraint')
@@ -266,12 +266,12 @@ class TypeDoc(object):
             if node.get('extendedTypes'):
                 doclet['classdesc'] += '\n\n**Extends:**\n'
                 for type in node.get('extendedTypes', []):
-                    type_name = " ".join(self.make_type_name(type))
+                    type_name = ' '.join(self.make_type_name(type))
                     doclet['classdesc'] += ' * :js:class:`' + type_name + '`\n'
             if node.get('implementedTypes'):
                 doclet['classdesc'] += '\n\n**Implements:**\n'
                 for type in node.get('implementedTypes', []):
-                    type_name = " ".join(self.make_type_name(type))
+                    type_name = ' '.join(self.make_type_name(type))
                     doclet['classdesc'] += ' * :js:class:`' + type_name + '`\n'
 
             else:
