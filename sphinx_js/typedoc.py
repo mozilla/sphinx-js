@@ -133,7 +133,7 @@ class TypeDoc(object):
             names = ['"' + type.get('value') + '"']
         elif type.get('type') == 'array':
             names = [self.make_type_name(type.get('elementType'))[0] + '[]']
-        elif type.get('type') == 'tuple':
+        elif type.get('type') == 'tuple' and type.get('elements'):
             types = [self.make_type_name(t) for t in type.get('elements')]
             names = ['[' + ','.join(types) + ']']
         elif type.get('type') == 'union':
@@ -318,9 +318,9 @@ class TypeDoc(object):
         elif kindString == 'Accessor':
             doclet = self.simple_doclet('member', node)
             if node.get('getSignature'):
-                type = self.make_type(node['getSignature']['type'])
+                type = self.make_type(node['getSignature'][0]['type'])
             else:
-                type_name = node['setSignature']['parameters'][0]['type']
+                type_name = node['setSignature'][0]['parameters'][0]['type']
                 type = self.make_type(type_name)
             self.extend_doclet(doclet, type=type)
 
