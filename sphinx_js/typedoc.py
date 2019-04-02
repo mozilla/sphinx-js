@@ -127,21 +127,20 @@ class TypeDoc(object):
                 names = [parent['name'][1:-1] + '.' + node['name']]
             else:
                 names = [node['name']]
-        elif type.get('type') in ['intrinsic', 'reference']:
+        elif type.get('type') in ['intrinsic', 'reference', 'unknown']:
             names = [type.get('name')]
         elif type.get('type') == 'stringLiteral':
             names = ['"' + type.get('value') + '"']
         elif type.get('type') == 'array':
-            names = [self.make_type_name(type.get('elementType')) + '[]']
+            names = [self.make_type_name(type.get('elementType'))[0] + '[]']
         elif type.get('type') == 'tuple':
             types = [self.make_type_name(t) for t in type.get('elements')]
             names = ['[' + ','.join(types) + ']']
         elif type.get('type') == 'union':
-            types = [self.make_type_name(t) for t in type.get('types')]
-            return types
+            names = [self.make_type_name(t)[0] for t in type.get('types') if self.make_type_name(t)]
         elif type.get('type') == 'typeOperator':
             target_name = self.make_type_name(type.get('target'))
-            names = [type.get('operator'), target_name]
+            names = [type.get('operator') + ":" + ":".join(target_name)]
         elif type.get('type') == 'typeParameter':
             names = [type.get('name')]
             constraint = type.get('constraint')
@@ -149,19 +148,12 @@ class TypeDoc(object):
                 names.extend(['extends', self.make_type_name(constraint)])
         elif type.get('type') == 'reflection':
             names = ['<TODO>']
-        return ' '.join(names)
+        return names
 
     def make_type(self, type):
         """Construct a jsdoc type entry"""
         type_name = self.make_type_name(type)
-        if isinstance(type_name, list):
-            return {
-                'names': type_name
-            }
-        else:
-            return {
-                'names': [type_name]
-            }
+        return {'names': type_name}
 
     def make_description(self, comment):
         """Construct a jsdoc description entry"""
@@ -274,12 +266,12 @@ class TypeDoc(object):
             if node.get('extendedTypes'):
                 doclet['classdesc'] += '\n\n**Extends:**\n'
                 for type in node.get('extendedTypes', []):
-                    type_name = self.make_type_name(type)
+                    type_name = " ".join(self.make_type_name(type))
                     doclet['classdesc'] += ' * :js:class:`' + type_name + '`\n'
             if node.get('implementedTypes'):
                 doclet['classdesc'] += '\n\n**Implements:**\n'
                 for type in node.get('implementedTypes', []):
-                    type_name = self.make_type_name(type)
+                    type_name = " ".join(self.make_type_name(type))
                     doclet['classdesc'] += ' * :js:class:`' + type_name + '`\n'
 
             else:
