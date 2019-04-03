@@ -165,17 +165,23 @@ class TypeDoc(object):
                 comment.get('text', '')
             ])
 
-    def make_param(self, param, parent_comment=None):
+    def make_param(self, param, tags_comment=None):
         """Construct a jsdoc parameter entry"""
         typeEntry = param.get('type')
-        description = self.make_description(param.get('comment'))
+        description = self.make_description(param.get('comment', {}))
         name = param.get('name')
-        if parent_comment is not None and parent_comment.get('tags') is not None:
-            for tag in parent_comment.get('tags'):
+        # this part reads parameter descriptions that were written with
+        # @arg or @argument instead of @param, which are valid aliases
+        # but treated differently by typedoc
+        # see: https://github.com/Microsoft/TypeScript/wiki/JsDoc-support-in-JavaScript
+        if tags_comment is not None and tags_comment.get('tags', []):
+            for tag in tags_comment.get('tags', []):
                 tag_text = tag.get('text')
-                if tag.get('tag') == 'arg' and tag_text.startswith(name):
+                # the space prevents partial matching
+                # i.e. 'simple2' starts with 'simple' but not with 'simple '
+                if tag.get('tag') in ['arg', 'argument'] and tag_text.startswith(name + ' '):
                     tag_text.replace(name, '', 1)
-                    description = tag_text
+                    description += '\n\n' + tag_text
         if typeEntry is None:
             return self.make_doclet(
                 name=name,
@@ -344,7 +350,7 @@ class TypeDoc(object):
             )
             doclet['meta']['code']['paramnames'] = []
             for param in node.get('parameters', []):
-                doclet['params'].append(self.make_param(param))
+                doclet['params'].append(self.make_param(param, node.get('comment')))
                 doclet['meta']['code']['paramnames'].append(param.get('name'))
         else:
             doclet = None

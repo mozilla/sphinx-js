@@ -1,0 +1,107 @@
+[
+    {
+        "comment": "<empty>",
+        "description": "",
+        "kind": "external",
+        "longname": "external:docstring-alias",
+        "meta": {
+            "code": {},
+            "filename": "docstring-alias.ts",
+            "lineno": 1,
+            "path": "./"
+        },
+        "name": "\"docstring-alias\""
+    },
+    {
+        "classdesc": "",
+        "comment": "<empty>",
+        "description": "A definition of a class with aliases in the docstrings\n\n\n\nConstructor doc.\n\nThis is a constructor with @arg and @argument as alias for @param\nin its docstring",
+        "extends": [],
+        "kind": "class",
+        "longname": "external:docstring-alias~AliasClassDefinition",
+        "memberof": "external:docstring-alias",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "simple",
+                    "simple2"
+                ]
+            },
+            "filename": "docstring-alias.ts",
+            "lineno": 4,
+            "path": "./"
+        },
+        "name": "AliasClassDefinition",
+        "params": [
+            {
+                "description": "\n\nsimple {number} parameter with 'arg' as alias for param in its docstring",
+                "name": "simple",
+                "type": {
+                    "names": [
+                        "number"
+                    ]
+                }
+            },
+            {
+                "description": "\n\nsimple2 {number} parameter with 'argument' as alias for param in its docstring\n",
+                "name": "simple2",
+                "type": {
+                    "names": [
+                        "number"
+                    ]
+                }
+            }
+        ],
+        "returns": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "This is a method with @arg and @argument as alias for @param and\n\n",
+        "kind": "function",
+        "longname": "external:docstring-alias~AliasClassDefinition.alias_method",
+        "memberof": "external:docstring-alias~AliasClassDefinition",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "simple3",
+                    "simple4"
+                ]
+            },
+            "filename": "docstring-alias.ts",
+            "lineno": 22,
+            "path": "./"
+        },
+        "name": "alias_method",
+        "params": [
+            {
+                "description": "\n\nsimple3 {number} parameter with 'arg' as alias for param in its docstring",
+                "name": "simple3",
+                "type": {
+                    "names": [
+                        "number"
+                    ]
+                }
+            },
+            {
+                "description": "\n\nsimple4 {number} parameter with 'argument' as alias for param in its docstring",
+                "name": "simple4",
+                "type": {
+                    "names": [
+                        "number"
+                    ]
+                }
+            }
+        ],
+        "returns": [
+            {
+                "description": "as alias for @returns in its docstring",
+                "name": "alias_method",
+                "type": {
+                    "names": [
+                        "number"
+                    ]
+                }
+            }
+        ]
+    }
+]
