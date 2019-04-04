@@ -31,6 +31,7 @@ class Tests(TestCase):
             typedoc_command_name,
             '--out', self.tmpdir,
             '--ignoreCompilerErrors',
+            '--target', 'ES6',
             '--json', outfile,
             os.path.join(self.source_dir, source)
         ])

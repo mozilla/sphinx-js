@@ -1,0 +1,72 @@
+[
+    {
+        "comment": "<empty>",
+        "description": "",
+        "kind": "external",
+        "longname": "external:generic-complex",
+        "meta": {
+            "code": {},
+            "filename": "generic-complex.ts",
+            "lineno": 1,
+            "path": "./"
+        },
+        "name": "\"generic-complex\""
+    },
+    {
+        "classdesc": "",
+        "comment": "<empty>",
+        "description": "A definition of a class, using generic types containing unions and lists\n\n",
+        "extends": [],
+        "kind": "class",
+        "longname": "external:generic-complex~ClassWithComplexGenericMethodArgs",
+        "memberof": "external:generic-complex",
+        "meta": {
+            "code": {},
+            "filename": "generic-complex.ts",
+            "lineno": 4,
+            "path": "./"
+        },
+        "name": "ClassWithComplexGenericMethodArgs",
+        "params": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "A generic method\n\n",
+        "kind": "function",
+        "longname": "external:generic-complex~ClassWithComplexGenericMethodArgs.method",
+        "memberof": "external:generic-complex~ClassWithComplexGenericMethodArgs",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "arg"
+                ]
+            },
+            "filename": "generic-complex.ts",
+            "lineno": 10,
+            "path": "./"
+        },
+        "name": "method",
+        "params": [
+            {
+                "description": "\n\na generic argument",
+                "name": "arg",
+                "type": {
+                    "names": [
+                        "Partial<T|number>"
+                    ]
+                }
+            }
+        ],
+        "returns": [
+            {
+                "description": "a value of the generic type\n",
+                "name": "method",
+                "type": {
+                    "names": [
+                        "Promise<[Partial<T|number>,number]>"
+                    ]
+                }
+            }
+        ]
+    }
+]

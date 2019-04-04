@@ -29,11 +29,3 @@ class Tests(SphinxBuildTestCase):
         pos_field = contents.index('ClassDefinition.field')
         pos_method2 = contents.index('ClassDefinition.anotherMethod')
         assert_true(pos_method < pos_field < pos_method2, 'Methods and fields are not in right order in ' + contents)
-
-    def test_generic_type(self):
-        """Make sure all information about generic type is rendered"""
-        contents = self._file_contents('index')
-        assert_true(
-            '**generic** (*Promise<Partial<class.ClassDefinition>>*)' in contents,
-            'Generic type is rendered incompletely in ' + contents
-        )

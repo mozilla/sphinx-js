@@ -291,7 +291,7 @@ class AutoClassRenderer(JsRenderer):
             if '*' in included_set:
                 star_index = include.index('*')
                 sorted_not_included_doclets = sorted(
-                    [d for d in doclets if d['name'] not in included_set],
+                    (d for d in doclets if d['name'] not in included_set),
                     key=lambda d: d.get('longname', d['name'])
                 )
                 not_included = [d['name'] for d in sorted_not_included_doclets]
