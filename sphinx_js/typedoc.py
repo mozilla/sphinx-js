@@ -149,8 +149,9 @@ class TypeDoc(object):
         elif type.get('type') == 'reflection':
             names = ['<TODO>']
         if type.get('typeArguments'):
-            argNames = ', '.join([self.make_type_name(arg) for arg in type.get('typeArguments')])
-            names = [names[0] + "<" + argNames + ">"]
+            # TODO: doesnt work with union 
+            argNames = [', '.join(self.make_type_name(arg)) for arg in type.get('typeArguments')]
+            names = [names[0] + '<' + ', '.join(argNames) + '>']
         return names
 
     def make_type(self, type):
