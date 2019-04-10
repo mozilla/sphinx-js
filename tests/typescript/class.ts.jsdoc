@@ -15,26 +15,11 @@
     {
         "classdesc": "",
         "comment": "<empty>",
-        "description": "A definition of a class\n\n",
+        "description": "A definition of a class\n\n\n\nClassDefinition constructor\n\n",
         "extends": [],
         "kind": "class",
         "longname": "external:class~ClassDefinition",
         "memberof": "external:class",
-        "meta": {
-            "code": {},
-            "filename": "class.ts",
-            "lineno": 4,
-            "path": "./"
-        },
-        "name": "ClassDefinition",
-        "params": []
-    },
-    {
-        "comment": "<empty>",
-        "description": "ClassDefinition constructor\n\n",
-        "kind": "function",
-        "longname": "external:class~ClassDefinition~new ClassDefinition",
-        "memberof": "external:class~ClassDefinition",
         "meta": {
             "code": {
                 "paramnames": [
@@ -47,7 +32,7 @@
             "lineno": 4,
             "path": "./"
         },
-        "name": "new ClassDefinition",
+        "name": "ClassDefinition",
         "params": [
             {
                 "description": "A parameter with a simple type\n\n",
@@ -77,16 +62,7 @@
                 }
             }
         ],
-        "returns": [
-            {
-                "name": "new ClassDefinition",
-                "type": {
-                    "names": [
-                        "class.ClassDefinition"
-                    ]
-                }
-            }
-        ]
+        "returns": []
     },
     {
         "comment": "<empty>",
@@ -97,7 +73,7 @@
         "meta": {
             "code": {},
             "filename": "class.ts",
-            "lineno": 35,
+            "lineno": 43,
             "path": "./"
         },
         "name": "property",
@@ -116,7 +92,7 @@
         "meta": {
             "code": {},
             "filename": "class.ts",
-            "lineno": 38,
+            "lineno": 46,
             "path": "./"
         },
         "name": "property2",
@@ -135,7 +111,7 @@
         "meta": {
             "code": {},
             "filename": "class.ts",
-            "lineno": 44,
+            "lineno": 52,
             "path": "./"
         },
         "name": "property3",
@@ -154,7 +130,7 @@
         "meta": {
             "code": {},
             "filename": "class.ts",
-            "lineno": 52,
+            "lineno": 60,
             "path": "./"
         },
         "name": "property4",
@@ -269,6 +245,50 @@
                 "type": {
                     "names": [
                         "number"
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "comment": "<empty>",
+        "description": "This is a method with a union type\n\n",
+        "kind": "function",
+        "longname": "external:class~ClassDefinition.method3",
+        "memberof": "external:class~ClassDefinition",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "union"
+                ]
+            },
+            "filename": "class.ts",
+            "lineno": 38,
+            "path": "./"
+        },
+        "name": "method3",
+        "params": [
+            {
+                "description": "\n\nA parameter with a union type",
+                "name": "union",
+                "type": {
+                    "names": [
+                        "number",
+                        "string",
+                        "any"
+                    ]
+                }
+            }
+        ],
+        "returns": [
+            {
+                "description": "union\n",
+                "name": "method3",
+                "type": {
+                    "names": [
+                        "number",
+                        "string",
+                        "any"
                     ]
                 }
             }

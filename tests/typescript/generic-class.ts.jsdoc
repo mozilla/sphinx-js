@@ -15,31 +15,11 @@
     {
         "classdesc": "",
         "comment": "<empty>",
-        "description": "A definition of a generic class\n\n",
+        "description": "A definition of a generic class\n\n\n\nGenericClass constructor\n\n",
         "extends": [],
         "kind": "class",
         "longname": "external:generic-class~GenericClass",
         "memberof": "external:generic-class",
-        "meta": {
-            "code": {},
-            "filename": "generic-class.ts",
-            "lineno": 4,
-            "path": "./"
-        },
-        "name": "GenericClass",
-        "params": [
-            {
-                "description": "",
-                "name": "T"
-            }
-        ]
-    },
-    {
-        "comment": "<empty>",
-        "description": "GenericClass constructor\n\n",
-        "kind": "function",
-        "longname": "external:generic-class~GenericClass~new GenericClass",
-        "memberof": "external:generic-class~GenericClass",
         "meta": {
             "code": {
                 "paramnames": [
@@ -50,7 +30,7 @@
             "lineno": 4,
             "path": "./"
         },
-        "name": "new GenericClass",
+        "name": "GenericClass",
         "params": [
             {
                 "description": "Generic as argument\n\n\n",
@@ -62,16 +42,7 @@
                 }
             }
         ],
-        "returns": [
-            {
-                "name": "new GenericClass",
-                "type": {
-                    "names": [
-                        "generic-class.GenericClass"
-                    ]
-                }
-            }
-        ]
+        "returns": []
     },
     {
         "comment": "<empty>",
@@ -82,7 +53,7 @@
         "meta": {
             "code": {},
             "filename": "generic-class.ts",
-            "lineno": 16,
+            "lineno": 9,
             "path": "./"
         },
         "name": "member",

@@ -8,3 +8,7 @@ sphinx_js.egg-info/
 */__pycache__/*
 # Python 2.7
 *.pyc
+# Pycharm config
+.idea
+# VsCode config
+.vscode

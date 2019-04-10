@@ -37,7 +37,7 @@
                 "name": "K",
                 "type": {
                     "names": [
-                        "keyof T"
+                        "keyof:T"
                     ]
                 }
             }
@@ -58,7 +58,7 @@
         "name": "K",
         "type": {
             "names": [
-                ""
+                "T[K]"
             ]
         }
     }

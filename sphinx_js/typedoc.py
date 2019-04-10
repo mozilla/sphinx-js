@@ -127,21 +127,20 @@ class TypeDoc(object):
                 names = [parent['name'][1:-1] + '.' + node['name']]
             else:
                 names = [node['name']]
-        elif type.get('type') in ['intrinsic', 'reference']:
+        elif type.get('type') in ['intrinsic', 'reference', 'unknown']:
             names = [type.get('name')]
         elif type.get('type') == 'stringLiteral':
             names = ['"' + type.get('value') + '"']
         elif type.get('type') == 'array':
-            names = [self.make_type_name(type.get('elementType')) + '[]']
+            names = [self.make_type_name(type.get('elementType'))[0] + '[]']
         elif type.get('type') == 'tuple' and type.get('elements'):
             types = [self.make_type_name(t) for t in type.get('elements')]
             names = ['[' + ','.join(types) + ']']
         elif type.get('type') == 'union':
-            types = [self.make_type_name(t) for t in type.get('types')]
-            names = [' | '.join(types)]
+            names = [self.make_type_name(t)[0] for t in type.get('types') if self.make_type_name(t)]
         elif type.get('type') == 'typeOperator':
             target_name = self.make_type_name(type.get('target'))
-            names = [type.get('operator'), target_name]
+            names = [type.get('operator') + ':' + ':'.join(target_name)]
         elif type.get('type') == 'typeParameter':
             names = [type.get('name')]
             constraint = type.get('constraint')
@@ -149,13 +148,12 @@ class TypeDoc(object):
                 names.extend(['extends', self.make_type_name(constraint)])
         elif type.get('type') == 'reflection':
             names = ['<TODO>']
-        return ' '.join(names)
+        return names
 
     def make_type(self, type):
         """Construct a jsdoc type entry"""
-        return {
-            'names': [self.make_type_name(type)]
-        }
+        type_name = self.make_type_name(type)
+        return {'names': type_name}
 
     def make_description(self, comment):
         """Construct a jsdoc description entry"""
@@ -167,19 +165,33 @@ class TypeDoc(object):
                 comment.get('text', '')
             ])
 
-    def make_param(self, param):
+    def make_param(self, param, tags_comment=None):
         """Construct a jsdoc parameter entry"""
         typeEntry = param.get('type')
+        description = self.make_description(param.get('comment', {}))
+        name = param.get('name')
+        # this part reads parameter descriptions that were written with
+        # @arg or @argument instead of @param, which are valid aliases
+        # but treated differently by typedoc
+        # see: https://github.com/Microsoft/TypeScript/wiki/JsDoc-support-in-JavaScript
+        if tags_comment is not None and tags_comment.get('tags', []):
+            for tag in tags_comment.get('tags', []):
+                tag_text = tag.get('text')
+                # the space prevents partial matching
+                # i.e. 'simple2' starts with 'simple' but not with 'simple '
+                if tag.get('tag') in ['arg', 'argument'] and tag_text.startswith(name + ' '):
+                    tag_text.replace(name, '', 1)
+                    description += '\n\n' + tag_text
         if typeEntry is None:
             return self.make_doclet(
-                name=param.get('name'),
-                description=self.make_description(param.get('comment'))
+                name=name,
+                description=description
             )
         else:
             return self.make_doclet(
-                name=param.get('name'),
+                name=name,
                 type=self.make_type(typeEntry),
-                description=self.make_description(param.get('comment'))
+                description=description
             )
 
     def make_result(self, param):
@@ -213,7 +225,7 @@ class TypeDoc(object):
             name=node.get('name'),
             longname=self.make_longname(node),
             memberof=memberof,
-            description=self.make_description(comment)
+            description=self.make_description(comment),
         )
 
     def convert_node(self, node):
@@ -260,17 +272,41 @@ class TypeDoc(object):
             if node.get('extendedTypes'):
                 doclet['classdesc'] += '\n\n**Extends:**\n'
                 for type in node.get('extendedTypes', []):
-                    type_name = self.make_type_name(type)
+                    type_name = ' '.join(self.make_type_name(type))
                     doclet['classdesc'] += ' * :js:class:`' + type_name + '`\n'
             if node.get('implementedTypes'):
                 doclet['classdesc'] += '\n\n**Implements:**\n'
                 for type in node.get('implementedTypes', []):
-                    type_name = self.make_type_name(type)
+                    type_name = ' '.join(self.make_type_name(type))
                     doclet['classdesc'] += ' * :js:class:`' + type_name + '`\n'
 
-            doclet['params'] = []
-            for param in node.get('typeParameter', []):
-                doclet['params'].append(self.make_param(param))
+            else:
+                doclet['params'] = []
+                for param in node.get('typeParameter', []):
+                    doclet['params'].append(self.make_param(param))
+
+            if kindString == 'Class':
+                for child in node.get('children'):
+                    if (child.get('kindString') == 'Constructor'):
+                        child_comment = child.get('comment', {})
+                        child_description = self.make_description(child_comment)
+                        doclet['description'] += '\n\n{}'.format(child_description)
+                        if child.get('flags', {}).get('isAbstract'):
+                            doclet['description'] = '*abstract*\n\n' + doclet['description']
+                        if child.get('flags', {}).get('isOptional'):
+                            doclet['description'] = '*optional*\n\n' + doclet['description']
+                        self.extend_doclet(
+                            doclet,
+                            params=[],
+                            returns=self.make_result(child)
+                        )
+                        signature = child.get('signatures')[0]
+                        doclet['meta']['code']['paramnames'] = []
+                        for param in signature.get('parameters', []):
+                            doclet['params'].append(self.make_param(param, child_comment))
+                            doclet['meta']['code']['paramnames'].append(param.get('name'))
+                        break
+
             self.extend_doclet(
                 doclet,
                 extends=[e['name'] for e in node.get('extendedTypes', [])]
@@ -300,7 +336,7 @@ class TypeDoc(object):
                 self.convert_node(sig)
             return
 
-        elif kindString in ['Constructor signature', 'Call signature']:
+        elif kindString in ['Call signature']:
             parent = self.get_parent(node)
             doclet = self.simple_doclet('function', node)
             if parent.get('flags', {}).get('isAbstract'):
@@ -314,7 +350,7 @@ class TypeDoc(object):
             )
             doclet['meta']['code']['paramnames'] = []
             for param in node.get('parameters', []):
-                doclet['params'].append(self.make_param(param))
+                doclet['params'].append(self.make_param(param, node.get('comment')))
                 doclet['meta']['code']['paramnames'].append(param.get('name'))
         else:
             doclet = None

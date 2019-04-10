@@ -30,6 +30,14 @@ class ClassDefinition {
     method2(simple:number, complex:{[id:string]:any}, ...args:any[]) : number {
         return 42;
     }
+    /**
+     * This is a method with a union type
+     * @param union A parameter with a union type
+     * @returns union
+     */
+    method3(union: number | string | any) : number | string | any{
+        return union;
+    }
 
     /** Read/write property/variable */
     property: any
