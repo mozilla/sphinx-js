@@ -1,4 +1,5 @@
-from nose.tools import assert_raises, eq_
+# -*- coding: utf-8 -*-
+import pytest
 
 from sphinx_js.suffix_tree import SuffixAmbiguous, SuffixNotFound, SuffixTree
 
@@ -9,7 +10,9 @@ def test_things():
     s.add(['./', 'dir/', 'footils.', 'max'], 2)
     s.add(['./', 'dir/', 'footils.', 'hacks'], 3)
 
-    eq_(s.get(['hacks']), 3)
-    eq_(s.get(['footils.', 'max']), 2)
-    assert_raises(SuffixNotFound, s.get, ['quacks.', 'max'])
-    assert_raises(SuffixAmbiguous, s.get, ['max'])
+    assert s.get(['hacks']) == 3
+    assert s.get(['footils.', 'max']) == 2
+    with pytest.raises(SuffixNotFound):
+        s.get(['quacks.', 'max'])
+    with pytest.raises(SuffixAmbiguous):
+        s.get(['max'])

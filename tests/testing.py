@@ -1,10 +1,10 @@
+# -*- coding: utf-8 -*-
 from io import open
 from os.path import dirname, join
 from shutil import rmtree
 from unittest import TestCase
 import sys
 
-from nose.tools import eq_
 from sphinx.cmdline import main as sphinx_main
 from sphinx.util.osutil import cd
 
@@ -39,4 +39,4 @@ class SphinxBuildTestCase(TestCase):
             return file.read()
 
     def _file_contents_eq(self, filename, contents):
-        eq_(self._file_contents(filename), contents)
+        assert self._file_contents(filename) == contents

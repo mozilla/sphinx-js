@@ -1,11 +1,10 @@
+# -*- coding: utf-8 -*-
 import os
 import subprocess
 import shutil
 import json
 from unittest import TestCase
 from tempfile import mkdtemp
-
-from nose.tools import eq_
 
 from sphinx_js.doclets import program_name_on_this_platform
 from sphinx_js.typedoc import TypeDoc, parse_typedoc
@@ -39,7 +38,7 @@ class Tests(TestCase):
     def test_empty(self):
         json = {}
         jsdoc = TypeDoc(json).jsdoc
-        eq_(jsdoc, [])
+        assert jsdoc == []
 
     def test_references(self):
         for source in os.listdir(self.source_dir):
@@ -62,4 +61,4 @@ class Tests(TestCase):
                 else:
                     with open(jsdoc_ref_file, 'r') as jsdocfile:
                         jsdoc_ref = json.load(jsdocfile)
-                    eq_(jsdoc, jsdoc_ref)
+                    assert jsdoc == jsdoc_ref
