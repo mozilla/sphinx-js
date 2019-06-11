@@ -1,5 +1,6 @@
 /.eggs
 /.tox
+/.pytest_cache
 /build
 /dist
 /tests/source/docs/_build
