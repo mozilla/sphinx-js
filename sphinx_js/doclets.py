@@ -45,7 +45,9 @@ def gather_doclets(app):
                 doclet_full_path(d, root_for_relative_paths),
                 d)
         except PathTaken as conflict:
-            conflicts.append(conflict.segments)
+            # Allow overloaded functions, but not other duplicates
+            if d['kind'] != 'function':
+                conflicts.append(conflict.segments)
     if conflicts:
         raise PathsTaken(conflicts)
 
