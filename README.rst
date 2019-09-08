@@ -304,6 +304,11 @@ Configuration Reference
 ``root_for_relative_js_paths``
   The directory relative to which relative pathnames are resolved. Defaults to ``js_source_path`` if it is only one item.
 
+``jsdoc_cache``
+  Path to a file where JSDoc data used for references will be cached. Defaults
+  to None, JSDoc is always ran to gather docstrings. If you have a large number of source files, it may be beneficial to configure this value. Be careful, the cache is not automatically detected as stale if your source code change, you'll want to `rm` it manually if you need to
+  refresh it.
+
 Example
 =======
 
