@@ -8,12 +8,16 @@ from os.path import abspath, relpath, splitext, sep
 import subprocess
 from tempfile import TemporaryFile, NamedTemporaryFile
 
+from parsimonious.exceptions import ParseError
 from six import string_types
 from sphinx.errors import SphinxError
+from sphinx.util.logging import getLogger
 
 from .parsers import path_and_formal_params, PathVisitor
 from .suffix_tree import PathTaken, SuffixTree
 from .typedoc import parse_typedoc
+
+logger = getLogger(__name__)
 
 
 def gather_doclets(app):
@@ -46,8 +50,17 @@ def gather_doclets(app):
                 d)
         except PathTaken as conflict:
             conflicts.append(conflict.segments)
+        except ParseError:
+            if not app.config.sphinx_js_lax:
+                raise
+            else:
+                logger.warning('Could not parse correctly %s' % d)
     if conflicts:
-        raise PathsTaken(conflicts)
+        exception = PathsTaken(conflicts)
+        if not app.config.sphinx_js_lax:
+            raise exception
+        else:
+            logger.warning('%s' % exception)
 
     # Build lookup table for autoclass's :members: option. This will also
     # pick up members of functions (inner variables), but it will instantly
