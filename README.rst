@@ -330,10 +330,19 @@ Caveats
 Tests
 =====
 
-To test modified code you will need to have all dependencies installed ``npm i -g jsdoc typedoc``,
-``pip install -r requirements_dev.txt`` and ``pip install -e .``.
-The tests can than simply be run by run ``pytest`` in the root folder of the project.
-To test across different Python versions, run ``tox``.
+First, install dependencies::
+
+    npm i -g jsdoc typedoc
+    pip install -r requirements_dev.txt
+    pip install -e .
+
+Then, run the tests::
+
+    pytest
+
+To test across different Python versions... ::
+
+    tox
 
 Version History
 ===============
