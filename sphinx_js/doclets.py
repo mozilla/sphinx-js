@@ -1,7 +1,8 @@
 from codecs import getwriter
 from collections import defaultdict
 from errno import ENOENT
-from json import load
+from functools import wraps
+from json import load, dump
 import os
 from os.path import abspath, relpath, splitext, sep
 import subprocess
@@ -84,6 +85,30 @@ class Command(object):
         return [self.program] + self.args
 
 
+def cache_to_file(get_filename):
+    """Return a decorator that will cache the result of ``get_filename()`` to a
+    file
+
+    :arg get_filename: A function which receives the original arguments of the
+        decorated function
+    """
+    def decorator(fn):
+        @wraps(fn)
+        def decorated(*args, **kwargs):
+            filename = get_filename(*args, **kwargs)
+            if filename and os.path.isfile(filename):
+                with open(filename) as f:
+                    return load(f)
+            res = fn(*args, **kwargs)
+            if filename:
+                with open(filename, 'w') as f:
+                    dump(res, f, indent=2)
+            return res
+        return decorated
+    return decorator
+
+
+@cache_to_file(lambda abs_source_paths, app: getattr(app.config, 'jsdoc_cache', None))
 def analyze_jsdoc(abs_source_paths, app):
     command = Command('jsdoc')
     command.add('-X', *abs_source_paths)

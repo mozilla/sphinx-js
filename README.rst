@@ -304,6 +304,9 @@ Configuration Reference
 ``root_for_relative_js_paths``
   The directory relative to which relative pathnames are resolved. Defaults to ``js_source_path`` if it is only one item.
 
+``jsdoc_cache``
+  Path to a file where jsdoc output will be cached. If omitted, jsdoc will be run every time Sphinx is. If you have a large number of source files, it may be beneficial to configure this value. But be careful: the cache is not automatically flushed if your source code changes; you must delete it manually.
+
 Example
 =======
 
