@@ -26,6 +26,7 @@ def typedoc():
             typedoc_command_name,
             '--out', tmpdir,
             '--ignoreCompilerErrors',
+            '--target', 'ES6',
             '--json', outfile,
             os.path.join(TS_SOURCE_DIR, source)
         ])
