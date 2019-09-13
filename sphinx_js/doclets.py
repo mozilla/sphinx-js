@@ -1,7 +1,7 @@
 from codecs import getwriter
 from collections import defaultdict
 from errno import ENOENT
-import functools
+from functools import wraps
 from json import load, dump
 import os
 from os.path import abspath, relpath, splitext, sep
@@ -86,13 +86,14 @@ class Command(object):
 
 
 def cache_to_file(get_filename):
-    """Returns a decorator that will cache the result of fn to a file
+    """Return a decorator that will cache the result of ``get_filename()`` to a
+    file
 
-    The name of the file is computed at run-time by get_filename.
-    get_filename receives the original arguments of fn.
+    :arg get_filename: A function which receives the original arguments of the
+        decorated function
     """
     def decorator(fn):
-        @functools.wraps(fn)
+        @wraps(fn)
         def decorated(*args, **kwargs):
             filename = get_filename(*args, **kwargs)
             if filename and os.path.isfile(filename):
