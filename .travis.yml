@@ -7,6 +7,14 @@ addons:
 python:
   - "2.7"
   - "3.6"
+
+matrix:
+  fast_finish: true
+  include:
+    - python: 3.6
+      env: TOXENV=flake8
+      install: pip install tox
+
 install:
   - npm install jsdoc@3.5.5
   - npm install typedoc@0.14.1

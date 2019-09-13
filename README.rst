@@ -330,7 +330,19 @@ Caveats
 Tests
 =====
 
-Run ``python setup.py test``. Run ``tox`` to test across Python versions.
+First, install dependencies::
+
+    npm i -g jsdoc typedoc
+    pip install -r requirements_dev.txt
+    pip install -e .
+
+Then, run the tests::
+
+    pytest
+
+To test across different Python versions... ::
+
+    tox
 
 Version History
 ===============

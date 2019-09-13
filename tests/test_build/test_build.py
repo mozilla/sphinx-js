@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from nose.tools import assert_in, assert_not_in
-
 from tests.testing import SphinxBuildTestCase
 
 
@@ -131,8 +129,8 @@ class Tests(SphinxBuildTestCase):
         """Make sure classes show their class comment and constructor
         comment."""
         contents = self._file_contents('autoclass')
-        assert_in('Class doc.', contents)
-        assert_in('Constructor doc.', contents)
+        assert 'Class doc.' in contents
+        assert 'Constructor doc.' in contents
 
     def test_autoclass_members(self):
         """Make sure classes list their members if ``:members:`` is specified.
@@ -171,15 +169,15 @@ class Tests(SphinxBuildTestCase):
         """Make sure classes list their private members if
         ``:private-members:`` is specified."""
         contents = self._file_contents('autoclass_private_members')
-        assert_in('secret()', contents)
+        assert 'secret()' in contents
 
     def test_autoclass_exclude_members(self):
         """Make sure ``exclude-members`` option actually excludes listed
         members."""
         contents = self._file_contents('autoclass_exclude_members')
-        assert_in('publical()', contents)
-        assert_not_in('publical2', contents)
-        assert_not_in('publical3', contents)
+        assert 'publical()' in contents
+        assert 'publical2' not in contents
+        assert 'publical3' not in contents
 
     def test_autoclass_example(self):
         """Make sure @example tags can be documented with autoclass."""
