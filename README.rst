@@ -350,6 +350,15 @@ To test across different Python versions... ::
 Version History
 ===============
 
+2.8
+  * Display generic TypeScript types properly. Make fields come before methods. (Paul Grau)
+  * Combine constructor and class documentation at the top TypeScript classes. (Sebastian Weigand)
+  * Switch to pytest as the testrunner. (Sebastian Weigand)
+  * Add optional caching of jsdoc output, for large codebases. (Patrick Browne)
+  * Fix the display of union types in TypeScript. (Sebastian Weigand)
+  * Fix parsing breakage that began in typedoc 0.14.0. (Paul Grau)
+  * Fix a data-intake crash with TypeScript. (Cristiano Santos)
+
 2.7.1
   * Fix a crash that would happen sometimes with UTF-8 on Windows. #67.
   * Always use conf.py's dir for jsdoc's working dir. #78. (Thomas Khyn)
