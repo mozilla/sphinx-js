@@ -336,7 +336,7 @@ Tests
 Run the tests using tox, which will also install jsdoc and typedoc at pinned versions::
 
     pip install tox
-    tox -e py37
+    tox
 
 Version History
 ===============
