@@ -283,7 +283,7 @@ To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and th
 TypeScript support
 ------------------
 
-There is experimental TypeScript support in sphinx-js. Enable it by setting the config variable ``js_language = 'typescript'``. Then, instead of installing JSDoc, install TypeDoc (version 0.11.1 is known to work)::
+There is experimental TypeScript support in sphinx-js. Enable it by setting the config variable ``js_language = 'typescript'``. Then, instead of installing JSDoc, install TypeDoc (version 0.15.0 is known to work)::
 
     npm install -g typedoc
 
@@ -320,9 +320,9 @@ A good example using most of sphinx-js's functionality is the Fathom documentati
 
 Then put the version of sphinx-js you want in ``docs/requirements.txt``. For example... ::
 
-    sphinx-js==2.5
+    sphinx-js==2.8
 
-Or, if you prefer, the Fathom repo carries a `Travis CI configuration <https://github.com/mozilla/fathom/blob/master/.travis.yml>`_ and a `deployment script <https://github.com/mozilla/fathom/blob/master/docs/tooling/travis-deploy-docs>`_ for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them.
+Or, if you prefer, the Fathom repo carries a `Travis CI configuration <https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/.travis.yml#L41>`_ and a `deployment script <https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/tooling/travis-deploy-docs>`_ for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them.
 
 Caveats
 =======
