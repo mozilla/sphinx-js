@@ -50,11 +50,11 @@ def gather_doclets(app):
                 d)
         except PathTaken as conflict:
             conflicts.append(conflict.segments)
-        except ParseError:
+        except ParseError as e:
             if not app.config.sphinx_js_lax:
                 raise
             else:
-                logger.warning('Could not parse correctly %s' % d)
+                logger.warning('Could not parse path correctly %s' % e.text)
     if conflicts:
         exception = PathsTaken(conflicts)
         if not app.config.sphinx_js_lax:

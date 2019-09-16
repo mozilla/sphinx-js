@@ -98,10 +98,10 @@ def test_gather_doclets_conflicted_lax():
     app.config.js_source_path = 'source-path'
     app.config.root_for_relative_js_paths = '/boogie/smoo/Checkouts/fathom'
 
-    with patch('sphinx_js.doclets.logger', Mock()) as m:
+    with patch('sphinx_js.doclets.logger', Mock()) as logger_mock:
         gather_doclets(app)
 
-        message, = m.warning.call_args_list[0][0]
+        message, = logger_mock.warning.call_args_list[0][0]
         assert './utils.best#thing~yeah' in message
         assert './utils.best#thing~woot' in message
 
@@ -123,3 +123,36 @@ def test_gather_doclets_conflicted():
     message = str(e.value)
     assert './utils.best#thing~yeah' in message
     assert './utils.best#thing~woot' in message
+
+
+def test_gather_doclets_parse_error():
+    app = Mock()
+    app.config.js_language = 'javascript'
+    app.config.js_source_path = 'source-path'
+    app.config.root_for_relative_js_paths = '/boogie/smoo/Checkouts/fathom'
+    app.config.sphinx_js_lax = True
+
+    parse_error_doclet = {
+        'comment': True,
+        'undocumented': False,
+        'longname': 'best#thing~yeah',
+        'meta': {
+            'filename': 'utils.jsm',
+            'path': '../boogie/smoo/Checkouts/fathom'
+        }
+    }
+
+    def patch_logger():
+        return patch('sphinx_js.doclets.logger', Mock())
+
+    def patch_analyze():
+        return patch('sphinx_js.doclets.ANALYZERS', {
+            'javascript': mock_analyze_jsdoc([parse_error_doclet])
+        })
+
+    with patch_logger() as logger_mock, patch_analyze():
+        gather_doclets(app)
+
+    message, = logger_mock.warning.call_args_list[0][0]
+    assert 'Could not parse path correctly' in message
+    assert 'boogie/smoo/Checkouts/fathom/utils.best#thing~yeah' in message
