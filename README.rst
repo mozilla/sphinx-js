@@ -16,7 +16,7 @@ Setup
 
         npm install -g jsdoc
 
-   We work with jsdoc 3.4.3, 3.5.4, and quite possibly other versions.
+   We work with jsdoc 3.6.3 and quite possibly other versions.
 
 2. Install sphinx-js, which will pull in Sphinx itself as a dependency::
 
@@ -333,19 +333,10 @@ Caveats
 Tests
 =====
 
-First, install dependencies::
+Run the tests using tox, which will also install jsdoc and typedoc at pinned versions::
 
-    npm i -g jsdoc typedoc
-    pip install -r requirements_dev.txt
-    pip install -e .
-
-Then, run the tests::
-
-    pytest
-
-To test across different Python versions... ::
-
-    tox
+    pip install tox
+    tox -e py37
 
 Version History
 ===============

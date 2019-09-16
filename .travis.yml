@@ -6,7 +6,7 @@ addons:
       - npm
 python:
   - "2.7"
-  - "3.6"
+  - "3.7"
 
 matrix:
   fast_finish: true
@@ -16,8 +16,6 @@ matrix:
       install: pip install tox
 
 install:
-  - npm install jsdoc@3.5.5
-  - npm install typedoc@0.14.1
   - pip install tox-travis
 script:
-  - PATH=$TRAVIS_BUILD_DIR/node_modules/.bin:$PATH tox
+  - tox
