@@ -3,6 +3,7 @@
 /.pytest_cache
 /build
 /dist
+/node_modules
 /tests/source/docs/_build
 sphinx_js.egg-info/
 # Python 3

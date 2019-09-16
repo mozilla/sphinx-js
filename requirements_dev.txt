@@ -1,5 +1,4 @@
-tox
-pytest
+pytest==5.1.2
 recommonmark==0.4.0
 # Sphinx's plain-text renderer changes behavior slightly
 # with regard to how it emits class names and em dashes from

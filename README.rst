@@ -333,19 +333,10 @@ Caveats
 Tests
 =====
 
-First, install dependencies::
+Run the tests using tox, which will also install jsdoc and typedoc at pinned versions::
 
-    npm i -g jsdoc typedoc
-    pip install -r requirements_dev.txt
-    pip install -e .
-
-Then, run the tests::
-
-    pytest
-
-To test across different Python versions... ::
-
-    tox
+    pip install tox
+    tox -e py37
 
 Version History
 ===============
