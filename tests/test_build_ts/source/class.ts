@@ -26,4 +26,18 @@ class ClassDefinition {
     anotherMethod() {
 
     }
+
+    /**
+     * This is an overloaded method (1).
+     */
+    overloaded(arg: number): number;
+
+    /**
+     * This is an overloaded method (2).
+     */
+    overloaded(arg: string): string;
+
+    overloaded(arg: number | string): number | string {
+        return arg;
+    }
 }

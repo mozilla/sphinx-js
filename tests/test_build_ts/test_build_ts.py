@@ -27,3 +27,10 @@ class Tests(SphinxBuildTestCase):
         pos_field = contents.index('ClassDefinition.field')
         pos_method2 = contents.index('ClassDefinition.anotherMethod')
         assert pos_method < pos_field < pos_method2, 'Methods and fields are not in right order in ' + contents
+
+    def test_overloads(self):
+        """Make sure overloaded methods work."""
+        contents = self._file_contents('index')
+        pos_overloaded_1 = contents.index('overloaded method (1)')
+        pos_overloaded_2 = contents.index('overloaded method (2)')
+        assert pos_overloaded_1 < pos_overloaded_2, 'Method overloads are not in right order in ' + contents
