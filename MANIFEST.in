@@ -1,2 +1,2 @@
 recursive-include sphinx_js/templates *.rst
-
+include LICENSE
