@@ -145,7 +145,7 @@ class TypeDoc(object):
             names = [type.get('name')]
             constraint = type.get('constraint')
             if constraint is not None:
-                names.extend(['extends', self.make_type_name(constraint)])
+                names.extend(['extends'] + self.make_type_name(constraint))
         elif type.get('type') == 'reflection':
             names = ['<TODO>']
         if type.get('typeArguments'):
