@@ -2,6 +2,7 @@ from codecs import getwriter
 from collections import defaultdict
 from errno import ENOENT
 from functools import wraps
+from io import TextIOWrapper
 from json import load, dump
 import os
 from os.path import abspath, relpath, splitext, sep
@@ -20,7 +21,7 @@ def gather_doclets(app):
     """Run JSDoc or another analysis tool across a whole codebase, and squirrel
     away its results in jsdoc doclet format."""
     source_paths = [app.config.js_source_path] if isinstance(app.config.js_source_path, string_types) else app.config.js_source_path
-    # Uses cwd, which Sphinx seems to set to the dir containing conf.py:
+    # Uses cwd, which Sphinx seems to set to the dir containing conf.py. Hmm, not always, though.
     abs_source_paths = [abspath(path) for path in source_paths]
 
     root_for_relative_paths = root_or_fallback(app.config.root_for_relative_js_paths,
@@ -129,7 +130,9 @@ def analyze_jsdoc(abs_source_paths, app):
         # Once output is finished, move back to beginning of file and load it:
         temp.seek(0)
         try:
-            return load(temp)
+            # In Python 3.5, load() can't take bytes (and Popen can't take an
+            # "encoding" kwarg), so we have to decode manually here:
+            return load(TextIOWrapper(temp, encoding='utf-8'))
         except ValueError:
             raise SphinxError('jsdoc found no JS files in the directories %s. Make sure js_source_path is set correctly in conf.py. It is also possible (though unlikely) that jsdoc emitted invalid JSON.' % abs_source_paths)
 
