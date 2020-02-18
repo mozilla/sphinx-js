@@ -289,7 +289,7 @@ class TypeDoc(object):
                     doclet['params'].append(self.make_param(param))
 
             if kindString == 'Class':
-                for child in node.get('children'):
+                for child in node.get('children', []):
                     if (child.get('kindString') == 'Constructor'):
                         child_comment = child.get('comment', {})
                         child_description = self.make_description(child_comment)
