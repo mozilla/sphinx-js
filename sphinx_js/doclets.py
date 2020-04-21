@@ -20,6 +20,11 @@ def gather_doclets(app):
     """Run JSDoc or another analysis tool across a whole codebase, and squirrel
     away its results in jsdoc doclet format."""
     source_paths = [app.config.js_source_path] if isinstance(app.config.js_source_path, string_types) else app.config.js_source_path
+    # Set expected cwd
+    cwd = os.getcwd()
+    if cwd != app.confdir:
+        os.chdir(app.confdir)
+
     # Uses cwd, which Sphinx seems to set to the dir containing conf.py:
     abs_source_paths = [abspath(path) for path in source_paths]
 
