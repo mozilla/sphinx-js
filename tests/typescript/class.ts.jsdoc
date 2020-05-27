@@ -273,9 +273,7 @@
                 "name": "union",
                 "type": {
                     "names": [
-                        "number",
-                        "string",
-                        "any"
+                        "number|string|any"
                     ]
                 }
             }
@@ -286,9 +284,7 @@
                 "name": "method3",
                 "type": {
                     "names": [
-                        "number",
-                        "string",
-                        "any"
+                        "number|string|any"
                     ]
                 }
             }

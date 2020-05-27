@@ -118,45 +118,46 @@ class TypeDoc(object):
 
     def make_type_name(self, type):
         """Construct the name of a type from a Typedoc type entry"""
-        names = []
+        name = ''
         if type.get('type') == 'reference' and type.get('id'):
             node = self.nodelist[type.get('id')]
             # Should be: names = [ self.make_longname(node)]
             parent = self.nodelist[node.get('__parentId')]
             if parent.get('kindString') == 'External module':
-                names = [parent['name'][1:-1] + '.' + node['name']]
+                name = parent['name'][1:-1] + '.' + node['name']
             else:
-                names = [node['name']]
+                name = node['name']
         elif type.get('type') in ['intrinsic', 'reference', 'unknown']:
-            names = [type.get('name')]
+            name = type.get('name')
         elif type.get('type') == 'stringLiteral':
-            names = ['"' + type.get('value') + '"']
+            name = '"' + type.get('value') + '"'
         elif type.get('type') == 'array':
-            names = [self.make_type_name(type.get('elementType'))[0] + '[]']
+            name = self.make_type_name(type.get('elementType')) + '[]'
         elif type.get('type') == 'tuple' and type.get('elements'):
-            types = ['|'.join(self.make_type_name(t)) for t in type.get('elements')]
-            names = ['[' + ','.join(types) + ']']
+            types = [self.make_type_name(t) for t in type.get('elements')]
+            name = '[' + ','.join(types) + ']'
         elif type.get('type') == 'union':
-            names = [self.make_type_name(t)[0] for t in type.get('types') if self.make_type_name(t)]
+            types = [self.make_type_name(t) for t in type.get('types') if self.make_type_name(t)]
+            name = '|'.join(types)
         elif type.get('type') == 'typeOperator':
             target_name = self.make_type_name(type.get('target'))
-            names = [type.get('operator') + ':' + ':'.join(target_name)]
+            name = type.get('operator') + ':' + ':'.join(target_name)
         elif type.get('type') == 'typeParameter':
-            names = [type.get('name')]
+            name = type.get('name')
             constraint = type.get('constraint')
             if constraint is not None:
-                names.extend(['extends', self.make_type_name(constraint)])
+                name += ' extends ' + self.make_type_name(constraint)
         elif type.get('type') == 'reflection':
-            names = ['<TODO>']
+            name = '<TODO>'
         if type.get('typeArguments'):
-            argNames = ['|'.join(self.make_type_name(arg)) for arg in type.get('typeArguments')]
-            names = [names[0] + '<' + ','.join(argNames) + '>']
-        return names
+            argNames = [self.make_type_name(arg) for arg in type.get('typeArguments')]
+            name += '<' + ','.join(argNames) + '>'
+        return name
 
     def make_type(self, type):
         """Construct a jsdoc type entry"""
         type_name = self.make_type_name(type)
-        return {'names': type_name}
+        return {'names': [type_name]}
 
     def make_description(self, comment):
         """Construct a jsdoc description entry"""
@@ -275,13 +276,11 @@ class TypeDoc(object):
             if node.get('extendedTypes'):
                 doclet['classdesc'] += '\n\n**Extends:**\n'
                 for type in node.get('extendedTypes', []):
-                    type_name = ' '.join(self.make_type_name(type))
-                    doclet['classdesc'] += ' * :js:class:`' + type_name + '`\n'
+                    doclet['classdesc'] += ' * :js:class:`' + self.make_type_name(type) + '`\n'
             if node.get('implementedTypes'):
                 doclet['classdesc'] += '\n\n**Implements:**\n'
                 for type in node.get('implementedTypes', []):
-                    type_name = ' '.join(self.make_type_name(type))
-                    doclet['classdesc'] += ' * :js:class:`' + type_name + '`\n'
+                    doclet['classdesc'] += ' * :js:class:`' + self.make_type_name(type) + '`\n'
 
             else:
                 doclet['params'] = []

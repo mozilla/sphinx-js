@@ -1,0 +1,172 @@
+[
+    {
+        "comment": "<empty>",
+        "description": "",
+        "kind": "external",
+        "longname": "external:generic-constraint",
+        "meta": {
+            "code": {},
+            "filename": "generic-constraint.ts",
+            "lineno": 1,
+            "path": "./"
+        },
+        "name": "\"generic-constraint\""
+    },
+    {
+        "classdesc": "",
+        "comment": "<empty>",
+        "description": "Generic class with a type constraint\n\n",
+        "extends": [],
+        "kind": "class",
+        "longname": "external:generic-constraint~GenericConstraint",
+        "memberof": "external:generic-constraint",
+        "meta": {
+            "code": {},
+            "filename": "generic-constraint.ts",
+            "lineno": 13,
+            "path": "./"
+        },
+        "name": "GenericConstraint",
+        "params": [
+            {
+                "description": "Type extending A\n\n\n",
+                "name": "T",
+                "type": {
+                    "names": [
+                        "generic-constraint.A"
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "comment": "<empty>",
+        "description": "",
+        "kind": "member",
+        "longname": "external:generic-constraint~GenericConstraint#t",
+        "memberof": "external:generic-constraint~GenericConstraint",
+        "meta": {
+            "code": {},
+            "filename": "generic-constraint.ts",
+            "lineno": 14,
+            "path": "./"
+        },
+        "name": "t",
+        "type": {
+            "names": [
+                "T extends generic-constraint.A"
+            ]
+        }
+    },
+    {
+        "comment": "<empty>",
+        "description": "A generic method with a type constraint\n\n",
+        "kind": "function",
+        "longname": "external:generic-constraint~GenericConstraint.method",
+        "memberof": "external:generic-constraint~GenericConstraint",
+        "meta": {
+            "code": {
+                "paramnames": [
+                    "arg"
+                ]
+            },
+            "filename": "generic-constraint.ts",
+            "lineno": 20,
+            "path": "./"
+        },
+        "name": "method",
+        "params": [
+            {
+                "description": "\n\nAn argument of type U\n",
+                "name": "arg",
+                "type": {
+                    "names": [
+                        "U extends generic-constraint.B"
+                    ]
+                }
+            }
+        ],
+        "returns": [
+            {
+                "name": "method",
+                "type": {
+                    "names": [
+                        "U"
+                    ]
+                }
+            }
+        ]
+    },
+    {
+        "classdesc": "*interface*",
+        "comment": "<empty>",
+        "description": "",
+        "extends": [],
+        "kind": "interface",
+        "longname": "external:generic-constraint~A",
+        "memberof": "external:generic-constraint",
+        "meta": {
+            "code": {},
+            "filename": "generic-constraint.ts",
+            "lineno": 1,
+            "path": "./"
+        },
+        "name": "A",
+        "params": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "",
+        "kind": "member",
+        "longname": "external:generic-constraint~A#a",
+        "memberof": "external:generic-constraint~A",
+        "meta": {
+            "code": {},
+            "filename": "generic-constraint.ts",
+            "lineno": 2,
+            "path": "./"
+        },
+        "name": "a",
+        "type": {
+            "names": [
+                "number"
+            ]
+        }
+    },
+    {
+        "classdesc": "*interface*",
+        "comment": "<empty>",
+        "description": "",
+        "extends": [],
+        "kind": "interface",
+        "longname": "external:generic-constraint~B",
+        "memberof": "external:generic-constraint",
+        "meta": {
+            "code": {},
+            "filename": "generic-constraint.ts",
+            "lineno": 5,
+            "path": "./"
+        },
+        "name": "B",
+        "params": []
+    },
+    {
+        "comment": "<empty>",
+        "description": "",
+        "kind": "member",
+        "longname": "external:generic-constraint~B#b",
+        "memberof": "external:generic-constraint~B",
+        "meta": {
+            "code": {},
+            "filename": "generic-constraint.ts",
+            "lineno": 6,
+            "path": "./"
+        },
+        "name": "b",
+        "type": {
+            "names": [
+                "number"
+            ]
+        }
+    }
+]
