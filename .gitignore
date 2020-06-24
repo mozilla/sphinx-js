@@ -15,3 +15,4 @@ sphinx_js.egg-info/
 # VsCode config
 .vscode
 .DS_Store
+venv

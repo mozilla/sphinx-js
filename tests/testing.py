@@ -5,7 +5,7 @@ from shutil import rmtree
 from unittest import TestCase
 import sys
 
-from sphinx.cmdline import main as sphinx_main
+from sphinx.cmd.build import main as sphinx_main
 from sphinx.util.osutil import cd
 
 
