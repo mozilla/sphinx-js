@@ -1,4 +1,4 @@
-from codecs import getwriter
+from codecs import getreader, getwriter
 from collections import defaultdict
 from errno import ENOENT
 from functools import wraps
@@ -97,11 +97,11 @@ def cache_to_file(get_filename):
         def decorated(*args, **kwargs):
             filename = get_filename(*args, **kwargs)
             if filename and os.path.isfile(filename):
-                with open(filename) as f:
+                with open(filename, encoding='utf-8') as f:
                     return load(f)
             res = fn(*args, **kwargs)
             if filename:
-                with open(filename, 'w') as f:
+                with open(filename, 'w', encoding='utf-8') as f:
                     dump(res, f, indent=2)
             return res
         return decorated
@@ -129,7 +129,7 @@ def analyze_jsdoc(abs_source_paths, app):
         # Once output is finished, move back to beginning of file and load it:
         temp.seek(0)
         try:
-            return load(temp)
+            return load(getreader('utf-8')(temp))
         except ValueError:
             raise SphinxError('jsdoc found no JS files in the directories %s. Make sure js_source_path is set correctly in conf.py. It is also possible (though unlikely) that jsdoc emitted invalid JSON.' % abs_source_paths)
 
