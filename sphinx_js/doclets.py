@@ -4,7 +4,7 @@ from errno import ENOENT
 from functools import wraps
 from json import load, dump
 import os
-from os.path import abspath, relpath, splitext, sep
+from os.path import join, normpath, relpath, splitext, sep
 import subprocess
 from tempfile import TemporaryFile, NamedTemporaryFile
 
@@ -20,11 +20,11 @@ def gather_doclets(app):
     """Run JSDoc or another analysis tool across a whole codebase, and squirrel
     away its results in jsdoc doclet format."""
     source_paths = [app.config.js_source_path] if isinstance(app.config.js_source_path, string_types) else app.config.js_source_path
-    # Uses cwd, which Sphinx seems to set to the dir containing conf.py:
-    abs_source_paths = [abspath(path) for path in source_paths]
+    abs_source_paths = [normpath(join(app.confdir, path)) for path in source_paths]
 
-    root_for_relative_paths = root_or_fallback(app.config.root_for_relative_js_paths,
-                                               abs_source_paths)
+    root_for_relative_paths = root_or_fallback(
+        normpath(join(app.confdir, app.config.root_for_relative_js_paths)) if app.config.root_for_relative_js_paths else None,
+        abs_source_paths)
 
     analyze = analyzer_for(app.config.js_language)
     doclets = analyze(abs_source_paths, app)
@@ -170,13 +170,13 @@ def root_or_fallback(root_for_relative_paths, abs_source_paths):
 
     Fall back to the sole JS source path if the setting is unspecified.
 
-    :arg root_for_relative_paths: The raw root_for_relative_js_paths setting.
-        None if the user hasn't specified it.
+    :arg root_for_relative_paths: The absolute-ized root_for_relative_js_paths
+        setting. None if the user hasn't specified it.
     :arg abs_source_paths: Absolute paths of dirs to scan for JS code
 
     """
     if root_for_relative_paths:
-        return abspath(root_for_relative_paths)
+        return root_for_relative_paths
     else:
         if len(abs_source_paths) > 1:
             raise SphinxError('Since more than one js_source_path is specified in conf.py, root_for_relative_js_paths must also be specified. This allows paths beginning with ./ or ../ to be unambiguous.')

@@ -18,9 +18,8 @@ class SphinxBuildTestCase(TestCase):
     def setup_class(cls):
         """Run Sphinx against the dir adjacent to the testcase."""
         cls.docs_dir = join(cls.this_dir(), 'source', 'docs')
-        with cd(cls.docs_dir):
-            if sphinx_main(['.', '-b', 'text', '-E', '_build']):
-                raise RuntimeError('Sphinx build exploded.')
+        if sphinx_main([cls.docs_dir, '-b', 'text', '-E', join(cls.docs_dir, '_build')]):
+            raise RuntimeError('Sphinx build exploded.')
 
     @classmethod
     def teardown_class(cls):
