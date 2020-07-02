@@ -180,9 +180,9 @@ class JsRenderer(object):
                 name = '...' + name
 
             if name not in used_names:
-                params.append(rst.escape(name) if default is MARKER else
-                              '%s=%s' % (rst.escape(name),
-                                         rst.escape(format_default_according_to_type_hints(default, type['names']))))
+                params.append(name if default is MARKER else
+                              '%s=%s' % (name,
+                                         format_default_according_to_type_hints(default, type['names'])))
                 used_names.append(name)
 
         # Use params from JS code if there are no documented params:
