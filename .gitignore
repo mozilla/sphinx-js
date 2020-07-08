@@ -5,6 +5,7 @@
 /dist
 /node_modules
 /tests/source/docs/_build
+/tests/test_build/source/_build
 sphinx_js.egg-info/
 # Python 3
 */__pycache__/*

@@ -187,7 +187,7 @@ class JsRenderer(object):
 
         # Use params from JS code if there are no documented params:
         if not params:
-            params = [rst.escape(p) for p in doclet['meta']['code'].get('paramnames', [])]
+            params = [p for p in doclet['meta']['code'].get('paramnames', [])]
 
         return '(%s)' % ', '.join(params)
 
@@ -343,7 +343,7 @@ def _params_formatter(field, description):
     types = _or_types(field)
     if types:
         heads.append(types)
-    heads.append(rst.escape(field['name']))
+    heads.append(field['name'])
     tail = description
     return heads, tail
 
@@ -372,7 +372,7 @@ def _or_types(field):
     ReST-escape the types.
 
     """
-    return rst.escape('|'.join(field.get('type', {}).get('names', [])))
+    return '|'.join(field.get('type', {}).get('names', []))
 
 
 def _dotted_path(segments):
