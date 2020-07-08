@@ -139,7 +139,7 @@ def analyze_typescript(abs_source_paths, app):
     if app.config.jsdoc_config_path:
         command.add('--tsconfig', normpath(join(app.confdir, app.config.jsdoc_config_path)))
 
-    with getwriter('utf-8')(NamedTemporaryFile(mode='w+b')) as temp:
+    with NamedTemporaryFile(mode='w+b') as temp:
         command.add('--json', temp.name, *abs_source_paths)
         try:
             subprocess.call(command.make())
@@ -149,7 +149,7 @@ def analyze_typescript(abs_source_paths, app):
             else:
                 raise
         # typedoc emits a valid JSON file even if it finds no TS files in the dir:
-        return parse_typedoc(temp)
+        return parse_typedoc(getreader('utf-8')(temp))
 
 
 ANALYZERS = {'javascript': analyze_jsdoc,
