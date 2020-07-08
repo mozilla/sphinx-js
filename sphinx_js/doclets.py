@@ -113,7 +113,7 @@ def analyze_jsdoc(abs_source_paths, app):
     command = Command('jsdoc')
     command.add('-X', *abs_source_paths)
     if app.config.jsdoc_config_path:
-        command.add('-c', app.config.jsdoc_config_path)
+        command.add('-c', normpath(join(app.confdir, app.config.jsdoc_config_path)))
 
     # Use a temporary file to handle large output volume. JSDoc defaults to
     # utf8-encoded output.
@@ -137,7 +137,7 @@ def analyze_jsdoc(abs_source_paths, app):
 def analyze_typescript(abs_source_paths, app):
     command = Command('typedoc')
     if app.config.jsdoc_config_path:
-        command.add('--tsconfig', app.config.jsdoc_config_path)
+        command.add('--tsconfig', normpath(join(app.confdir, app.config.jsdoc_config_path)))
 
     with getwriter('utf-8')(NamedTemporaryFile(mode='w+b')) as temp:
         command.add('--json', temp.name, *abs_source_paths)
