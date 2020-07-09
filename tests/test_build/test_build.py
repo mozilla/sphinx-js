@@ -263,15 +263,20 @@ class Tests(SphinxBuildTestCase):
 
     def test_restructuredtext_injection(self):
         """Make sure param names and types are escaped and cannot be
-        interpreted as RestructuredText."""
+        interpreted as RestructuredText.
+
+        Descriptions should not be escaped; it is a feature to be able to use
+        RST markup there.
+
+        """
         self._file_contents_eq(
             'injection',
             u'injection(a_, b)\n\n'
             '   Arguments:\n'
             '      * **a_** --\n\n'
-            '      * **b** (*type_*) --\n\n'
+            '      * **b** (*type_*) -- >>Borf_<<\n\n'
             '   Returns:\n'
-            '      **rtype_** --\n')
+            '      **rtype_** -- >>Dorf_<<\n')
 
 
 DESCRIPTION = """

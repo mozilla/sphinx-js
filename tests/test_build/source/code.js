@@ -152,8 +152,8 @@ function destructuredParams(p1, {foo, bar}) {}
 
 /**
  * @param a_
- * @param {type_} b
- * @returns {rtype_}
+ * @param {type_} b Borf_
+ * @returns {rtype_} Dorf_
  */
 function injection() {}
 
