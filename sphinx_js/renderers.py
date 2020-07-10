@@ -1,5 +1,4 @@
 from json import dumps
-import re
 from re import sub
 
 from docutils.parsers.rst import Parser as RstParser
@@ -181,6 +180,10 @@ class JsRenderer(object):
                 name = '...' + name
 
             if name not in used_names:
+                # We don't rst.escape() anything here, because, empirically,
+                # the js:function directive (or maybe directive params in
+                # general) automatically ignores markup constructs in its
+                # parameter (though not its contents).
                 params.append(name if default is MARKER else
                               '%s=%s' % (name,
                                          format_default_according_to_type_hints(default, type['names'])))
@@ -210,8 +213,9 @@ class JsRenderer(object):
         for field_name, callback in FIELD_TYPES:
             for field in doclet.get(field_name, []):
                 description = field.get('description', '')
-                unwrapped = sub(r'[ \t]*[\r\n]+[ \t]*', ' ', description)
-                yield callback(field, unwrapped)
+                unwrapped = sub(r'[ \t]*[\r\n]+[ \t]*', ' ', description)  # TODO: Don't unwrap unless totally unindented. Maybe this would let us support OLs and ULs in param descriptions.
+                heads, tail = callback(field, unwrapped)
+                yield [rst.escape(h) for h in heads], tail
 
 
 class AutoFunctionRenderer(JsRenderer):
@@ -330,27 +334,10 @@ class AutoAttributeRenderer(JsRenderer):
             content='\n'.join(self._content))
 
 
-# Based on sphinx.util.rst.symbols_re but I added _ (which makes anchors) and
-# removed apparently redundant hyphens. And put a backslash before the slash,
-# because why would you escape the slash? They must have meant to escape the
-# backslash. Why is [ in this pattern but not ]? Why { but not }? I have a lot
-# of questions.
-escape_re = re.compile(r'([!-\\/:@\[`{~_])')
-def escape_inline(rst):
-    """Put a backslash before any character RST might interpret as markup in an
-    inline context.
-
-    Notably, periods are not escaped, because they are special only when
-    beginning a line, as in ``.. note::``.
-
-    """
-    return escape_re.sub(r'\\\1', rst)
-
-
 def _returns_formatter(field, description):
     """Derive heads and tail from ``@returns`` blocks."""
     types = _or_types(field)
-    tail = ('**%s** -- ' % escape_inline(types)) if types else ''
+    tail = ('**%s** -- ' % rst.escape(types)) if types else ''
     tail += description
     return ['returns'], tail
 
@@ -369,7 +356,7 @@ def _params_formatter(field, description):
 def _param_type_formatter(field, description):
     """Generate types for function parameters specified in field."""
     heads = ['type', field['name']]
-    tail = escape_inline(_or_types(field))
+    tail = rst.escape(_or_types(field))
     return heads, tail
 
 
