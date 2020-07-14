@@ -5,7 +5,6 @@ from docutils.parsers.rst import Parser as RstParser
 from docutils.statemachine import StringList
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
-from six import string_types
 from sphinx.errors import SphinxError
 from sphinx.util import rst
 
@@ -142,7 +141,7 @@ class JsRenderer(object):
             # want your ambiguously documented default like ``@param
             # {string|Array} [foo=[]]`` to be treated as a string, make sure
             # "string" comes first.
-            if isinstance(value, string_types):  # JSDoc threw it to us as a string in the JSON.
+            if isinstance(value, str):  # JSDoc threw it to us as a string in the JSON.
                 if declared_types and not declared_type_implies_string:
                     # It's a spurious string, like ``() => 5`` or a variable name.
                     # Let it through verbatim.

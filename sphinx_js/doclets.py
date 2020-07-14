@@ -8,7 +8,6 @@ from os.path import join, normpath, relpath, splitext, sep
 import subprocess
 from tempfile import TemporaryFile, NamedTemporaryFile
 
-from six import string_types
 from sphinx.errors import SphinxError
 
 from .parsers import path_and_formal_params, PathVisitor
@@ -19,7 +18,7 @@ from .typedoc import parse_typedoc
 def gather_doclets(app):
     """Run JSDoc or another analysis tool across a whole codebase, and squirrel
     away its results in jsdoc doclet format."""
-    source_paths = [app.config.js_source_path] if isinstance(app.config.js_source_path, string_types) else app.config.js_source_path
+    source_paths = [app.config.js_source_path] if isinstance(app.config.js_source_path, str) else app.config.js_source_path
     abs_source_paths = [normpath(join(app.confdir, path)) for path in source_paths]
 
     root_for_relative_paths = root_or_fallback(

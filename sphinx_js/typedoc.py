@@ -4,8 +4,6 @@ import os
 import sys
 import json
 
-from six import iteritems
-
 # JSDoc entries used in sphinx-js:
 # - optional access of [ public, private, protected ]
 # - optional classdesc
@@ -76,7 +74,7 @@ class TypeDoc(object):
            the description field in :py:func:`make_result`.
         """
         result.update(**kwargs)
-        return {k: v for k, v in iteritems(result) if v is not None}
+        return {k: v for k, v in result.items() if v is not None}
 
     def make_doclet(self, **kwargs):
         """Create a new jsdoc entry"""
