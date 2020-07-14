@@ -320,7 +320,7 @@ A good example using most of sphinx-js's functionality is the Fathom documentati
 
 Then put the version of sphinx-js you want in ``docs/requirements.txt``. For example... ::
 
-    sphinx-js==2.8
+    sphinx-js==3.0
 
 Or, if you prefer, the Fathom repo carries a `Travis CI configuration <https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/.travis.yml#L41>`_ and a `deployment script <https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/tooling/travis-deploy-docs>`_ for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them.
 
@@ -340,6 +340,12 @@ Run the tests using tox, which will also install jsdoc and typedoc at pinned ver
 
 Version History
 ===============
+
+3.0
+  * Make compatible with Sphinx 3, which requires Python 3.
+  * Drop support for Python 2.
+  * Make sphinx-js not care what the current working directory is, except for the TypeScript analyzer, which needs further work.
+  * Properly RST-escape return types.
 
 2.8
   * Display generic TypeScript types properly. Make fields come before methods. (Paul Grau)
