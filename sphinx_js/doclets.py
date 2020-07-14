@@ -191,7 +191,7 @@ def doclet_full_path(d, base_dir, longname_field='longname'):
     Example: ``['./', 'dir/', 'dir/', 'file/', 'object.', 'object#', 'object']``
 
     :arg d: The doclet
-    :arg base_dir: Absolutized value of the jsdoc_source_path option
+    :arg base_dir: Absolutized value of the root_for_relative_js_paths option
     :arg longname_field: The field to look in at the top level of the doclet
         for the long name of the object to emit a path to
     """
@@ -199,7 +199,7 @@ def doclet_full_path(d, base_dir, longname_field='longname'):
     rel = relpath(meta['path'], base_dir)
     rel = '/'.join(rel.split(sep))
     if not rel.startswith(('../', './')) and rel not in ('..', '.'):
-        # It just starts right out with the name of a folder in the cwd.
+        # It just starts right out with the name of a folder in the base_dir.
         rooted_rel = './%s' % rel
     else:
         rooted_rel = rel
