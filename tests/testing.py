@@ -18,8 +18,9 @@ class SphinxBuildTestCase(TestCase):
     def setup_class(cls):
         """Run Sphinx against the dir adjacent to the testcase."""
         cls.docs_dir = join(cls.this_dir(), 'source', 'docs')
-        if sphinx_main([cls.docs_dir, '-b', 'text', '-E', join(cls.docs_dir, '_build')]):
-            raise RuntimeError('Sphinx build exploded.')
+        with cd(cls.docs_dir):  # Matters only to keep test_build_ts tests passing. Remove once we clean that module up. Its cwd-sensitivity still means it doesn't work for actual users if the cwd isn't just right.
+            if sphinx_main([cls.docs_dir, '-b', 'text', '-E', join(cls.docs_dir, '_build')]):
+                raise RuntimeError('Sphinx build exploded.')
 
     @classmethod
     def teardown_class(cls):
