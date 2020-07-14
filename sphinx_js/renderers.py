@@ -5,7 +5,6 @@ from docutils.parsers.rst import Parser as RstParser
 from docutils.statemachine import StringList
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
-from six import string_types
 from sphinx.errors import SphinxError
 from sphinx.util import rst
 
@@ -142,7 +141,7 @@ class JsRenderer(object):
             # want your ambiguously documented default like ``@param
             # {string|Array} [foo=[]]`` to be treated as a string, make sure
             # "string" comes first.
-            if isinstance(value, string_types):  # JSDoc threw it to us as a string in the JSON.
+            if isinstance(value, str):  # JSDoc threw it to us as a string in the JSON.
                 if declared_types and not declared_type_implies_string:
                     # It's a spurious string, like ``() => 5`` or a variable name.
                     # Let it through verbatim.
@@ -180,14 +179,18 @@ class JsRenderer(object):
                 name = '...' + name
 
             if name not in used_names:
-                params.append(rst.escape(name) if default is MARKER else
-                              '%s=%s' % (rst.escape(name),
-                                         rst.escape(format_default_according_to_type_hints(default, type['names']))))
+                # We don't rst.escape() anything here, because, empirically,
+                # the js:function directive (or maybe directive params in
+                # general) automatically ignores markup constructs in its
+                # parameter (though not its contents).
+                params.append(name if default is MARKER else
+                              '%s=%s' % (name,
+                                         format_default_according_to_type_hints(default, type['names'])))
                 used_names.append(name)
 
         # Use params from JS code if there are no documented params:
         if not params:
-            params = [rst.escape(p) for p in doclet['meta']['code'].get('paramnames', [])]
+            params = [p for p in doclet['meta']['code'].get('paramnames', [])]
 
         return '(%s)' % ', '.join(params)
 
@@ -209,8 +212,9 @@ class JsRenderer(object):
         for field_name, callback in FIELD_TYPES:
             for field in doclet.get(field_name, []):
                 description = field.get('description', '')
-                unwrapped = sub(r'[ \t]*[\r\n]+[ \t]*', ' ', description)
-                yield callback(field, unwrapped)
+                unwrapped = sub(r'[ \t]*[\r\n]+[ \t]*', ' ', description)  # TODO: Don't unwrap unless totally unindented. Maybe this would let us support OLs and ULs in param descriptions.
+                heads, tail = callback(field, unwrapped)
+                yield [rst.escape(h) for h in heads], tail
 
 
 class AutoFunctionRenderer(JsRenderer):
@@ -332,7 +336,7 @@ class AutoAttributeRenderer(JsRenderer):
 def _returns_formatter(field, description):
     """Derive heads and tail from ``@returns`` blocks."""
     types = _or_types(field)
-    tail = ('**%s** -- ' % types) if types else ''
+    tail = ('**%s** -- ' % rst.escape(types)) if types else ''
     tail += description
     return ['returns'], tail
 
@@ -343,7 +347,7 @@ def _params_formatter(field, description):
     types = _or_types(field)
     if types:
         heads.append(types)
-    heads.append(rst.escape(field['name']))
+    heads.append(field['name'])
     tail = description
     return heads, tail
 
@@ -351,7 +355,7 @@ def _params_formatter(field, description):
 def _param_type_formatter(field, description):
     """Generate types for function parameters specified in field."""
     heads = ['type', field['name']]
-    tail = _or_types(field)
+    tail = rst.escape(_or_types(field))
     return heads, tail
 
 
@@ -372,7 +376,7 @@ def _or_types(field):
     ReST-escape the types.
 
     """
-    return rst.escape('|'.join(field.get('type', {}).get('names', [])))
+    return '|'.join(field.get('type', {}).get('names', []))
 
 
 def _dotted_path(segments):

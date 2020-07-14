@@ -1,14 +1,13 @@
-from codecs import getwriter
+from codecs import getreader, getwriter
 from collections import defaultdict
 from errno import ENOENT
 from functools import wraps
 from json import load, dump
 import os
-from os.path import abspath, relpath, splitext, sep
+from os.path import join, normpath, relpath, splitext, sep
 import subprocess
 from tempfile import TemporaryFile, NamedTemporaryFile
 
-from six import string_types
 from sphinx.errors import SphinxError
 
 from .parsers import path_and_formal_params, PathVisitor
@@ -19,12 +18,12 @@ from .typedoc import parse_typedoc
 def gather_doclets(app):
     """Run JSDoc or another analysis tool across a whole codebase, and squirrel
     away its results in jsdoc doclet format."""
-    source_paths = [app.config.js_source_path] if isinstance(app.config.js_source_path, string_types) else app.config.js_source_path
-    # Uses cwd, which Sphinx seems to set to the dir containing conf.py:
-    abs_source_paths = [abspath(path) for path in source_paths]
+    source_paths = [app.config.js_source_path] if isinstance(app.config.js_source_path, str) else app.config.js_source_path
+    abs_source_paths = [normpath(join(app.confdir, path)) for path in source_paths]
 
-    root_for_relative_paths = root_or_fallback(app.config.root_for_relative_js_paths,
-                                               abs_source_paths)
+    root_for_relative_paths = root_or_fallback(
+        normpath(join(app.confdir, app.config.root_for_relative_js_paths)) if app.config.root_for_relative_js_paths else None,
+        abs_source_paths)
 
     analyze = analyzer_for(app.config.js_language)
     doclets = analyze(abs_source_paths, app)
@@ -97,11 +96,11 @@ def cache_to_file(get_filename):
         def decorated(*args, **kwargs):
             filename = get_filename(*args, **kwargs)
             if filename and os.path.isfile(filename):
-                with open(filename) as f:
+                with open(filename, encoding='utf-8') as f:
                     return load(f)
             res = fn(*args, **kwargs)
             if filename:
-                with open(filename, 'w') as f:
+                with open(filename, 'w', encoding='utf-8') as f:
                     dump(res, f, indent=2)
             return res
         return decorated
@@ -113,7 +112,7 @@ def analyze_jsdoc(abs_source_paths, app):
     command = Command('jsdoc')
     command.add('-X', *abs_source_paths)
     if app.config.jsdoc_config_path:
-        command.add('-c', app.config.jsdoc_config_path)
+        command.add('-c', normpath(join(app.confdir, app.config.jsdoc_config_path)))
 
     # Use a temporary file to handle large output volume. JSDoc defaults to
     # utf8-encoded output.
@@ -129,7 +128,7 @@ def analyze_jsdoc(abs_source_paths, app):
         # Once output is finished, move back to beginning of file and load it:
         temp.seek(0)
         try:
-            return load(temp)
+            return load(getreader('utf-8')(temp))
         except ValueError:
             raise SphinxError('jsdoc found no JS files in the directories %s. Make sure js_source_path is set correctly in conf.py. It is also possible (though unlikely) that jsdoc emitted invalid JSON.' % abs_source_paths)
 
@@ -137,9 +136,9 @@ def analyze_jsdoc(abs_source_paths, app):
 def analyze_typescript(abs_source_paths, app):
     command = Command('typedoc')
     if app.config.jsdoc_config_path:
-        command.add('--tsconfig', app.config.jsdoc_config_path)
+        command.add('--tsconfig', normpath(join(app.confdir, app.config.jsdoc_config_path)))
 
-    with getwriter('utf-8')(NamedTemporaryFile(mode='w+b')) as temp:
+    with NamedTemporaryFile(mode='w+b') as temp:
         command.add('--json', temp.name, *abs_source_paths)
         try:
             subprocess.call(command.make())
@@ -149,7 +148,7 @@ def analyze_typescript(abs_source_paths, app):
             else:
                 raise
         # typedoc emits a valid JSON file even if it finds no TS files in the dir:
-        return parse_typedoc(temp)
+        return parse_typedoc(getreader('utf-8')(temp))
 
 
 ANALYZERS = {'javascript': analyze_jsdoc,
@@ -170,13 +169,13 @@ def root_or_fallback(root_for_relative_paths, abs_source_paths):
 
     Fall back to the sole JS source path if the setting is unspecified.
 
-    :arg root_for_relative_paths: The raw root_for_relative_js_paths setting.
-        None if the user hasn't specified it.
+    :arg root_for_relative_paths: The absolute-ized root_for_relative_js_paths
+        setting. None if the user hasn't specified it.
     :arg abs_source_paths: Absolute paths of dirs to scan for JS code
 
     """
     if root_for_relative_paths:
-        return abspath(root_for_relative_paths)
+        return root_for_relative_paths
     else:
         if len(abs_source_paths) > 1:
             raise SphinxError('Since more than one js_source_path is specified in conf.py, root_for_relative_js_paths must also be specified. This allows paths beginning with ./ or ../ to be unambiguous.')
@@ -191,7 +190,7 @@ def doclet_full_path(d, base_dir, longname_field='longname'):
     Example: ``['./', 'dir/', 'dir/', 'file/', 'object.', 'object#', 'object']``
 
     :arg d: The doclet
-    :arg base_dir: Absolutized value of the jsdoc_source_path option
+    :arg base_dir: Absolutized value of the root_for_relative_js_paths option
     :arg longname_field: The field to look in at the top level of the doclet
         for the long name of the object to emit a path to
     """
@@ -199,7 +198,7 @@ def doclet_full_path(d, base_dir, longname_field='longname'):
     rel = relpath(meta['path'], base_dir)
     rel = '/'.join(rel.split(sep))
     if not rel.startswith(('../', './')) and rel not in ('..', '.'):
-        # It just starts right out with the name of a folder in the cwd.
+        # It just starts right out with the name of a folder in the base_dir.
         rooted_rel = './%s' % rel
     else:
         rooted_rel = rel

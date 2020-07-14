@@ -1,8 +1,8 @@
 from recommonmark.transform import AutoStructify
-from recommonmark.parser import CommonMarkParser
 
 
 extensions = [
+    'recommonmark',
     'sphinx.ext.mathjax',
     'sphinx_js'
 ]
@@ -10,9 +10,6 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 author = 'Jam Risser'
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
-source_parsers = {
-    '.md': CommonMarkParser
-}
 
 
 def setup(app):

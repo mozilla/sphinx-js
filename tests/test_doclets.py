@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from os.path import abspath
-
 import pytest
 from sphinx.errors import SphinxError
 
@@ -33,4 +31,4 @@ def test_relative_path_root():
     assert root_or_fallback(None, ['a']) == 'a'
     with pytest.raises(SphinxError):
         root_or_fallback(None, ['a', 'b'])
-    assert root_or_fallback('smoo', ['a']) == abspath('smoo')
+    assert root_or_fallback('smoo', ['a']) == 'smoo'

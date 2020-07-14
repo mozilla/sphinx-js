@@ -1,7 +1,5 @@
 from collections import namedtuple
 
-from six import iterkeys, python_2_unicode_compatible
-
 
 Value = namedtuple('Value', ['value'])
 
@@ -45,7 +43,7 @@ class SuffixTree(object):
 
         # Follow all the 1-key dicts. These are the paths that are unambiguous.
         while len(tree) == 1:
-            key = next(iterkeys(tree))
+            key = next(iter(tree.keys()))
             value = tree[key]
             full_path.append(key)
             if isinstance(value, Value):
@@ -55,13 +53,12 @@ class SuffixTree(object):
                 tree = value
 
         # We hit a >1-key dict, an ambiguous path:
-        raise SuffixAmbiguous(segments, list(iterkeys(tree)))
+        raise SuffixAmbiguous(segments, list(tree.keys()))
 
     def get(self, segments):
         return self.get_with_path(segments)[0]
 
 
-@python_2_unicode_compatible
 class SuffixError(Exception):
     def __init__(self, segments):
         self.segments = segments
@@ -80,7 +77,6 @@ class SuffixNotFound(SuffixError):
     _message = 'No path found ending in %s.'
 
 
-@python_2_unicode_compatible
 class SuffixAmbiguous(SuffixError):
     """There were multiple keys found ending in the suffix."""
 
