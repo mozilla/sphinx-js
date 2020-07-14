@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from os.path import abspath
-
 import pytest
 from sphinx.errors import SphinxError
 
