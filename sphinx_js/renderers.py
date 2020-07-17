@@ -66,6 +66,8 @@ class JsRenderer(object):
         try:
             # Get the relevant documentation together:
             doclet, full_path = self._app._sphinxjs_doclets_by_path.get_with_path(self._partial_path)
+            # TODO: I don't think full_path will be necessary when we get class.members working. Only autoclass uses it: to get the class's members.
+            doclet, full_path = self._look_up_object(self._partial_path)
         except SuffixNotFound as exc:
             raise SphinxError('No JSDoc documentation was found for object "%s" or any path ending with that.'
                               % ''.join(exc.segments))
@@ -83,10 +85,9 @@ class JsRenderer(object):
             #
             # Not sure if passing the settings from the "real" doc is the right
             # thing to do here:
-            meta = doclet['meta']
-            doc = new_document('%s:%s(%s)' % (meta['filename'],
-                                              doclet['longname'],
-                                              meta['lineno']),
+            doc = new_document('%s:%s(%s)' % (doclet.filename,
+                                              doclet.path,
+                                              doclet.line),
                                settings=self._directive.state.document.settings)
             RstParser().parse(rst, doc)
             return doc.children
@@ -113,51 +114,6 @@ class JsRenderer(object):
         Return a ReST-escaped string ready for substitution into the template.
 
         """
-        def format_default_according_to_type_hints(value, declared_types):
-            """Return the default value for a param, formatted as a string
-            ready to be used in a formal parameter list.
-
-            JSDoc is a mess at extracting default values. It can unambiguously
-            extract only a few simple types from the function signature, and
-            ambiguity is even more rife when extracting from doclets. So we use
-            any declared types to resolve the ambiguity.
-
-            :arg value: The extracted value, which may be of the right or wrong type
-            :arg declared_types: A list of types declared in the doclet for
-                this param. For example ``{string|number}`` would yield ['string',
-                'number'].
-
-            """
-            def first(list, default):
-                try:
-                    return list[0]
-                except IndexError:
-                    return default
-
-            declared_type_implies_string = first(declared_types, '') == 'string'
-
-            # If the first item of the type disjunction is "string", we treat
-            # the default value as a string. Otherwise, we don't. So, if you
-            # want your ambiguously documented default like ``@param
-            # {string|Array} [foo=[]]`` to be treated as a string, make sure
-            # "string" comes first.
-            if isinstance(value, str):  # JSDoc threw it to us as a string in the JSON.
-                if declared_types and not declared_type_implies_string:
-                    # It's a spurious string, like ``() => 5`` or a variable name.
-                    # Let it through verbatim.
-                    return value
-                else:
-                    # It's a real string.
-                    return dumps(value)  # Escape any contained quotes.
-            else:  # It came in as a non-string.
-                if declared_type_implies_string:
-                    # It came in as an int, null, or bool, and we have to
-                    # convert it back to a string.
-                    return '"%s"' % (dumps(value),)
-                else:
-                    # It's fine as the type it is.
-                    return dumps(value)
-
         if self._explicit_formal_params:
             return self._explicit_formal_params
 
@@ -165,17 +121,15 @@ class JsRenderer(object):
         # explicit formal param. Even look at params that are really
         # documenting subproperties of formal params. Also handle param default
         # values.
-        params = []
-        used_names = []
-        MARKER = object()
+        formals = []
+        used_names = set()
 
-        for param in doclet.get('params', []):
-            name = param['name'].split('.')[0]
-            default = param.get('defaultvalue', MARKER)
-            type = param.get('type', {'names': []})
+        for param in doclet.params:
+            name = param.name
+            default = param.default
 
             # Add '...' to the parameter name if it's a variadic argument
-            if param.get('variable'):
+            if param.is_variadic:
                 name = '...' + name
 
             if name not in used_names:
@@ -183,16 +137,11 @@ class JsRenderer(object):
                 # the js:function directive (or maybe directive params in
                 # general) automatically ignores markup constructs in its
                 # parameter (though not its contents).
-                params.append(name if default is MARKER else
-                              '%s=%s' % (name,
-                                         format_default_according_to_type_hints(default, type['names'])))
-                used_names.append(name)
+                formals.append(name if not param.has_default else
+                               '%s=%s' % (name, param.default))
+                used_names.add(name)
 
-        # Use params from JS code if there are no documented params:
-        if not params:
-            params = [p for p in doclet['meta']['code'].get('paramnames', [])]
-
-        return '(%s)' % ', '.join(params)
+        return '(%s)' % ', '.join(formals)
 
     def _fields(self, doclet):
         """Return an iterable of "info fields" to be included in the directive,
@@ -203,22 +152,35 @@ class JsRenderer(object):
         tail comes after.
 
         """
-        FIELD_TYPES = [('params', _params_formatter),
+        FIELD_TYPES = [('params', _param_formatter),
                        ('params', _param_type_formatter),
-                       ('properties', _params_formatter),
+                       ('properties', _param_formatter),
                        ('properties', _param_type_formatter),
-                       ('exceptions', _exceptions_formatter),
+                       ('exceptions', _exception_formatter),
                        ('returns', _returns_formatter)]
-        for field_name, callback in FIELD_TYPES:
-            for field in doclet.get(field_name, []):
-                description = field.get('description', '')
+        for collection_attr, callback in FIELD_TYPES:
+            for instance in getattr(doclet, collection_attr, []):
+                description = instance.get('description', '')
+                # TODO: Quit unwrapping here. Do it in the analyzers.
                 unwrapped = sub(r'[ \t]*[\r\n]+[ \t]*', ' ', description)  # TODO: Don't unwrap unless totally unindented. Maybe this would let us support OLs and ULs in param descriptions.
-                heads, tail = callback(field, unwrapped)
+                heads, tail = callback(instance, unwrapped)
                 yield [rst.escape(h) for h in heads], tail
 
 
 class AutoFunctionRenderer(JsRenderer):
     _template = 'function.rst'
+
+    def _look_up_object(self, partial_path):
+        """Return the IR of the object to render.
+
+        Ask the analyzer for the object referred to by the given path suffix.
+        Use the fact that we're in an autofunction call to deduce that the
+        object coming back should be treated as a Function. Raise
+        SuffixNotFound or SuffixAmbiguous in the situations their names
+        suggest.
+
+        """
+        return self._app._analyzer.get_object(partial_path, 'function')
 
     def _template_vars(self, name, full_path, doclet):
         return dict(
@@ -329,54 +291,53 @@ class AutoAttributeRenderer(JsRenderer):
             deprecated=doclet.get('deprecated', False),
             see_also=doclet.get('see', []),
             examples=doclet.get('examples', ''),
-            type='|'.join(doclet.get('type', {}).get('names', [])),
+            type=_or_types(doclet.get('type', {}).get('names', [])),
             content='\n'.join(self._content))
 
 
-def _returns_formatter(field, description):
+def _returns_formatter(returns, description):
     """Derive heads and tail from ``@returns`` blocks."""
-    types = _or_types(field)
+    types = _or_types(returns)
     tail = ('**%s** -- ' % rst.escape(types)) if types else ''
     tail += description
     return ['returns'], tail
 
 
-def _params_formatter(field, description):
+def _param_formatter(param, description):
     """Derive heads and tail from ``@param`` blocks."""
     heads = ['param']
-    types = _or_types(field)
+    types = _or_types(param.types)
     if types:
         heads.append(types)
-    heads.append(field['name'])
+    heads.append(param.name)
     tail = description
     return heads, tail
 
 
-def _param_type_formatter(field, description):
+def _param_type_formatter(param, description):
     """Generate types for function parameters specified in field."""
-    heads = ['type', field['name']]
-    tail = rst.escape(_or_types(field))
+    # TODO: I'm not sure what this does.
+    heads = ['type', param.name]
+    tail = rst.escape(_or_types(param.types))
     return heads, tail
 
 
-def _exceptions_formatter(field, description):
+def _exception_formatter(exception, description):
     """Derive heads and tail from ``@throws`` blocks."""
     heads = ['throws']
-    types = _or_types(field)
+    types = _or_types(exception.types)
     if types:
         heads.append(types)
     tail = description
     return heads, tail
 
 
-def _or_types(field):
+def _or_types(types):
     """Return all the types in a doclet subfield like "params" or "returns"
     with vertical bars between them, like "number|string".
 
-    ReST-escape the types.
-
     """
-    return '|'.join(field.get('type', {}).get('names', []))
+    return '|'.join(types)
 
 
 def _dotted_path(segments):

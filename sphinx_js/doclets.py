@@ -27,13 +27,14 @@ def gather_doclets(app):
 
     analyze = analyzer_for(app.config.js_language)
     doclets = analyze(abs_source_paths, app)
+
+
+
     # 2 doclets are made for classes, and they are largely redundant: one for
     # the class itself and another for the constructor. However, the
     # constructor one gets merged into the class one and is intentionally
     # marked as undocumented, even if it isn't. See
     # https://github.com/jsdoc3/jsdoc/issues/1129.
-    doclets = [d for d in doclets if d.get('comment')
-                                     and not d.get('undocumented')]
 
     # Build table for lookup by name, which most directives use:
     app._sphinxjs_doclets_by_path = SuffixTree()
@@ -41,7 +42,7 @@ def gather_doclets(app):
     for d in doclets:
         try:
             app._sphinxjs_doclets_by_path.add(
-                doclet_full_path(d, root_for_relative_paths),
+                d.path_segments(root_for_relative_paths)
                 d)
         except PathTaken as conflict:
             conflicts.append(conflict.segments)
@@ -58,11 +59,12 @@ def gather_doclets(app):
     # though they have names. This will lead to multiple methods having each
     # other's members. But if you don't have same-named inner functions or
     # inner variables that are documented, you shouldn't have trouble.
+    # TODO: Unnecessary in favor of class.members?
     app._sphinxjs_doclets_by_class = defaultdict(lambda: [])
     for d in doclets:
         of = d.get('memberof')
         if of:  # speed optimization
-            segments = doclet_full_path(d, root_for_relative_paths, longname_field='memberof')
+            segments = path_segments(d, root_for_relative_paths, longname_field='memberof')
             app._sphinxjs_doclets_by_class[tuple(segments)].append(d)
 
 
@@ -128,7 +130,7 @@ def analyze_jsdoc(abs_source_paths, app):
         # Once output is finished, move back to beginning of file and load it:
         temp.seek(0)
         try:
-            return load(getreader('utf-8')(temp))
+            return jsdoc_to_ir(load(getreader('utf-8')(temp)))
         except ValueError:
             raise SphinxError('jsdoc found no JS files in the directories %s. Make sure js_source_path is set correctly in conf.py. It is also possible (though unlikely) that jsdoc emitted invalid JSON.' % abs_source_paths)
 
@@ -183,7 +185,7 @@ def root_or_fallback(root_for_relative_paths, abs_source_paths):
             return abs_source_paths[0]
 
 
-def doclet_full_path(d, base_dir, longname_field='longname'):
+def path_segments(d, base_dir, longname_field='longname'):
     """Return the full, unambiguous list of path segments that points to an
     entity described by a doclet.
 
