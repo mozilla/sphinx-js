@@ -132,11 +132,13 @@ class Function(TopLevel):
 
 @dataclass
 class Class(TopLevel):
-    #: TypeScript classes can be parametrized by types.
-    params: List[Param]
-    #: Any comment attached to constructor. Doesn't include args or other fields.
-    constructor_description: str
+    #: The default constructor for this class
+    constructor: Function
     #: Class members, concretized ahead of time for simplicity. Otherwise,
     #: we'd have to pass the doclets_by_class map in and keep it around, along
     #: with a callable that would create the member IRs from it on demand.
     members: List[Union[Function, Attribute]]
+    # There's room here for additional fields like @example on the class doclet
+    # itself. These are supported and extracted by jsdoc, but they end up in an
+    # `undocumented: True` doclet and so are presently filtered out. But we do
+    # have the space to include them later.

@@ -179,17 +179,19 @@ class AutoClassRenderer(JsRenderer):
     _renderer_type = 'class'
 
     def _template_vars(self, name, doclet):
+        # At the moment, we pull most fields (params, returns, exceptions,
+        # etc.) off the constructor only. We could pull them off the class
+        # itself too in the future.
         return dict(
             name=name,
-            params=self._formal_params(doclet),
-            fields=self._fields(doclet),
-            examples=doclet.examples,
-            deprecated=doclet.deprecated,
-            see_also=doclet.see_alsos,
+            params=self._formal_params(doclet.constructor),
+            fields=self._fields(doclet.constructor),
+            examples=doclet.constructor.examples,
+            deprecated=doclet.constructor.deprecated,
+            see_also=doclet.constructor.see_alsos,
             class_comment=doclet.description,
-            constructor_comment=doclet.constructor_description,
+            constructor_comment=doclet.constructor.description,
             content='\n'.join(self._content),
-            # NEXT: See if we can get some unit tests going. ir.py still needs to be written.
             members=self._members_of(doclet,
                                      include=self._options['members'],
                                      exclude=self._options.get('exclude-members', set()),

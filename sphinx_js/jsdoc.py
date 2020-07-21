@@ -123,9 +123,11 @@ class Analyzer:
             members.append(member)
         return Class(
             description=doclet.get('classdesc', ''),
-            constructor_description=unwrapped_description(doclet),
+            # Right now, a class generates several doclets, all but one of
+            # which are marked as undocumented. In the one that's left, most of
+            # the fields are about the default constructor:
+            constructor=doclet_as_function(doclet, full_path),
             members=members,
-            params=params_to_ir(doclet),
             **top_level_properties(doclet, full_path))
 
 
@@ -198,7 +200,7 @@ def top_level_properties(doclet, full_path):
         #fs_path=join(doclet['meta']['path'], doclet['meta']['filename']),
         filename=doclet['meta']['filename'],
         # description's source varies depending on whether the doclet is a
-        #    class, so it is filled out elsewhere.
+        #    class, so it gets filled out elsewhere.
         line=doclet['meta']['lineno'],
         deprecated=doclet.get('deprecated', False),
         examples=doclet.get('examples', []),
