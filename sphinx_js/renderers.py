@@ -80,7 +80,7 @@ class JsRenderer(object):
             # Not sure if passing the settings from the "real" doc is the right
             # thing to do here:
             doc = new_document('%s:%s(%s)' % (doclet.filename,
-                                              doclet.path,
+                                              ''.join(doclet.path_segments),
                                               doclet.line),
                                settings=self._directive.state.document.settings)
             RstParser().parse(rst, doc)

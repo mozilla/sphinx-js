@@ -7,6 +7,7 @@ from tempfile import NamedTemporaryFile
 
 from sphinx.errors import SphinxError
 
+from .jsdoc import Analyzer as JsAnalyzer
 from .typedoc import parse_typedoc
 
 
@@ -22,8 +23,8 @@ def gather_doclets(app):
 
     # Pick analyzer:
     try:
-        analyzer = {'javascript': javascript.Analyzer,
-                    'typescript': typescript.Analyzer}[app.config.js_language]
+        analyzer = {'javascript': JsAnalyzer,
+                    'typescript': 'TsAnalyzer'}[app.config.js_language]
     except KeyError:
         raise SphinxError('Unsupported value of js_language in config: %s' % language)
 
