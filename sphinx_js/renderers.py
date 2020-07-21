@@ -1,6 +1,3 @@
-from json import dumps
-from re import sub
-
 from docutils.parsers.rst import Parser as RstParser
 from docutils.statemachine import StringList
 from docutils.utils import new_document
@@ -64,19 +61,16 @@ class JsRenderer(object):
 
         """
         try:
-            # Get the relevant documentation together:
-            doclet, full_path = self._app._sphinxjs_doclets_by_path.get_with_path(self._partial_path)
-            # TODO: I don't think full_path will be necessary when we get class.members working. Only autoclass uses it: to get the class's members.
-            doclet, full_path = self._look_up_object(self._partial_path)
+            doclet = self._app._sphinxjs_analyzer.get_object(
+                self._partial_path, self._renderer_type)
         except SuffixNotFound as exc:
             raise SphinxError('No JSDoc documentation was found for object "%s" or any path ending with that.'
                               % ''.join(exc.segments))
         except SuffixAmbiguous as exc:
-            raise SphinxError('More than one JS object matches the path suffix "%s". Candidate paths have these segments in front: %s'
+            raise SphinxError('More than one object matches the path suffix "%s". Candidate paths have these segments in front: %s'
                               % (''.join(exc.segments), exc.next_possible_keys))
         else:
             rst = self.rst(self._partial_path,
-                           full_path,
                            doclet,
                            use_short_name='short-name' in self._options)
 
@@ -93,14 +87,14 @@ class JsRenderer(object):
             return doc.children
         return []
 
-    def rst(self, partial_path, full_path, doclet, use_short_name=False):
+    def rst(self, partial_path, doclet, use_short_name=False):
         """Return rendered RST about an entity with the given name and doclet."""
         dotted_name = partial_path[-1] if use_short_name else _dotted_path(partial_path)
 
         # Render to RST using Jinja:
         env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
         template = env.get_template(self._template)
-        return template.render(**self._template_vars(dotted_name, full_path, doclet))
+        return template.render(**self._template_vars(dotted_name, doclet))
 
     def _name(self):
         """Return the JS function or class longname."""
@@ -157,67 +151,55 @@ class JsRenderer(object):
                        ('properties', _param_formatter),
                        ('properties', _param_type_formatter),
                        ('exceptions', _exception_formatter),
-                       ('returns', _returns_formatter)]
+                       ('returns', _return_formatter)]
         for collection_attr, callback in FIELD_TYPES:
             for instance in getattr(doclet, collection_attr, []):
-                description = instance.get('description', '')
-                # TODO: Quit unwrapping here. Do it in the analyzers.
-                unwrapped = sub(r'[ \t]*[\r\n]+[ \t]*', ' ', description)  # TODO: Don't unwrap unless totally unindented. Maybe this would let us support OLs and ULs in param descriptions.
-                heads, tail = callback(instance, unwrapped)
+                heads, tail = callback(instance, instance.description)
                 yield [rst.escape(h) for h in heads], tail
 
 
 class AutoFunctionRenderer(JsRenderer):
     _template = 'function.rst'
+    _renderer_type = 'function'
 
-    def _look_up_object(self, partial_path):
-        """Return the IR of the object to render.
-
-        Ask the analyzer for the object referred to by the given path suffix.
-        Use the fact that we're in an autofunction call to deduce that the
-        object coming back should be treated as a Function. Raise
-        SuffixNotFound or SuffixAmbiguous in the situations their names
-        suggest.
-
-        """
-        return self._app._analyzer.get_object(partial_path, 'function')
-
-    def _template_vars(self, name, full_path, doclet):
+    def _template_vars(self, name, doclet):
         return dict(
             name=name,
             params=self._formal_params(doclet),
             fields=self._fields(doclet),
-            description=doclet.get('description', ''),
-            examples=doclet.get('examples', ''),
-            deprecated=doclet.get('deprecated', False),
-            see_also=doclet.get('see', []),
+            description=doclet.description,
+            examples=doclet.examples,
+            deprecated=doclet.deprecated,
+            see_also=doclet.see_alsos,
             content='\n'.join(self._content))
 
 
 class AutoClassRenderer(JsRenderer):
     _template = 'class.rst'
+    _renderer_type = 'class'
 
-    def _template_vars(self, name, full_path, doclet):
+    def _template_vars(self, name, doclet):
         return dict(
             name=name,
             params=self._formal_params(doclet),
             fields=self._fields(doclet),
-            examples=doclet.get('examples', ''),
-            deprecated=doclet.get('deprecated', False),
-            see_also=doclet.get('see', []),
-            class_comment=doclet.get('classdesc', ''),
-            constructor_comment=doclet.get('description', ''),
+            examples=doclet.examples,
+            deprecated=doclet.deprecated,
+            see_also=doclet.see_alsos,
+            class_comment=doclet.description,
+            constructor_comment=doclet.constructor_description,
             content='\n'.join(self._content),
-            members=self._members_of(full_path,
+            # NEXT: See if we can get some unit tests going. ir.py still needs to be written.
+            members=self._members_of(doclet,
                                      include=self._options['members'],
                                      exclude=self._options.get('exclude-members', set()),
                                      should_include_private='private-members' in self._options)
                     if 'members' in self._options else '')
 
-    def _members_of(self, full_path, include, exclude, should_include_private):
-        """Return RST describing the members of the named class.
+    def _members_of(self, doclet, include, exclude, should_include_private):
+        """Return RST describing the members of a given class.
 
-        :arg full_path list: The unambiguous path of the class we're documenting
+        :arg doclet Class: The class we're documenting
         :arg include: List of names of members to include. If empty, include
             all.
         :arg exclude: Set of names of members to exclude
@@ -225,13 +207,13 @@ class AutoClassRenderer(JsRenderer):
 
         """
         def rst_for(doclet):
-            renderer = (AutoFunctionRenderer if doclet.get('kind') in ['function', 'typedef']
+            renderer = (AutoFunctionRenderer if isinstance(doclet, Function)
                         else AutoAttributeRenderer)
             # Pass a dummy arg list with no formal param list so
             # _formal_params() won't find an explicit param list in there and
             # override what it finds in the code:
             return renderer(self._directive, self._app, arguments=['dummy']).rst(
-                [doclet['name']],
+                [doclet.name],
                 'dummy_full_path',
                 doclet,
                 use_short_name=False)
@@ -246,10 +228,10 @@ class AutoClassRenderer(JsRenderer):
             inserted at the placeholder "*".
 
             """
-            doclets = self._app._sphinxjs_doclets_by_class[tuple(full_path)]
+            doclets = doclet.members
             if not include:
                 # Specifying none means listing all.
-                return sorted(doclets, key=lambda d: d.get('longname', d['name']))
+                return sorted(doclets, key=lambda d: d.path_segments)  # TODO: If path_segments is empty, fall back to d.name like this used to pre-IR.
             included_set = set(include)
 
             # If the special name * is included in the list, include
@@ -257,10 +239,10 @@ class AutoClassRenderer(JsRenderer):
             if '*' in included_set:
                 star_index = include.index('*')
                 sorted_not_included_doclets = sorted(
-                    (d for d in doclets if d['name'] not in included_set),
-                    key=lambda d: d.get('longname', d['name'])
+                    (d for d in doclets if d.name not in included_set),
+                    key=lambda d: d.path_segments  # TODO: Fall back to d.name if needed like it used to.
                 )
-                not_included = [d['name'] for d in sorted_not_included_doclets]
+                not_included = [d.name for d in sorted_not_included_doclets]
                 include = include[:star_index] + not_included + include[star_index + 1:]
                 included_set.update(not_included)
 
@@ -268,53 +250,55 @@ class AutoClassRenderer(JsRenderer):
             # static member and an instance one), keep them both. This
             # prefiltering step should make the below sort less horrible, even
             # though I'm calling index().
-            included_doclets = [d for d in doclets if d['name'] in included_set]
+            included_doclets = [d for d in doclets if d.name in included_set]
             # sort()'s stability should keep same-named doclets in the order
             # JSDoc spits them out in.
-            included_doclets.sort(key=lambda d: include.index(d['name']))
+            included_doclets.sort(key=lambda d: include.index(d.name))
             return included_doclets
+            # TODO: Quit saying "doclets" where what we really mean is IR entities.
 
         return '\n\n'.join(
             rst_for(doclet) for doclet in doclets_to_include(include)
-            if (doclet.get('access', 'public') in ('public', 'protected')
-                or (doclet.get('access') == 'private' and should_include_private))
-            and doclet['name'] not in exclude)
+            if (not doclet.is_private()
+                or (doclet.is_private and should_include_private))
+            and doclet.name not in exclude)
 
 
 class AutoAttributeRenderer(JsRenderer):
     _template = 'attribute.rst'
+    _renderer_type = 'attribute'
 
-    def _template_vars(self, name, full_path, doclet):
+    def _template_vars(self, name, doclet):
         return dict(
             name=name,
-            description=doclet.get('description', ''),
-            deprecated=doclet.get('deprecated', False),
-            see_also=doclet.get('see', []),
-            examples=doclet.get('examples', ''),
-            type=_or_types(doclet.get('type', {}).get('names', [])),
+            description=doclet.description,
+            deprecated=doclet.deprecated,
+            see_also=doclet.see_alsos,
+            examples=doclet.examples,
+            type=_or_types(doclet.types),
             content='\n'.join(self._content))
 
 
-def _returns_formatter(returns, description):
+def _return_formatter(return_):
     """Derive heads and tail from ``@returns`` blocks."""
-    types = _or_types(returns)
+    types = _or_types(return_)
     tail = ('**%s** -- ' % rst.escape(types)) if types else ''
-    tail += description
+    tail += return_.description
     return ['returns'], tail
 
 
-def _param_formatter(param, description):
+def _param_formatter(param):
     """Derive heads and tail from ``@param`` blocks."""
     heads = ['param']
     types = _or_types(param.types)
     if types:
         heads.append(types)
     heads.append(param.name)
-    tail = description
+    tail = param.description
     return heads, tail
 
 
-def _param_type_formatter(param, description):
+def _param_type_formatter(param):
     """Generate types for function parameters specified in field."""
     # TODO: I'm not sure what this does.
     heads = ['type', param.name]
@@ -322,13 +306,13 @@ def _param_type_formatter(param, description):
     return heads, tail
 
 
-def _exception_formatter(exception, description):
+def _exception_formatter(exception):
     """Derive heads and tail from ``@throws`` blocks."""
     heads = ['throws']
     types = _or_types(exception.types)
     if types:
         heads.append(types)
-    tail = description
+    tail = exception.description
     return heads, tail
 
 

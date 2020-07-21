@@ -1,138 +1,36 @@
-from codecs import getreader, getwriter
-from collections import defaultdict
+# TODO: Maybe move this whole file into __init__.
+from codecs import getreader
 from errno import ENOENT
-from functools import wraps
-from json import load, dump
-import os
-from os.path import join, normpath, relpath, splitext, sep
+from os.path import join, normpath
 import subprocess
-from tempfile import TemporaryFile, NamedTemporaryFile
+from tempfile import NamedTemporaryFile
 
 from sphinx.errors import SphinxError
 
-from .parsers import path_and_formal_params, PathVisitor
-from .suffix_tree import PathTaken, SuffixTree
 from .typedoc import parse_typedoc
 
 
 def gather_doclets(app):
     """Run JSDoc or another analysis tool across a whole codebase, and squirrel
-    away its results in jsdoc doclet format."""
+    away its results in a language-specific Analyzer."""
+    # Normalize config values:
     source_paths = [app.config.js_source_path] if isinstance(app.config.js_source_path, str) else app.config.js_source_path
     abs_source_paths = [normpath(join(app.confdir, path)) for path in source_paths]
-
     root_for_relative_paths = root_or_fallback(
         normpath(join(app.confdir, app.config.root_for_relative_js_paths)) if app.config.root_for_relative_js_paths else None,
         abs_source_paths)
 
-    analyze = analyzer_for(app.config.js_language)
-    doclets = analyze(abs_source_paths, app)
+    # Pick analyzer:
+    try:
+        analyzer = {'javascript': javascript.Analyzer,
+                    'typescript': typescript.Analyzer}[app.config.js_language]
+    except KeyError:
+        raise SphinxError('Unsupported value of js_language in config: %s' % language)
 
-
-
-    # 2 doclets are made for classes, and they are largely redundant: one for
-    # the class itself and another for the constructor. However, the
-    # constructor one gets merged into the class one and is intentionally
-    # marked as undocumented, even if it isn't. See
-    # https://github.com/jsdoc3/jsdoc/issues/1129.
-
-    # Build table for lookup by name, which most directives use:
-    app._sphinxjs_doclets_by_path = SuffixTree()
-    conflicts = []
-    for d in doclets:
-        try:
-            app._sphinxjs_doclets_by_path.add(
-                d.path_segments(root_for_relative_paths)
-                d)
-        except PathTaken as conflict:
-            conflicts.append(conflict.segments)
-    if conflicts:
-        raise PathsTaken(conflicts)
-
-    # Build lookup table for autoclass's :members: option. This will also
-    # pick up members of functions (inner variables), but it will instantly
-    # filter almost all of them back out again because they're undocumented.
-    # We index these by unambiguous full path. Then, when looking them up by
-    # arbitrary name segment, we disambiguate that first by running it through
-    # the suffix tree above. Expect trouble due to jsdoc's habit of calling
-    # things (like ES6 class methods) "<anonymous>" in the memberof field, even
-    # though they have names. This will lead to multiple methods having each
-    # other's members. But if you don't have same-named inner functions or
-    # inner variables that are documented, you shouldn't have trouble.
-    # TODO: Unnecessary in favor of class.members?
-    app._sphinxjs_doclets_by_class = defaultdict(lambda: [])
-    for d in doclets:
-        of = d.get('memberof')
-        if of:  # speed optimization
-            segments = path_segments(d, root_for_relative_paths, longname_field='memberof')
-            app._sphinxjs_doclets_by_class[tuple(segments)].append(d)
-
-
-def program_name_on_this_platform(program):
-    """Return the name of the executable file on the current platform, given a
-    command name with no extension."""
-    return program + '.cmd' if os.name == 'nt' else program
-
-
-class Command(object):
-    def __init__(self, program):
-        self.program = program_name_on_this_platform(program)
-        self.args = []
-
-    def add(self, *args):
-        self.args.extend(args)
-
-    def make(self):
-        return [self.program] + self.args
-
-
-def cache_to_file(get_filename):
-    """Return a decorator that will cache the result of ``get_filename()`` to a
-    file
-
-    :arg get_filename: A function which receives the original arguments of the
-        decorated function
-    """
-    def decorator(fn):
-        @wraps(fn)
-        def decorated(*args, **kwargs):
-            filename = get_filename(*args, **kwargs)
-            if filename and os.path.isfile(filename):
-                with open(filename, encoding='utf-8') as f:
-                    return load(f)
-            res = fn(*args, **kwargs)
-            if filename:
-                with open(filename, 'w', encoding='utf-8') as f:
-                    dump(res, f, indent=2)
-            return res
-        return decorated
-    return decorator
-
-
-@cache_to_file(lambda abs_source_paths, app: getattr(app.config, 'jsdoc_cache', None))
-def analyze_jsdoc(abs_source_paths, app):
-    command = Command('jsdoc')
-    command.add('-X', *abs_source_paths)
-    if app.config.jsdoc_config_path:
-        command.add('-c', normpath(join(app.confdir, app.config.jsdoc_config_path)))
-
-    # Use a temporary file to handle large output volume. JSDoc defaults to
-    # utf8-encoded output.
-    with getwriter('utf-8')(TemporaryFile(mode='w+b')) as temp:
-        try:
-            p = subprocess.Popen(command.make(), cwd=app.confdir, stdout=temp)
-        except OSError as exc:
-            if exc.errno == ENOENT:
-                raise SphinxError('%s was not found. Install it using "npm install -g jsdoc".' % command.program)
-            else:
-                raise
-        p.wait()
-        # Once output is finished, move back to beginning of file and load it:
-        temp.seek(0)
-        try:
-            return jsdoc_to_ir(load(getreader('utf-8')(temp)))
-        except ValueError:
-            raise SphinxError('jsdoc found no JS files in the directories %s. Make sure js_source_path is set correctly in conf.py. It is also possible (though unlikely) that jsdoc emitted invalid JSON.' % abs_source_paths)
+    # Analyze source code:
+    app._sphinxjs_analyzer = analyzer.from_disk(abs_source_paths,
+                                                app,
+                                                root_for_relative_paths)
 
 
 def analyze_typescript(abs_source_paths, app):
@@ -153,19 +51,6 @@ def analyze_typescript(abs_source_paths, app):
         return parse_typedoc(getreader('utf-8')(temp))
 
 
-ANALYZERS = {'javascript': analyze_jsdoc,
-             'typescript': analyze_typescript}
-
-
-def analyzer_for(language):
-    """Return a callable that spits out JSDoc-style doclets from some language:
-    JS, TypeScript, or other."""
-    try:
-        return ANALYZERS[language]
-    except KeyError:
-        raise SphinxError('Unsupported value of js_language in config: %s' % language)
-
-
 def root_or_fallback(root_for_relative_paths, abs_source_paths):
     """Return the path that relative JS entity paths in the docs are relative to.
 
@@ -183,51 +68,3 @@ def root_or_fallback(root_for_relative_paths, abs_source_paths):
             raise SphinxError('Since more than one js_source_path is specified in conf.py, root_for_relative_js_paths must also be specified. This allows paths beginning with ./ or ../ to be unambiguous.')
         else:
             return abs_source_paths[0]
-
-
-def path_segments(d, base_dir, longname_field='longname'):
-    """Return the full, unambiguous list of path segments that points to an
-    entity described by a doclet.
-
-    Example: ``['./', 'dir/', 'dir/', 'file/', 'object.', 'object#', 'object']``
-
-    :arg d: The doclet
-    :arg base_dir: Absolutized value of the root_for_relative_js_paths option
-    :arg longname_field: The field to look in at the top level of the doclet
-        for the long name of the object to emit a path to
-    """
-    meta = d['meta']
-    rel = relpath(meta['path'], base_dir)
-    rel = '/'.join(rel.split(sep))
-    if not rel.startswith(('../', './')) and rel not in ('..', '.'):
-        # It just starts right out with the name of a folder in the base_dir.
-        rooted_rel = './%s' % rel
-    else:
-        rooted_rel = rel
-
-    # Building up a string and then parsing it back down again is probably
-    # not the fastest approach, but it means knowledge of path format is in
-    # one place: the parser.
-    path = '%s/%s.%s' % (rooted_rel,
-                         splitext(meta['filename'])[0],
-                         d[longname_field])
-    return PathVisitor().visit(
-        path_and_formal_params['path'].parse(path))
-
-
-class PathsTaken(Exception):
-    """One or more JS objects had the same paths.
-
-    Rolls up multiple PathTaken exceptions for mass reporting.
-
-    """
-    def __init__(self, conflicts):
-        # List of paths, each given as a list of segments:
-        self.conflicts = conflicts
-
-    def __str__(self):
-        return ('Your JS code contains multiple documented objects at each of '
-                "these paths:\n\n  %s\n\nWe won't know which one you're "
-                'talking about. Using JSDoc tags like @class might help you '
-                'differentiate them.' %
-                '\n  '.join(''.join(c) for c in self.conflicts))

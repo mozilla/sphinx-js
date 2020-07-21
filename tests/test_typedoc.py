@@ -7,7 +7,7 @@ from tempfile import mkdtemp
 
 import pytest
 
-from sphinx_js.doclets import program_name_on_this_platform
+from sphinx_js.analyzer_utils import program_name_on_this_platform
 from sphinx_js.typedoc import TypeDoc, parse_typedoc
 
 TS_SOURCE_DIR = os.path.join(os.path.dirname(__file__), 'typescript')

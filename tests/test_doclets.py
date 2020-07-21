@@ -2,11 +2,12 @@
 import pytest
 from sphinx.errors import SphinxError
 
-from sphinx_js.doclets import doclet_full_path, root_or_fallback
+from sphinx_js.doclets import root_or_fallback
+from sphinx_js.jsdoc import full_path_segments
 
 
 def test_doclet_full_path():
-    """Sanity-check doclet_full_path(), including throwing it a non-.js filename."""
+    """Sanity-check full_path_segments(), including throwing it a non-.js filename."""
     doclet = {
         'meta': {
             'filename': 'utils.jsm',
@@ -14,7 +15,7 @@ def test_doclet_full_path():
         },
         'longname': 'best#thing~yeah'
     }
-    assert doclet_full_path(doclet, '/boogie/smoo/Checkouts') == [
+    assert full_path_segments(doclet, '/boogie/smoo/Checkouts') == [
         './',
         'fathom/',
         'utils.',

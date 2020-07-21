@@ -1,16 +1,17 @@
-Node:
+TopLevel:
     .name (the short name of a member, regardless of whether it's a class or function or typedef or param)
     .description
     .path_segments (computed from .longname) (our namepath-like things)
-    .path (computed from path_segments)
+    .path (joined path_segments)  # might not need. Nope, need it for doclets_to_include(). Nm, I switched it to use path_segments. It's just for sorting.
     .filename ("foo.js", computed from fs_path)
-    .fs_path (full OS-specific pathname with extension)
+    #.fs_path (full OS-specific pathname with extension)
     .line (from .lineno)
     .deprecated
     .examples
     .memberof  # Or maybe Class.members suffices.
-    .see_also
+    .see_alsos
     .properties
+    .is_private
 
 
 
@@ -19,31 +20,34 @@ Node:
 Class or Function:  # Whether this ends up being a common superclass is an implementation detail, but the point is that both functions and classes have these fields.
     .params (classes in TS are type-parametrizable)
 
-Function(Node):
+Function(TopLevel):
     .exceptions
     .returns
 
-Class(Node):
-    (.classdesc can go into Node.description)
+Class(TopLevel):
+    (.classdesc goes into TopLevel.description)
+    .constructor_description
     Maybe _sphinxjs_doclets_by_class turns into .members.
     Maybe will want a .constructor.
 
-Typedef(Node?):  # TODO: Make sure autofunction still works on these.
-    .type
+#Typedef(TopLevel?):  # TODO: Make sure autofunction still works on these.
+#    .type  # Yeah, so, we're using Functions to represent Typedefs as well, because apparently we were doing it before. Let's see how it works out. Maybe stop doing that once we show everything is working, because it's icky.
+
+Attribute(TopLevel):
+    .types
 
 
-
-Anything that can be a class member (constant, (function, class, attr, anything else?):
+Anything that can be a class member (functions, attributes. That's all we need, because it's all jsdoc.doclets_as_class emits.):
     .access (private, public, protected)
 
 # Subentities:
 
-Param:  # Does this subclass Node? It has a name, description, filename, lineno. Probably. But no, it doesn't have path_segments or much of the other stuff.
+Param:  # Does this subclass TopLevel? It has a name, description, filename, lineno. Probably. But no, it doesn't have path_segments or much of the other stuff.
     .name
     .description
     .default
     .is_variadic
-    .types # list of type, which are strings. Types could even be parametrized by other types, but we probably don't care for IR purposes: let whichever analyzer boil them down to strings.
+    .types # list of types, which are strings. Types could even be parametrized by other types, but we probably don't care for IR purposes: let whichever analyzer boil them down to strings.
 
 Property:
     .name

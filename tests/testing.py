@@ -8,8 +8,22 @@ import sys
 from sphinx.cmd.build import main as sphinx_main
 from sphinx.util.osutil import cd
 
+from sphinx_js.jsdoc import Analyzer, jsdoc_output
 
-class SphinxBuildTestCase(TestCase):
+
+class ThisDirTestCase(TestCase):
+    """A TestCase that knows how to find the directory the subclass is defined
+    in"""
+
+    @classmethod
+    def this_dir(cls):
+        """Return the path to the dir containing the testcase class."""
+        # nose does some amazing magic that makes this work even if there are
+        # multiple test modules with the same name:
+        return dirname(sys.modules[cls.__module__].__file__)
+
+
+class SphinxBuildTestCase(ThisDirTestCase):
     """Base class for tests which require a Sphinx tree to be built and then
     deleted afterward
 
@@ -26,13 +40,6 @@ class SphinxBuildTestCase(TestCase):
     def teardown_class(cls):
         rmtree(join(cls.docs_dir, '_build'))
 
-    @classmethod
-    def this_dir(cls):
-        """Return the path to the dir containing the testcase class."""
-        # nose does some amazing magic that makes this work even if there are
-        # multiple test modules with the same name:
-        return dirname(sys.modules[cls.__module__].__file__)
-
     def _file_contents(self, filename):
         with open(join(self.docs_dir, '_build', '%s.txt' % filename),
                   encoding='utf8') as file:
@@ -40,3 +47,16 @@ class SphinxBuildTestCase(TestCase):
 
     def _file_contents_eq(self, filename, contents):
         assert self._file_contents(filename) == contents
+
+
+class JsDocTestCase(ThisDirTestCase):
+    """Base class for tests which analyze a file using JSDoc"""
+    @classmethod
+    def setup_class(cls):
+        """Run Sphinx against the dir adjacent to the testcase."""
+        source_dir = join(cls.this_dir(), 'source')
+        output = jsdoc_output(None,
+                              [join(source_dir, cls.file)],
+                              source_dir,
+                              source_dir)
+        cls.analyzer = Analyzer(output, source_dir)
