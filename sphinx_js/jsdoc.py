@@ -101,9 +101,9 @@ class Analyzer:
         # alogether.
         try:
             doclet_as_whatever = {
-                'function': doclet_as_function,
+                'function': self._doclet_as_function,
                 'class': self._doclet_as_class,
-                'attribute': doclet_as_attribute}[as_type]
+                'attribute': self._doclet_as_attribute}[as_type]
         except KeyError:
             raise NotImplementedError('Unknown autodoc directive: auto%s' % as_type)
 
@@ -117,7 +117,7 @@ class Analyzer:
             kind = member_doclet.get('kind')
             member_full_path = full_path_segments(member_doclet, self._base_dir)
             # Typedefs should still fit into function-shaped holes:
-            doclet_as_whatever = doclet_as_function if (kind == 'function' or kind == 'typedef') else doclet_as_attribute
+            doclet_as_whatever = self._doclet_as_function if (kind == 'function' or kind == 'typedef') else self._doclet_as_attribute
             # TODO: What about inner classes? Can they happen?
             member = doclet_as_whatever(member_doclet, member_full_path)
             members.append(member)
@@ -126,9 +126,26 @@ class Analyzer:
             # Right now, a class generates several doclets, all but one of
             # which are marked as undocumented. In the one that's left, most of
             # the fields are about the default constructor:
-            constructor=doclet_as_function(doclet, full_path),
+            constructor=self._doclet_as_function(doclet, full_path),
             members=members,
             **top_level_properties(doclet, full_path))
+
+    @staticmethod
+    def _doclet_as_function(doclet, full_path):
+        return Function(
+            description=unwrapped_description(doclet),
+            exceptions=exceptions_to_ir(doclet.get('exceptions', [])),
+            returns=returns_to_ir(doclet.get('returns', [])),
+            params=params_to_ir(doclet),
+            **top_level_properties(doclet, full_path))
+
+    @staticmethod
+    def _doclet_as_attribute(doclet, full_path):
+        return Attribute(
+            description=unwrapped_description(doclet),
+            types=get_types(doclet),
+            **top_level_properties(doclet, full_path)
+        )
 
 
 def full_path_segments(d, base_dir, longname_field='longname'):
@@ -207,23 +224,6 @@ def top_level_properties(doclet, full_path):
         see_alsos=doclet.get('see', []),
         properties=properties_to_ir(doclet.get('properties', [])),
         is_private=doclet.get('access') == 'private')
-
-
-def doclet_as_function(doclet, full_path):
-    return Function(
-        description=unwrapped_description(doclet),
-        exceptions=exceptions_to_ir(doclet.get('exceptions', [])),
-        returns=returns_to_ir(doclet.get('returns', [])),
-        params=params_to_ir(doclet),
-        **top_level_properties(doclet, full_path))
-
-
-def doclet_as_attribute(doclet, full_path):
-    return Attribute(
-        description=unwrapped_description(doclet),
-        types=get_types(doclet),
-        **top_level_properties(doclet, full_path)
-    )
 
 
 def properties_to_ir(properties):
