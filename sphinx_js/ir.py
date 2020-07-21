@@ -10,12 +10,12 @@ typedoc's output. Nor is it meant to generalize to other uses like static
 analysis. Ideally, it exists to provide the minimum information necessary to
 render our Sphinx templates about JS and TS entities. Any expansion or
 generalization of the IR should be driven by needs of those templates and the
-minimal logic around them. The complexity of doing otherwise has no payback.
+(minimal) logic around them. The complexity of doing otherwise has no payback.
 
 I was conflicted about introducing an additional representation, since a
-multiplicity of representations incur conversion complexity costs at a
+multiplicity of representations incurs conversion complexity costs at a
 superlinear rate. However, I think it is essential complexity here. The
-potentially simpler approach would have been to have the RST template vars
+potentially simpler approach would have been to let the RST template vars
 required by our handful of directives be the IR. However, we still would have
 wanted to factor out formatting like the joining of types with "|" and the
 unwrapping of comments, making another representation inevitable. Therefore,
@@ -134,9 +134,10 @@ class Function(TopLevel):
 class Class(TopLevel):
     #: The default constructor for this class
     constructor: Function
-    #: Class members, concretized ahead of time for simplicity. Otherwise,
+    #: Class members, concretized ahead of time for simplicity. (Otherwise,
     #: we'd have to pass the doclets_by_class map in and keep it around, along
-    #: with a callable that would create the member IRs from it on demand.
+    #: with a callable that would create the member IRs from it on demand.)
+    #: Does not include the default constructor.
     members: List[Union[Function, Attribute]]
     # There's room here for additional fields like @example on the class doclet
     # itself. These are supported and extracted by jsdoc, but they end up in an

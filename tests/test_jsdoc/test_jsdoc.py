@@ -44,38 +44,27 @@ class ClassTests(JsDocTestCase):
     def test_class(self):
         """Smoke-test Class analysis."""
         cls = self.analyzer.get_object(['Foo'], 'class')
-        assert cls == Class(name='Foo',
-                            path_segments=['./', 'class.', 'Foo'],
-                            filename='class.js',
-                            description='Class doc.',
-                            line=14,  # Not ideal, as it refers to the constructor, but we'll allow it
-                            deprecated=False,
-                            examples=['Example in constructor'],
-                            see_alsos=[],
-                            properties=[],
-                            is_private=False,
-                            members=[],
-                            constructor=Function(
-                                name='Foo',
-                                path_segments=['./', 'class.', 'Foo'],
-                                filename='class.js',
-                                description='Constructor doc.',
-                                line=14,
-                                deprecated=False,
-                                examples=['Example in constructor'],
-                                see_alsos=[],
-                                properties=[],
-                                is_private=False,
-                                params=[Param(
-                                    name='ho',
-                                    description='A thing',
-                                    has_default=False,
-                                    is_variadic=False,
-                                    types=[])],
-                                exceptions=[Exc(types=[],
-                                                description='ExplosionError It went boom.')],
-                                returns=[]))
-# NEXT: Get rid of the uninformative fields ^^^ here. Give them defaults in the IR.
+        assert cls.name == 'Foo'
+        assert cls.path_segments == ['./', 'class.', 'Foo']
+        assert cls.filename == 'class.js'
+        assert cls.description == 'Class doc.'
+        assert cls.line == 14  # Not ideal, as it refers to the constructor, but we'll allow it
+        assert cls.examples == ['Example in constructor']  # We ignore examples and other fields from the class doclet so far. This could change someday.
+        assert cls.members == []  # default constructor not included here
+        constructor = cls.constructor
+        assert constructor.name == 'Foo'
+        assert constructor.path_segments == ['./', 'class.', 'Foo']  # Same path as class. This might differ in different languages.
+        assert constructor.filename == 'class.js'
+        assert constructor.description == 'Constructor doc.'
+        assert constructor.examples == ['Example in constructor']
+        assert constructor.params == [Param(name='ho',
+                                            description='A thing',
+                                            has_default=False,
+                                            is_variadic=False,
+                                            types=[])]
+        assert constructor.exceptions == [
+            Exc(types=[],
+                description='ExplosionError It went boom.')]
 
 # NEXT: Test exceptions and returns, unless the RST tests are good enough for that.
 # Test Class.
