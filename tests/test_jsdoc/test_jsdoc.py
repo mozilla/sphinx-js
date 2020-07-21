@@ -8,14 +8,18 @@ class FunctionTests(JsDocTestCase):
     file = 'function.js'
 
     def test_top_level_and_function(self):
-        """Smoke-test Function (and thus also TopLevel) analysis."""
+        """Test Function (and thus also TopLevel) analysis.
+
+        This also includes exceptions, returns, params, and default values.
+
+        """
         function = self.analyzer.get_object(['foo'], 'function')
         assert function == Function(
             name='foo',
             path_segments=['./', 'function.', 'foo'],
             filename='function.js',
             description='Function foo.',
-            line=9,
+            line=10,
             deprecated=False,
             examples=[],
             see_alsos=[],
@@ -32,7 +36,8 @@ class FunctionTests(JsDocTestCase):
                           default='8',
                           is_variadic=False,
                           types=[])],
-            exceptions=[],
+            exceptions=[Exc(types=[],
+                            description='ExplosionError It went boom.')],
             returns=[
                 Return(types=['Number'],
                        description='How many things there are')])  # Test text unwrapping.
@@ -42,13 +47,13 @@ class ClassTests(JsDocTestCase):
     file = 'class.js'
 
     def test_class(self):
-        """Test Class analysis."""
+        """Test Class analysis, including members, attributes, and privacy."""
         cls = self.analyzer.get_object(['Foo'], 'class')
         assert cls.name == 'Foo'
         assert cls.path_segments == ['./', 'class.', 'Foo']
         assert cls.filename == 'class.js'
         assert cls.description == 'Class doc.'
-        assert cls.line == 14  # Not ideal, as it refers to the constructor, but we'll allow it
+        assert cls.line == 13  # Not ideal, as it refers to the constructor, but we'll allow it
         assert cls.examples == ['Example in constructor']  # We ignore examples and other fields from the class doclet so far. This could change someday.
 
         # Members:
@@ -76,8 +81,3 @@ class ClassTests(JsDocTestCase):
                                             has_default=False,
                                             is_variadic=False,
                                             types=[])]
-        assert constructor.exceptions == [
-            Exc(types=[],
-                description='ExplosionError It went boom.')]
-
-# NEXT: Test exceptions and returns, unless the RST tests are good enough for that.
