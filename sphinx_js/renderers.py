@@ -5,6 +5,7 @@ from jinja2 import Environment, PackageLoader
 from sphinx.errors import SphinxError
 from sphinx.util import rst
 
+from .ir import Function
 from .parsers import PathVisitor
 from .suffix_tree import SuffixAmbiguous, SuffixNotFound
 
@@ -154,7 +155,7 @@ class JsRenderer(object):
                        ('returns', _return_formatter)]
         for collection_attr, callback in FIELD_TYPES:
             for instance in getattr(doclet, collection_attr, []):
-                heads, tail = callback(instance, instance.description)
+                heads, tail = callback(instance)
                 yield [rst.escape(h) for h in heads], tail
 
 
@@ -211,12 +212,8 @@ class AutoClassRenderer(JsRenderer):
         def rst_for(doclet):
             renderer = (AutoFunctionRenderer if isinstance(doclet, Function)
                         else AutoAttributeRenderer)
-            # Pass a dummy arg list with no formal param list so
-            # _formal_params() won't find an explicit param list in there and
-            # override what it finds in the code:
             return renderer(self._directive, self._app, arguments=['dummy']).rst(
                 [doclet.name],
-                'dummy_full_path',
                 doclet,
                 use_short_name=False)
 
@@ -261,7 +258,7 @@ class AutoClassRenderer(JsRenderer):
 
         return '\n\n'.join(
             rst_for(doclet) for doclet in doclets_to_include(include)
-            if (not doclet.is_private()
+            if (not doclet.is_private
                 or (doclet.is_private and should_include_private))
             and doclet.name not in exclude)
 
@@ -283,7 +280,7 @@ class AutoAttributeRenderer(JsRenderer):
 
 def _return_formatter(return_):
     """Derive heads and tail from ``@returns`` blocks."""
-    types = _or_types(return_)
+    types = _or_types(return_.types)
     tail = ('**%s** -- ' % rst.escape(types)) if types else ''
     tail += return_.description
     return ['returns'], tail

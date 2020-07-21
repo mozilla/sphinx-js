@@ -286,7 +286,7 @@ def properties_to_ir(properties):
     """Turn jsdoc-emitted properties JSON into a list of Properties."""
     return [Property(name=p['name'],
                      types=get_types(p),
-                     description=unwrapped_description(e))
+                     description=unwrapped_description(p))
             for p in properties]
 
 
