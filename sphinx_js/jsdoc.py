@@ -204,89 +204,6 @@ def jsdoc_output(cache, abs_source_paths, base_dir, sphinx_conf_dir, config_path
             raise SphinxError('jsdoc found no JS files in the directories %s. Make sure js_source_path is set correctly in conf.py. It is also possible (though unlikely) that jsdoc emitted invalid JSON.' % abs_source_paths)
 
 
-def top_level_properties(doclet, full_path):
-    """Extract information common to complex entities, and return it as a dict.
-
-    Specifically, pull out the information needed to parametrize TopLevel's
-    constructor.
-
-    """
-    return dict(
-        name=doclet['name'],
-        path_segments=full_path,
-        #fs_path=join(doclet['meta']['path'], doclet['meta']['filename']),
-        filename=doclet['meta']['filename'],
-        # description's source varies depending on whether the doclet is a
-        #    class, so it gets filled out elsewhere.
-        line=doclet['meta']['lineno'],
-        deprecated=doclet.get('deprecated', False),
-        examples=doclet.get('examples', []),
-        see_alsos=doclet.get('see', []),
-        properties=properties_to_ir(doclet.get('properties', [])),
-        is_private=doclet.get('access') == 'private')
-
-
-def properties_to_ir(properties):
-    """Turn jsdoc-emitted properties JSON into a list of Properties."""
-    return [Property(name=p['name'],
-                     types=get_types(p),
-                     description=unwrapped_description(e))
-            for p in properties]
-
-
-def unwrapped_description(obj):
-    return sub(r'[ \t]*[\r\n]+[ \t]*', ' ', obj.get('description', ''))  # TODO: Don't unwrap unless totally unindented. Maybe this would let us support OLs and ULs in param descriptions.
-
-
-def params_to_ir(doclet):
-    """Extract the parameters of a function or class, and return a list of
-    Param instances.
-
-    :arg doclet: A JSDoc doclet representing a function or class
-
-    """
-    ret = []
-
-    # First, go through the explicitly documented params:
-    for p in doclet.get('params', []):
-        types = get_types(p)
-        default = p.get('defaultvalue', NO_DEFAULT)
-        formatted_default = 'dummy' if default is NO_DEFAULT else format_default_according_to_type_hints(default, types)
-        ret.append(Param(
-            name=p['name'].split('.')[0],
-            description=p.get('description', ''),
-            has_default=default is not NO_DEFAULT,
-            default=formatted_default,
-            is_variadic=p.get('variable', False),
-            types=get_types(p)))
-
-    # Use params from JS code if there are no documented params:
-    if not ret:
-        ret = [Param(name=p) for p in
-               doclet['meta']['code'].get('paramnames', [])]
-
-    return ret
-
-
-def exceptions_to_ir(exceptions):
-    """Turn jsdoc's JSON-formatted exceptions into a list of Exceptions."""
-    return [Exc(types=get_types(e),
-                description=unwrapped_description(e))
-            for e in exceptions]
-
-
-def returns_to_ir(returns):
-    return [Return(types=get_types(r),
-                   description=unwrapped_description(r))
-            for r in returns]
-
-
-def get_types(props):
-    """Given an arbitrary object from a jsdoc-emitted JSON file, go get the
-    ``type`` property, and return a list of all the type names."""
-    return props.get('type', {}).get('names', [])
-
-
 def format_default_according_to_type_hints(value, declared_types):
     """Return the default value for a param, formatted as a string
     ready to be used in a formal parameter list.
@@ -331,3 +248,86 @@ def format_default_according_to_type_hints(value, declared_types):
         else:
             # It's fine as the type it is.
             return dumps(value)
+
+
+def unwrapped_description(obj):
+    return sub(r'[ \t]*[\r\n]+[ \t]*', ' ', obj.get('description', ''))  # TODO: Don't unwrap unless totally unindented. Maybe this would let us support OLs and ULs in param descriptions.
+
+
+def get_types(props):
+    """Given an arbitrary object from a jsdoc-emitted JSON file, go get the
+    ``type`` property, and return a list of all the type names."""
+    return props.get('type', {}).get('names', [])
+
+
+def top_level_properties(doclet, full_path):
+    """Extract information common to complex entities, and return it as a dict.
+
+    Specifically, pull out the information needed to parametrize TopLevel's
+    constructor.
+
+    """
+    return dict(
+        name=doclet['name'],
+        path_segments=full_path,
+        #fs_path=join(doclet['meta']['path'], doclet['meta']['filename']),
+        filename=doclet['meta']['filename'],
+        # description's source varies depending on whether the doclet is a
+        #    class, so it gets filled out elsewhere.
+        line=doclet['meta']['lineno'],
+        deprecated=doclet.get('deprecated', False),
+        examples=doclet.get('examples', []),
+        see_alsos=doclet.get('see', []),
+        properties=properties_to_ir(doclet.get('properties', [])),
+        is_private=doclet.get('access') == 'private')
+
+
+def properties_to_ir(properties):
+    """Turn jsdoc-emitted properties JSON into a list of Properties."""
+    return [Property(name=p['name'],
+                     types=get_types(p),
+                     description=unwrapped_description(e))
+            for p in properties]
+
+
+def params_to_ir(doclet):
+    """Extract the parameters of a function or class, and return a list of
+    Param instances.
+
+    :arg doclet: A JSDoc doclet representing a function or class
+
+    """
+    ret = []
+
+    # First, go through the explicitly documented params:
+    for p in doclet.get('params', []):
+        types = get_types(p)
+        default = p.get('defaultvalue', NO_DEFAULT)
+        formatted_default = 'dummy' if default is NO_DEFAULT else format_default_according_to_type_hints(default, types)
+        ret.append(Param(
+            name=p['name'].split('.')[0],
+            description=p.get('description', ''),
+            has_default=default is not NO_DEFAULT,
+            default=formatted_default,
+            is_variadic=p.get('variable', False),
+            types=get_types(p)))
+
+    # Use params from JS code if there are no documented params:
+    if not ret:
+        ret = [Param(name=p) for p in
+               doclet['meta']['code'].get('paramnames', [])]
+
+    return ret
+
+
+def exceptions_to_ir(exceptions):
+    """Turn jsdoc's JSON-formatted exceptions into a list of Exceptions."""
+    return [Exc(types=get_types(e),
+                description=unwrapped_description(e))
+            for e in exceptions]
+
+
+def returns_to_ir(returns):
+    return [Return(types=get_types(r),
+                   description=unwrapped_description(r))
+            for r in returns]
