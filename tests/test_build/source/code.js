@@ -151,7 +151,7 @@ const ExampleAttribute = null;
 function destructuredParams(p1, {foo, bar}) {}
 
 /**
- * @param a_
+ * @param a_ Snorf
  * @param {type_} b Borf_
  * @returns {rtype_} Dorf_
  */

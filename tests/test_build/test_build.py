@@ -101,10 +101,7 @@ class Tests(SphinxBuildTestCase):
         self._file_contents_eq(
             'autofunction_variadic',
             'variadicParameter(a, ...args)\n\n'
-            '   Variadic parameter\n\n'
-            '   Arguments:\n'
-            '      * **a** --\n\n'
-            '      * **args** --\n')
+            '   Variadic parameter\n')
 
     def test_autofunction_deprecated(self):
         """Make sure @deprecated tags can be documented with autofunction."""
@@ -273,7 +270,7 @@ class Tests(SphinxBuildTestCase):
             'injection',
             u'injection(a_, b)\n\n'
             '   Arguments:\n'
-            '      * **a_** --\n\n'
+            '      * **a_** -- Snorf\n\n'
             '      * **b** (*type_*) -- >>Borf_<<\n\n'
             '   Returns:\n'
             '      **rtype_** -- >>Dorf_<<\n')

@@ -294,6 +294,24 @@ def params_to_ir(doclet):
     """Extract the parameters of a function or class, and return a list of
     Param instances.
 
+    Formal param fallback philosophy:
+
+    1. If the user puts a formal param list in the RST explicitly, use that.
+    2. Else, if they've @param'd anything, show just those args. This gives the
+       user full control from the code, so they can use autoclass without
+       having to manually write each function signature in the RST.
+    3. Else, extract a formal param list from the meta field, which will lack
+       descriptions.
+
+    Param list:
+
+    * Don't show anything without a description or at least a type. It adds
+      nothing.
+
+    Our extraction to IR thus follows our formal param philosophy, and the
+    renderer caps it off by checking for descriptions and types while building
+    the param+description list.
+
     :arg doclet: A JSDoc doclet representing a function or class
 
     """
@@ -312,7 +330,7 @@ def params_to_ir(doclet):
             is_variadic=p.get('variable', False),
             types=get_types(p)))
 
-    # Use params from JS code if there are no documented params:
+    # Use params from JS code if there are no documented @params.
     if not ret:
         ret = [Param(name=p) for p in
                doclet['meta']['code'].get('paramnames', [])]

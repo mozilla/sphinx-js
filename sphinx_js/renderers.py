@@ -104,7 +104,7 @@ class JsRenderer(object):
     def _formal_params(self, doclet):
         """Return the JS function or class params, looking first to any
         explicit params written into the directive and falling back to those in
-        the JS code.
+        doclets or JS code.
 
         Return a ReST-escaped string ready for substitution into the template.
 
@@ -112,10 +112,6 @@ class JsRenderer(object):
         if self._explicit_formal_params:
             return self._explicit_formal_params
 
-        # Harvest params from the @param tag unless they collide with an
-        # explicit formal param. Even look at params that are really
-        # documenting subproperties of formal params. Also handle param default
-        # values.
         formals = []
         used_names = set()
 
@@ -155,8 +151,10 @@ class JsRenderer(object):
                        ('returns', _return_formatter)]
         for collection_attr, callback in FIELD_TYPES:
             for instance in getattr(doclet, collection_attr, []):
-                heads, tail = callback(instance)
-                yield [rst.escape(h) for h in heads], tail
+                result = callback(instance)
+                if result:
+                    heads, tail = result
+                    yield [rst.escape(h) for h in heads], tail
 
 
 class AutoFunctionRenderer(JsRenderer):
@@ -288,6 +286,9 @@ def _return_formatter(return_):
 
 def _param_formatter(param):
     """Derive heads and tail from ``@param`` blocks."""
+    if not param.types and not param.description:
+        # There's nothing worth saying about this param.
+        return None
     heads = ['param']
     types = _or_types(param.types)
     if types:
@@ -299,7 +300,9 @@ def _param_formatter(param):
 
 def _param_type_formatter(param):
     """Generate types for function parameters specified in field."""
-    # TODO: I'm not sure what this does.
+    if not param.types and not param.description:
+        return None
+    # TODO: I'm not sure what this function is for.
     heads = ['type', param.name]
     tail = rst.escape(_or_types(param.types))
     return heads, tail
