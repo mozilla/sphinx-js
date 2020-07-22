@@ -78,23 +78,15 @@ class Tests(SphinxBuildTestCase):
             'defaultsDocumentedInDoclet(func=() => 5, str="a string with \\" quote", strNum="42", strBool="true", num=5, nil=null)\n\n'
             '   Arguments:\n'
             '      * **func** (*function*) --\n\n'
-            '      * **str** --\n\n'
             '      * **strNum** (*string*) --\n\n'
-            '      * **strBool** (*string*) --\n\n'
-            '      * **num** --\n\n'
-            '      * **nil** --\n')
+            '      * **strBool** (*string*) --\n')
 
     def test_autofunction_defaults_in_code(self):
         """Make sure param default values appear in the function definition,
         when defined in code."""
         self._file_contents_eq(
             'autofunction_defaults_code',
-            'defaultsDocumentedInCode(num=5, str="true", bool=true, nil=null)\n\n'
-            '   Arguments:\n'
-            '      * **num** --\n\n'
-            '      * **str** --\n\n'
-            '      * **bool** --\n\n'
-            '      * **nil** --\n')
+            'defaultsDocumentedInCode(num=5, str="true", bool=true, nil=null)\n')
 
     def test_autofunction_variadic(self):
         """Make sure variadic parameters are rendered as ellipses."""

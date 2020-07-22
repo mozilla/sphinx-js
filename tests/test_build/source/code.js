@@ -165,7 +165,7 @@ function injection() {}
  * @param [num=5]
  * @param [nil=null]
  */
-function defaultsDocumentedInDoclet(func, strNum, strBool, num, nil) {}
+function defaultsDocumentedInDoclet(func, str, strNum, strBool, num, nil) {}
 
 /**
  * @param [num]
