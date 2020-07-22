@@ -323,7 +323,7 @@ def params_to_ir(doclet):
         default = p.get('defaultvalue', NO_DEFAULT)
         formatted_default = 'dummy' if default is NO_DEFAULT else format_default_according_to_type_hints(default, types)
         ret.append(Param(
-            name=p['name'].split('.')[0],
+            name=p['name'],
             description=p.get('description', ''),
             has_default=default is not NO_DEFAULT,
             default=formatted_default,

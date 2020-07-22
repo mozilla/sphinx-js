@@ -116,7 +116,9 @@ class JsRenderer(object):
         used_names = set()
 
         for param in doclet.params:
-            name = param.name
+            # Turn "@param p2.subProperty" into just p2. We wouldn't want to
+            # add subproperties to the flat formal param list:
+            name = param.name.split('.')[0]
             default = param.default
 
             # Add '...' to the parameter name if it's a variadic argument
