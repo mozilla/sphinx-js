@@ -8,7 +8,8 @@ import sys
 from sphinx.cmd.build import main as sphinx_main
 from sphinx.util.osutil import cd
 
-from sphinx_js.jsdoc import Analyzer, jsdoc_output
+from sphinx_js.jsdoc import Analyzer as JsAnalyzer, jsdoc_output
+from sphinx_js.typedoc import Analyzer as TsAnalyzer, typedoc_output
 
 
 class ThisDirTestCase(TestCase):
@@ -52,12 +53,37 @@ class SphinxBuildTestCase(ThisDirTestCase):
 
 class JsDocTestCase(ThisDirTestCase):
     """Base class for tests which analyze a file using JSDoc"""
+
     @classmethod
     def setup_class(cls):
-        """Run Sphinx against the dir adjacent to the testcase."""
+        """Run the JS analyzer over the JSDoc output."""
         source_dir = join(cls.this_dir(), 'source')
         output = jsdoc_output(None,
                               [join(source_dir, cls.file)],
                               source_dir,
                               source_dir)
-        cls.analyzer = Analyzer(output, source_dir)
+        cls.analyzer = JsAnalyzer(output, source_dir)
+
+
+class TypeDocTestCase(ThisDirTestCase):
+    """Base class for tests which analyze a file using TypeDoc"""
+
+    @classmethod
+    def setup_class(cls):
+        """Run the TS analyzer over the TypeDoc output."""
+        cls._source_dir = join(cls.this_dir(), 'source')
+        cls.json = typedoc_output([join(cls._source_dir, file)
+                                   for file in cls.files],
+                                cls._source_dir,
+                                cls._source_dir,
+                                'tsconfig.json')
+
+
+class TypeDocAnalyzerTestCase(TypeDocTestCase):
+    """Base class for tests which analyze a file using TypeDoc"""
+
+    @classmethod
+    def setup_class(cls):
+        """Run the TS analyzer over the TypeDoc output."""
+        super().setup_class()
+        cls.analyzer = TsAnalyzer(cls.json, cls._source_dir)

@@ -1,5 +1,3 @@
-from os.path import dirname, join
-
 from sphinx_js.ir import Attribute, Class, Exc, Function, Param, Return
 from tests.testing import JsDocTestCase
 
@@ -25,6 +23,10 @@ class FunctionTests(JsDocTestCase):
             see_alsos=[],
             properties=[],
             is_private=False,
+            exported_from=None,
+            is_abstract=False,
+            is_optional=False,
+            is_static=False,
             params=[Param(name='bar',
                           description='Which bar',
                           has_default=False,

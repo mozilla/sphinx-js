@@ -296,7 +296,7 @@ Configuration Reference
   Use 'javascript' or 'typescript' depending on the language you use. The default is 'javascript'.
 
 ``js_source_path``
-  A list of directories to scan (non-recursively) for JS files, relative to Sphinx's conf.py file. Can be a string instead if there is only one. If there is more than one, ``root_for_relative_js_paths`` must be specified as well.
+  A list of directories to scan (non-recursively) for JS files, relative to Sphinx's conf.py file. Can be a string instead if there is only one. If there is more than one, ``root_for_relative_js_paths`` must be specified as well. Defaults to '../'.
 
 ``jsdoc_config_path``
   A conf.py-relative path to a jsdoc or typedoc config file, which is useful if you want to specify your own jsdoc options, like recursion and custom filename matching.
@@ -340,6 +340,15 @@ Run the tests using tox, which will also install jsdoc and typedoc at pinned ver
 
 Version History
 ===============
+
+3.1
+  * Re-architect language analysis. There is now a well-documented intermediate representation between jsdoc- and typedoc-emitted JSON and the renderers. This should make it much faster to merge PRs.
+  * No longer show args in the arg list that are utterly uninformative, lacking both description and type info.
+  * Rewrite much of the TypeScript analysis engine so it feeds into the new IR.
+  * TypeScript analysis used to crash if you used any overloaded functions. This no longer happens; we now arbitrarily use only the first function signature of the overloaded function.
+  * Remove the "exported from" module links from classes and interfaces. Functions never had them. Let's see if we miss them.
+  * Add support for static properties on TS classes.
+  * Support variadic args in TS.
 
 3.0
   * Make compatible with Sphinx 3, which requires Python 3.

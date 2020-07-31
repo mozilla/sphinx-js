@@ -24,29 +24,73 @@ survive template changes.
 
 """
 from dataclasses import dataclass, field, InitVar
-from typing import Any, List, Union
+from typing import Any, List, NewType, Optional, Union
 
 
-#: List of types, which are strings. Types could even be parametrized by
-#: other types, but we probably don't care for IR purposes: let whichever
-#: analyzer boil them down to strings.
+#: List of types, which are strings. These are taken to be a unioned set of
+#: types. Types could even be parametrized by other types, but we probably
+#: don't care for IR purposes: let whichever analyzer boil them down to
+#: strings.
 Types = List[str]
+
+ReStructuredText = NewType('ReStructuredText', str)
+
+
+# Class:
+# .isAbstract
+# .isExported
+#
+# Interface:
+# # .isAbstract I don't think this is possible; it's just coded as if it is.
+# .isExported
+#
+# MEMBERS:
+# Property:
+# .isAbstract  # as of a property on a class that subclasses have to fill out
+# # .isOptional too
+# .isStatic  # probably used, from what I can infer from the code
+#
+# Function (method):
+# .isAbstract  # corollary to having abstract Properties
+# # .isOptional probably, as an optional method on an interface
+# .isStatic  # probably used, from what I can infer
+#
+# {Constructor/call} signature:
+# .isAbstract
+# .isOptional
+# # .isStatic is always true, right?
 
 
 @dataclass
-class Property:
+class Property:  # TODO: Do we need both this and Attribute? Maybe we should remove this and use Attribute; it has all the fields we need (and some we don't, but who cares? They can be set to sensible values.)
+    """A minimal embodiment of the JSDoc @property tag's params"""
     name: str
     types: Types
-    description: str
+    description: ReStructuredText
 
 
-class NoDefault:
+class _NoDefault:
     """A conspicuous no-default value that will show up in templates to help
     troubleshoot code paths that grab ``Param.default`` without checking
     ``Param.has_default`` first."""
     def __repr__(self):
         return '<no default value>'
-NO_DEFAULT = NoDefault()
+NO_DEFAULT = _NoDefault()
+
+
+@dataclass
+class _Member:
+    """An IR object that is a member of another, as a method is a member of a
+    class or interface"""
+    #: Whether this member is required to be provided by a subclass of a class
+    #: or implementor of an interface
+    is_abstract: bool
+    #: Whether this member is optional in the TypeScript sense of being allowed
+    #: on but not required of an object to conform to a type
+    is_optional: bool
+    #: Whether this member can be accessed on the container itself rather than
+    #: just on instances of it
+    is_static: bool
 
 
 @dataclass
@@ -54,7 +98,7 @@ class Param:
     """A parameter of either a function or (in the case of TS, which has
     classes parametrized by type) a class."""
     name: str
-    description: str = ''
+    description: ReStructuredText = ''
     has_default: bool = False
     is_variadic: bool = False
     types: Types = field(default_factory=list)
@@ -72,26 +116,32 @@ class Param:
 
 @dataclass
 class Exc:
-    """A declaration of one kind of exception that can be raised"""
-    #: The type of types the exception can have
+    """One kind of exception that can be raised by a function"""
+    #: The types the exception can have
     types: Types
-    description: str
+    description: ReStructuredText
 
 
 @dataclass
 class Return:
     """One kind of thing a function can return"""
+    #: The types this kind of return value can have
     types: Types
-    description: str
+    description: ReStructuredText
 
 
 @dataclass
 class TopLevel:
-    """A JavaScript or TypeScript object you can look up by path
+    """A language object with an independent existence
 
-    The semantics on this are fuzzy, but I feel like it's also a complex
-    entity. Obviously, it's at least the sort of thing with the potential to
-    include the kinds of subentities referenced by these fields.
+    A TopLevel entity is a potentially strong entity in the database sense; one
+    of these can exist on its own and not merely as a datum attached to another
+    entity. For example, Returns do not qualify, since they cannot exist
+    without a parent Function. And, though a given Attribute may be attached to
+    a Class, Attributes can also exist top-level in a module.
+
+    These are also complex entities: the sorts of thing with the potential to
+    include the kinds of subentities referenced by the fields defined herein.
 
     """
     # TODO: See if name is always the last item of path_segments. If so, don't make them pass name in.
@@ -104,11 +154,11 @@ class TopLevel:
     #: The basename of the file the object is from, e.g. "foo.js"
     filename: str
     #: The human-readable description of the entity or '' if absent
-    description: str
+    description: ReStructuredText
     #: Line number where the object (exluding any prefixing comment) begins
     line: int
-    #: String explanation of the deprecation (which implies True) or True or False
-    deprecated: Union[str, bool]
+    #: Explanation of the deprecation (which implies True) or True or False
+    deprecated: Union[ReStructuredText, bool]
     #: List of preformatted textual examples
     examples: List[str]
     #: List of paths to also refer the reader to
@@ -116,30 +166,57 @@ class TopLevel:
     #: Explicitly documented sub-properties of the object, a la jsdoc's @properties
     properties: List[Property]
     is_private: bool
+    #: None if not exported for use by outside code. Otherwise, the Sphinx
+    #: dotted path to the module it is exported from
+    exported_from: Optional[str]
 
 
 @dataclass
-class Attribute(TopLevel):
+class Attribute(TopLevel, _Member):
+    """A property of an object
+
+    These are called attributes to match up with Sphinx's autoattribute
+    directive which is used to display them.
+
+    """
+    #: The types this property's value can have
     types: Types
 
 
 @dataclass
-class Function(TopLevel):
+class Function(TopLevel, _Member):
     params: List[Param]
     exceptions: List[Exc]
     returns: List[Return]
 
 
 @dataclass
-class Class(TopLevel):
-    #: The default constructor for this class
-    constructor: Function
+class _MembersAndSupers:
+    """An IR object that can contain members and extend other types"""
     #: Class members, concretized ahead of time for simplicity. (Otherwise,
     #: we'd have to pass the doclets_by_class map in and keep it around, along
     #: with a callable that would create the member IRs from it on demand.)
     #: Does not include the default constructor.
     members: List[Union[Function, Attribute]]
+    #: Objects this one extends: for example, superclasses of a class or
+    #: superinterfaces of an interface
+    supers: Types
+
+
+@dataclass
+class Interface(TopLevel, _MembersAndSupers):
+    """An interface, a la TypeScript"""
+
+
+@dataclass
+class Class(TopLevel, _MembersAndSupers):
+    #: The default constructor for this class
+    constructor: Function
+    #: Whether this is an abstract class
+    is_abstract: bool
+    #: Names of interfaces this class implements
+    interfaces: Types
     # There's room here for additional fields like @example on the class doclet
     # itself. These are supported and extracted by jsdoc, but they end up in an
     # `undocumented: True` doclet and so are presently filtered out. But we do
-    # have the space to include them later.
+    # have the space to include them someday.

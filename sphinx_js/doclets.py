@@ -1,14 +1,10 @@
 # TODO: Maybe move this whole file into __init__.
-from codecs import getreader
-from errno import ENOENT
 from os.path import join, normpath
-import subprocess
-from tempfile import NamedTemporaryFile
 
 from sphinx.errors import SphinxError
 
 from .jsdoc import Analyzer as JsAnalyzer
-from .typedoc import parse_typedoc
+from .typedoc import Analyzer as TsAnalyzer
 
 
 def gather_doclets(app):
@@ -24,7 +20,7 @@ def gather_doclets(app):
     # Pick analyzer:
     try:
         analyzer = {'javascript': JsAnalyzer,
-                    'typescript': 'TsAnalyzer'}[app.config.js_language]
+                    'typescript': TsAnalyzer}[app.config.js_language]
     except KeyError:
         raise SphinxError('Unsupported value of js_language in config: %s' % language)
 
@@ -32,24 +28,6 @@ def gather_doclets(app):
     app._sphinxjs_analyzer = analyzer.from_disk(abs_source_paths,
                                                 app,
                                                 root_for_relative_paths)
-
-
-def analyze_typescript(abs_source_paths, app):
-    command = Command('typedoc')
-    if app.config.jsdoc_config_path:
-        command.add('--tsconfig', normpath(join(app.confdir, app.config.jsdoc_config_path)))
-
-    with NamedTemporaryFile(mode='w+b') as temp:
-        command.add('--json', temp.name, *abs_source_paths)
-        try:
-            subprocess.call(command.make())
-        except OSError as exc:
-            if exc.errno == ENOENT:
-                raise SphinxError('%s was not found. Install it using "npm install -g typedoc".' % command.program)
-            else:
-                raise
-        # typedoc emits a valid JSON file even if it finds no TS files in the dir:
-        return parse_typedoc(getreader('utf-8')(temp))
 
 
 def root_or_fallback(root_for_relative_paths, abs_source_paths):

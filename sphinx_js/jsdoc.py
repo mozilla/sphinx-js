@@ -45,11 +45,11 @@ class Analyzer:
                                                 not doclet.get('undocumented')]
 
         # Build table for lookup by name, which most directives use:
-        self.doclets_by_path = SuffixTree()
+        self._doclets_by_path = SuffixTree()
         conflicts = []
         for d in doclets:
             try:
-                self.doclets_by_path.add(
+                self._doclets_by_path.add(
                     full_path_segments(d, base_dir),
                     d)
             except PathTaken as conflict:
@@ -68,12 +68,12 @@ class Analyzer:
         # This will lead to multiple methods having each other's members. But
         # if you don't have same-named inner functions or inner variables that
         # are documented, you shouldn't have trouble.
-        self.doclets_by_class = defaultdict(lambda: [])
+        self._doclets_by_class = defaultdict(lambda: [])
         for d in doclets:
             of = d.get('memberof')
             if of:  # speed optimization
                 segments = full_path_segments(d, base_dir, longname_field='memberof')
-                self.doclets_by_class[tuple(segments)].append(d)
+                self._doclets_by_class[tuple(segments)].append(d)
 
     @classmethod
     def from_disk(cls, abs_source_paths, app, base_dir):
@@ -92,13 +92,13 @@ class Analyzer:
 
         """
         # Design note: Originally, I had planned to eagerly convert all the
-        # doclets to the IR. But it's hard to tell unambiguously what class
+        # doclets to the IR. But it's hard to tell unambiguously what kind
         # each doclet is, at least in the case of jsdoc. If instead we lazily
         # convert each doclet as it's referenced by an autodoc directive, we
         # can use the hint we previously did: the user saying "this is a
         # function (by using autofunction on it)", "this is a class", etc.
         # Additionally, being lazy lets us avoid converting unused doclets
-        # alogether.
+        # altogether.
         try:
             doclet_as_whatever = {
                 'function': self._doclet_as_function,
@@ -107,13 +107,13 @@ class Analyzer:
         except KeyError:
             raise NotImplementedError('Unknown autodoc directive: auto%s' % as_type)
 
-        doclet, full_path = self.doclets_by_path.get_with_path(path_suffix)
+        doclet, full_path = self._doclets_by_path.get_with_path(path_suffix)
         return doclet_as_whatever(doclet, full_path)
 
     def _doclet_as_class(self, doclet, full_path):
         # This is an instance method so it can get at the base dir.
         members = []
-        for member_doclet in self.doclets_by_class[tuple(full_path)]:
+        for member_doclet in self._doclets_by_class[tuple(full_path)]:
             kind = member_doclet.get('kind')
             member_full_path = full_path_segments(member_doclet, self._base_dir)
             # Typedefs should still fit into function-shaped holes:
@@ -123,6 +123,10 @@ class Analyzer:
             members.append(member)
         return Class(
             description=doclet.get('classdesc', ''),
+            supers=[],  # Could implement for JS later.
+            exported_from=None,  # Could implement for JS later.
+            is_abstract=False,
+            interfaces=[],
             # Right now, a class generates several doclets, all but one of
             # which are marked as undocumented. In the one that's left, most of
             # the fields are about the default constructor:
@@ -134,6 +138,10 @@ class Analyzer:
     def _doclet_as_function(doclet, full_path):
         return Function(
             description=unwrapped_description(doclet),
+            exported_from=None,
+            is_abstract=False,
+            is_optional=False,
+            is_static=False,
             exceptions=exceptions_to_ir(doclet.get('exceptions', [])),
             returns=returns_to_ir(doclet.get('returns', [])),
             params=params_to_ir(doclet),
@@ -143,6 +151,10 @@ class Analyzer:
     def _doclet_as_attribute(doclet, full_path):
         return Attribute(
             description=unwrapped_description(doclet),
+            exported_from=None,
+            is_abstract=False,
+            is_optional=False,
+            is_static=False,
             types=get_types(doclet),
             **top_level_properties(doclet, full_path)
         )
