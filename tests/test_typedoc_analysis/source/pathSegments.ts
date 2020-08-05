@@ -68,3 +68,10 @@ interface Face {
    */
   moof: string;
 }
+
+namespace SomeSpace {
+  /**
+   * Namespaced number
+   */
+  const spacedNumber = 4;
+}

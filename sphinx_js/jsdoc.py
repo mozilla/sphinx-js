@@ -15,7 +15,7 @@ from tempfile import TemporaryFile
 
 from sphinx.errors import SphinxError
 
-from .analyzer_utils import cache_to_file, Command, PathsTaken
+from .analyzer_utils import cache_to_file, Command, is_explicitly_rooted, PathsTaken
 from .ir import Attribute, Class, Exc, Function, NO_DEFAULT, Param, Property, Return
 from .parsers import path_and_formal_params, PathVisitor
 from .suffix_tree import PathTaken, SuffixTree
@@ -174,11 +174,7 @@ def full_path_segments(d, base_dir, longname_field='longname'):
     meta = d['meta']
     rel = relpath(meta['path'], base_dir)
     rel = '/'.join(rel.split(sep))
-    if not rel.startswith(('../', './')) and rel not in ('..', '.'):
-        # It just starts right out with the name of a folder in the base_dir.
-        rooted_rel = './%s' % rel
-    else:
-        rooted_rel = rel
+    rooted_rel = rel if is_explicitly_rooted(rel) else './%s' % rel
 
     # Building up a string and then parsing it back down again is probably
     # not the fastest approach, but it means knowledge of path format is in

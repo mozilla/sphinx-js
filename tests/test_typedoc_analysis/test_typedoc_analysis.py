@@ -108,36 +108,36 @@ class PathSegmentsTests(TypeDocTestCase):
         return make_path_segments(obj, self._source_dir)
 
     def test_class(self):
-        assert self.commented_object_path('Foo class') == ['pathSegments.', 'Foo']
+        assert self.commented_object_path('Foo class') == ['./', 'pathSegments.', 'Foo']
 
     def test_instance_property(self):
-        assert self.commented_object_path('Num instance var') == ['pathSegments.', 'Foo#', 'numInstanceVar']
+        assert self.commented_object_path('Num instance var') == ['./', 'pathSegments.', 'Foo#', 'numInstanceVar']
 
     def test_static_property(self):
-        assert self.commented_object_path('Static member') == ['pathSegments.', 'Foo.', 'staticMember']
+        assert self.commented_object_path('Static member') == ['./', 'pathSegments.', 'Foo.', 'staticMember']
 
     def test_interface_property(self):
-        assert self.commented_object_path('Interface property') == ['pathSegments.', 'Face.', 'moof']
+        assert self.commented_object_path('Interface property') == ['./', 'pathSegments.', 'Face.', 'moof']
 
     def test_weird_name(self):
         """Make sure property names that themselves contain delimiter chars
         like #./~ get their pathnames built correctly."""
-        assert self.commented_object_path('Weird var') == ['pathSegments.', 'Foo#', 'weird#Var']
+        assert self.commented_object_path('Weird var') == ['./', 'pathSegments.', 'Foo#', 'weird#Var']
 
     def test_getter(self):
-        assert self.commented_object_path('Getter') == ['pathSegments.', 'Foo#', 'getter']
+        assert self.commented_object_path('Getter') == ['./', 'pathSegments.', 'Foo#', 'getter']
 
     def test_setter(self):
-        assert self.commented_object_path('Setter') == ['pathSegments.', 'Foo#', 'setter']
+        assert self.commented_object_path('Setter') == ['./', 'pathSegments.', 'Foo#', 'setter']
 
     def test_method(self):
-        assert self.commented_object_path('Method') == ['pathSegments.', 'Foo#', 'someMethod']
+        assert self.commented_object_path('Method') == ['./', 'pathSegments.', 'Foo#', 'someMethod']
 
     def test_static_method(self):
         """Since ``make_path_segments()`` looks at the inner Call Signature,
         make sure the flags (which determine staticness) are on the node we
         expect."""
-        assert self.commented_object_path('Static method') == ['pathSegments.', 'Foo.', 'staticMethod']
+        assert self.commented_object_path('Static method') == ['./', 'pathSegments.', 'Foo.', 'staticMethod']
 
     def test_constructor(self):
         # Pass the kindString so we're sure to find the signature (which is
@@ -145,17 +145,21 @@ class PathSegmentsTests(TypeDocTestCase):
         # constructor itself. They both have the same comments.
         #
         # Constructors get a #. They aren't static; they can see ``this``.
-        assert self.commented_object_path('Constructor', kindString='Constructor signature') == ['pathSegments.', 'Foo#', 'constructor']
+        assert self.commented_object_path('Constructor', kindString='Constructor signature') == ['./', 'pathSegments.', 'Foo#', 'constructor']
 
     def test_function(self):
-        assert self.commented_object_path('Function') == ['pathSegments.', 'foo']
+        assert self.commented_object_path('Function') == ['./', 'pathSegments.', 'foo']
 
     def test_relative_paths(self):
         """Make sure FS path segments are emitted if ``base_dir`` doesn't
         directly contain the code."""
         obj = self.commented_object('Function')
         segments = make_path_segments(obj, dirname(dirname(self._source_dir)))
-        assert segments == ['test_typedoc_analysis/', 'source/', 'pathSegments.', 'foo']
+        assert segments == ['./', 'test_typedoc_analysis/', 'source/', 'pathSegments.', 'foo']
+
+    def test_namespaced_var(self):
+        """Make sure namespaces get into the path segments."""
+        assert self.commented_object_path('Namespaced number') == ['./', 'pathSegments.', 'SomeSpace.', 'spacedNumber']
 
 
 # class TypeDocAnalyzerTestCase:

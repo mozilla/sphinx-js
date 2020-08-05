@@ -60,3 +60,14 @@ class PathsTaken(Exception):
                 'talking about. Using JSDoc tags like @class might help you '
                 'differentiate them.' %
                 '\n  '.join(''.join(c) for c in self.conflicts))
+
+
+def is_explicitly_rooted(path):
+    """Return whether a relative path is explicitly rooted relative to the
+    cwd, rather than starting off immediately with a file or folder name.
+
+    It's nice to have paths start with "./" (or "../", "../../", etc.) so, if a
+    user is that explicit, we still find the path in the suffix tree.
+
+    """
+    return path.startswith(('../', './')) or path in ('..', '.')

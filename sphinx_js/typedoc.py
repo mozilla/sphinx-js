@@ -10,7 +10,7 @@ from typing import List, Tuple, Union
 
 from sphinx.errors import SphinxError
 
-from .analyzer_utils import Command
+from .analyzer_utils import Command, is_explicitly_rooted
 from .ir import Attribute, Class, Exc, Function, Interface, Param, Return, TopLevel, Types
 
 
@@ -293,7 +293,7 @@ def make_path_segments(node, base_dir, child_was_static=None):
 
     # Handle the cases here that are handled in convert_node(), plus any that
     # are encountered on other nodes on the way up to the root.
-    if kind in ['Property', 'Accessor', 'Interface']:
+    if kind in ['Variable', 'Property', 'Accessor', 'Interface', 'Module']:
         # We emit a segment for a Method's child Call Signature but skip the
         # Method itself. They 2 nodes have the same names, but, by taking the
         # child, we fortuitously end up without a trailing delimiter on our
@@ -309,14 +309,14 @@ def make_path_segments(node, base_dir, child_was_static=None):
         segments = [node['name']]
         if child_was_static == False:
             delimiter = '#'
-    elif kind == 'Module':
-        # TODO: Figure this out. Does it have filenames to relativize like external modules?
-        segments = [node.get('name')[1:-1]]
     elif kind == 'External module':
         # 'name' contains folder names if multiple folders are passed into
         # TypeDoc. It's also got excess quotes. So we ignore it and take
         # 'originalName', which has a nice, absolute path.
-        segments = relpath(node['originalName'], base_dir).split(sep)
+        rel = relpath(node['originalName'], base_dir)
+        if not is_explicitly_rooted(rel):
+            rel = f'.{sep}{rel}'
+        segments = rel.split(sep)
         filename = splitext(segments[-1])[0]
         segments = [s + '/' for s in segments[:-1]] + [filename]
     else:
@@ -375,7 +375,7 @@ def convert_node(node, index) -> Tuple[TopLevel, List[dict]]:
             is_abstract=node.get('flags', {}).get('isAbstract', False),
             interfaces=related_types(node, kind='implementedTypes'),
             **top_level_properties(node))
-    elif kind == 'Property':
+    elif kind in ['Property', 'Variable']:  # TODO: Handle Variables, like top-level consts.
         ir = Attribute(
             types=make_type(node.get('type')),
             **top_level_properties(node))
