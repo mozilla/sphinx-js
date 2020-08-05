@@ -286,7 +286,6 @@ def make_path_segments(node, base_dir, child_was_static=None):
     delimiter = '' if child_was_static is None else '.'
     # cases to handle: accessor, Call signature, Constructor signature, method
     # + any that occur between those and the file node.
-    segment = ''
     # Handle the cases here that are handled in convert_node(), plus any that
     # are encountered on other nodes on the way up to the root.
     if kind in ['Function', 'Constructor', 'Method', 'Property', 'Accessor', 'Interface']:
@@ -311,7 +310,7 @@ def make_path_segments(node, base_dir, child_was_static=None):
         segment = node.get('name')[1:-1]
     else:
         # None, as for the root node
-        pass
+        segment = ''
 
     if segment:
         # It's not some abstract thing the user doesn't think about and we skip
