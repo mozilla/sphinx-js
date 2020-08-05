@@ -108,6 +108,9 @@ class LongNameTests(TypeDocTestCase):
 
     def test_instance_property(self):
         assert self.commented_object_path('Num instance var') == ['longnames.', 'Foo#', 'numInstanceVar']
+
+    def test_static_property(self):
+        assert self.commented_object_path('Static member') == ['longnames.', 'Foo.', 'staticMember']
         #assert make_longname(json) self.analyzer
 
 
