@@ -18,11 +18,11 @@ class Analyzer:
     def __init__(self, json, base_dir):
         """
         :arg json: The loaded JSON output from typedoc
-        :arg base_dir: The dir relative to which to construct object paths
+        :arg base_dir: The absolute path of the dir relative to which to
+            construct object paths
 
         """
-        index = {}
-        index_by_id(index, json)
+        index = index_by_id({}, json)
         ir_nodes = []
         # Maybe index them into the suffix tree as we go, yielding from convert_all_nodes?
         convert_all_nodes(json, index)
@@ -94,12 +94,14 @@ def index_by_id(index, node, parent=None):
             for child in node.get(tag, []):
                 index_by_id(index, child, parent=node)
 
+        return index
+
         # Index type declarations:
-        type = node.get('type')
-        if isinstance(type, dict) and type['type'] != 'reference':
-            index_by_id(index, type, parent=parent)
-            # I found these only in "type" properties:
-            index_by_id(index, node.get('declaration'), parent=None)  # Seems like this should be parent=parent, since "type" properties never have seem to have IDs.
+#         type = node.get('type')
+#         if isinstance(type, dict) and type['type'] != 'reference':
+#             # index_by_id(index, type, parent=node)  # I don't think any non-reference type has an ID, so this never does anything.
+#             # I found these only in "type" properties:
+#             index_by_id(index, node.get('declaration'), parent=None)  # Seems like this should be parent=parent, since "type" properties never have seem to have IDs.  # Further, I don't see what good assigning any parent here does, since make_type_name() doesn't implement reference types yet.
 
 
 def make_description(comment):
@@ -256,29 +258,50 @@ def make_returns(signature) -> List[Return]:
         description=signature.get('comment', {}).get('returns', ''))]
 
 
-def make_longname(node):
-    """Construct the jsdoc longname entry for a typedoc node"""
-    parent = node.get('__parent')
-    longname = make_longname(parent) if parent is not None else ''
+# Optimization: Could memoize this for probably a decent perf gain: every child
+# of an object redoes th work for all its parents.
+def make_path_segments(node, base_dir, child_was_static=None):
+    """Return the full, unambiguous list of path segments that points to an
+    entity described by a TypeDoc JSON node.
 
-    kindString = node.get('kindString')
-    if kindString in [None, 'Function', 'Constructor', 'Method']:
-        return longname
-    if longname != '':
-        flags = node.get('flags')
-        if (parent.get('kindString') in ['Class', 'Interface'] and
-                not flags.get('isStatic')):
-            longname += '#'  # instance property
-        elif parent.get('kindString') in ['Function', 'Method']:
-            # Functions and methods can't be instantiated, so they can't have
-            # instance properties.
-            longname += '.'  # static property
-            # TODO: Do we correctly recognize static class members here?
-        else:
-            longname += '~'  # inner property
-    if kindString == 'Module':
-        return longname + 'module:' + node.get('name')[1:-1]
-    elif kindString == 'External module':
+    Example: ``['./', 'dir/', 'dir/', 'file.', 'object.', 'object#', 'object']``
+
+    Emitted file-path segments are relative to ``base_dir``.
+
+    :arg child_was_static: True if the child node we're computing the path of
+        is a static member of the node under consideration. False if it is.
+        None if the current node is the one we're ultimately computing the path
+        of.
+
+    """
+    # TODO: Make sure this works with properties that contain reserved chars like #.~.
+    try:
+        node_is_static = node.get('flags', {}).get('isStatic', False)
+    except AttributeError as e:
+        import pdb;pdb.set_trace()
+
+    parent = node.get('__parent')
+    parent_segments = (make_path_segments(parent, base_dir, child_was_static=node_is_static)
+                       if parent else [])
+
+    kind = node.get('kindString')
+    # TODO: See if the '~' (inner property) case ever fired on the old version of sphinx-js. I don't think TypeDoc emits inner properties.
+    delimiter = '.' if child_was_static == False else ''  # False vs. None is important.
+    # cases to handle: accessor, Call signature, Constructor signature, method
+    # + any that occur between those and the file node.
+    segment = ''
+    # Handle the cases here that are handled in convert_node(), plus any that
+    # are encountered on other nodes on the way up to the root.
+    if kind in ['Function', 'Constructor', 'Method', 'Interface', 'Property']:
+        segment = node['name']
+    elif kind == 'Class':
+        segment = node['name']
+        if child_was_static == False:  # Interface members are always static.
+            delimiter = '#'
+    elif kind == 'Module':
+        # TODO: Figure this out. Does it have filenames to relativize like external modules?
+        segment = node.get('name')[1:-1]
+    elif kind == 'External module':
         # 'name' key contains folder names, starting from the root passed to
         # TypeDoc, e.g. 'more/stuff.ts' if you pass it 'more'. When passed
         # multiple source folders to scan, typedoc's 'name' keys for the
@@ -287,9 +310,20 @@ def make_longname(node):
         # paths in the JSON will be c/d/... and e/f/.... Thus, we'll have to
         # look at the 'originalName' keys, relativize relative to our
         # root_for_relative_js_paths, and go from there.
-        return longname + 'external:' + node.get('name')[1:-1]
+        # TODO: Relativize.
+        segment = node.get('name')[1:-1]
     else:
-        return longname + node.get('name')
+        # None, as for the root node
+        pass
+
+    if segment:
+        # It's not some abstract thing the user doesn't think about and we skip
+        # over.
+        segment += delimiter
+        return parent_segments + [segment]
+    else:
+        # Allow some levels of the JSON to not have a corresponding path segment:
+        return parent_segments
     # TODO: Take into account FS paths. Right now, we'd just starting with
     # whatever TS's concept of modules is. I don't know if that takes into
     # account FS paths (it does: it's all about relative paths), especially in multi-item js_source_path configurations
@@ -300,7 +334,6 @@ def make_longname(node):
     # between, say, static and instance properties. I'm leaning toward
     # requiring our own namepath-like paths, even if we eventually support
     # {@link} syntax.
-
 
 def convert_node(node, index) -> Tuple[TopLevel, List[dict]]:
     """Convert a node of TypeScript JSON output to an IR object.

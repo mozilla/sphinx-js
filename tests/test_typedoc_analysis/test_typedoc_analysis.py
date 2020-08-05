@@ -1,43 +1,36 @@
 from json import loads
+from unittest import TestCase
 
 from sphinx_js.ir import Attribute, Class, Exc, Function, Param, Return
-from sphinx_js.typedoc import index_by_id, make_longname
-from tests.testing import TypeDocTestCase
+from sphinx_js.typedoc import index_by_id, make_path_segments
+
+from tests.testing import dict_where, TypeDocTestCase
 
 
-class ThisDirTestCase(TypeDocTestCase):
-    files = ['longnames.ts']
-
+class IndexByIdTests(TestCase):
     def test_top_level_function(self):
+        """Make sure nodes get indexed"""
+        # A simple TypeDoc JSON dump of a soruce file with a single, top-level
+        # function with no params or return value:
         json = loads(r"""{
           "id": 0,
           "name": "misterRoot",
-          "kind": 0,
-          "flags": {},
           "children": [
             {
               "id": 1,
               "name": "\"longnames\"",
-              "kind": 1,
               "kindString": "External module",
-              "flags": {
-                "isExported": true
-              },
               "originalName": "/a/b/c/tests/test_typedoc_analysis/source/longnames.ts",
               "children": [
                 {
                   "id": 2,
                   "name": "foo",
-                  "kind": 64,
                   "kindString": "Function",
-                  "flags": {},
                   "signatures": [
                     {
                       "id": 3,
                       "name": "foo",
-                      "kind": 4096,
                       "kindString": "Call signature",
-                      "flags": {},
                       "comment": {
                         "shortText": "Foo function."
                       },
@@ -59,7 +52,6 @@ class ThisDirTestCase(TypeDocTestCase):
               "groups": [
                 {
                   "title": "Functions",
-                  "kind": 64,
                   "children": [
                     2
                   ]
@@ -77,7 +69,6 @@ class ThisDirTestCase(TypeDocTestCase):
           "groups": [
             {
               "title": "External modules",
-              "kind": 1,
               "children": [
                 1
               ]
@@ -92,11 +83,31 @@ class ThisDirTestCase(TypeDocTestCase):
         # Things get parent links:
         assert function['__parent']['name'] == '"longnames"'
         assert function['__parent']['__parent']['name'] == 'misterRoot'
-        # Things get indexed by ID:
+        # Root gets indexed by ID:
         root = index[0]
         assert root['name'] == 'misterRoot'
         # Root parent link is absent or None:
         assert root.get('__parent') is None
+
+
+
+class LongNameTests(TypeDocTestCase):
+    files = ['longnames.ts']
+
+    def commented_object(self, comment):
+        """Return the object from ``json`` having the given comment short-text."""
+        return dict_where(self.json, comment={'shortText': comment})
+
+    def commented_object_path(self, comment):
+        """Return the path segments of the object with the given comment."""
+        obj = self.commented_object(comment)
+        return make_path_segments(obj, self._source_dir)
+
+    def test_top_level(self):
+        assert self.commented_object_path('Foo class') == ['longnames.', 'Foo']
+
+    def test_instance_property(self):
+        assert self.commented_object_path('Num instance var') == ['longnames.', 'Foo#', 'numInstanceVar']
         #assert make_longname(json) self.analyzer
 
 

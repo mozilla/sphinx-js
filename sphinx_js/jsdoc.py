@@ -164,7 +164,7 @@ def full_path_segments(d, base_dir, longname_field='longname'):
     """Return the full, unambiguous list of path segments that points to an
     entity described by a doclet.
 
-    Example: ``['./', 'dir/', 'dir/', 'file/', 'object.', 'object#', 'object']``
+    Example: ``['./', 'dir/', 'dir/', 'file.', 'object.', 'object#', 'object']``
 
     :arg d: The doclet
     :arg base_dir: Absolutized value of the root_for_relative_js_paths option

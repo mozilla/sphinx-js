@@ -9,7 +9,7 @@ from sphinx.cmd.build import main as sphinx_main
 from sphinx.util.osutil import cd
 
 from sphinx_js.jsdoc import Analyzer as JsAnalyzer, jsdoc_output
-from sphinx_js.typedoc import Analyzer as TsAnalyzer, typedoc_output
+from sphinx_js.typedoc import Analyzer as TsAnalyzer, index_by_id, typedoc_output
 
 
 class ThisDirTestCase(TestCase):
@@ -77,6 +77,7 @@ class TypeDocTestCase(ThisDirTestCase):
                                 cls._source_dir,
                                 cls._source_dir,
                                 'tsconfig.json')
+        index_by_id({}, cls.json)
 
 
 class TypeDocAnalyzerTestCase(TypeDocTestCase):
@@ -87,3 +88,50 @@ class TypeDocAnalyzerTestCase(TypeDocTestCase):
         """Run the TS analyzer over the TypeDoc output."""
         super().setup_class()
         cls.analyzer = TsAnalyzer(cls.json, cls._source_dir)
+
+
+NO_MATCH = object()
+def dict_where(json, already_seen=None, **kwargs):
+    """Return the first object in the given data structure with properties
+    equal to the  ones given by ``kwargs``.
+
+    For example::
+
+        >>> dict_where({'hi': 'there', {'mister': 'zangler', 'and': 'friends'}},
+                       mister=zangler)
+        {'mister': 'zangler', 'and': 'friends'}
+
+    So far, only dicts and lists are supported. Other data structures won't be
+    recursed into. Cycles are avoided.
+
+    """
+    def object_if_matches_properties(json, **kwargs):
+        """Return the given JSON object iff all the properties and values given
+        by ``kwargs`` are in it. Else, return NO_MATCH."""
+        for k, v in kwargs.items():
+            if json.get(k, NO_MATCH) != v:
+                return NO_MATCH
+        return json
+
+    if already_seen is None:
+        already_seen = set()
+    already_seen.add(id(json))
+    if isinstance(json, list):
+        for list_item in json:
+            if id(list_item) not in already_seen:
+                match = dict_where(list_item, already_seen, **kwargs)
+                if match is not NO_MATCH:
+                    return match
+    elif isinstance(json, dict):
+        match = object_if_matches_properties(json, **kwargs)
+        if match is not NO_MATCH:
+            return match
+        for k, v in json.items():
+            if id(v) not in already_seen:
+                match = dict_where(v, already_seen, **kwargs)
+                if match is not NO_MATCH:
+                    return match
+    else:
+        # We don't know how to match leaf values yet.
+        pass
+    return NO_MATCH
