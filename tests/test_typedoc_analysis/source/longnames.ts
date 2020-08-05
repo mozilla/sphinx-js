@@ -22,6 +22,10 @@ class Foo {
    * Num instance var
    */
   numInstanceVar: number;
+
+  /**
+   * Weird var
+   */
   "weird#Var": number;
 
   constructor (num: number) {
@@ -33,6 +37,9 @@ class Foo {
 }
 
 interface Face {
+  /**
+   * Interface property
+   */
   moof: string;
 }
 

@@ -111,6 +111,15 @@ class LongNameTests(TypeDocTestCase):
 
     def test_static_property(self):
         assert self.commented_object_path('Static member') == ['longnames.', 'Foo.', 'staticMember']
+
+    def test_interface_property(self):
+        assert self.commented_object_path('Interface property') == ['longnames.', 'Face.', 'moof']
+
+    def test_weird_name(self):
+        """Make sure property names that themselves contain delimiter chars
+        like #./~ get their pathnames built correctly."""
+        assert self.commented_object_path('Weird var') == ['longnames.', 'Foo#', 'weird#Var']
+
         #assert make_longname(json) self.analyzer
 
 
