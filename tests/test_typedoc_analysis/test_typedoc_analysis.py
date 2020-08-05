@@ -4,7 +4,7 @@ from unittest import TestCase
 from sphinx_js.ir import Attribute, Class, Exc, Function, Param, Return
 from sphinx_js.typedoc import index_by_id, make_path_segments
 
-from tests.testing import dict_where, TypeDocTestCase
+from tests.testing import dict_where, NO_MATCH, TypeDocTestCase
 
 
 class IndexByIdTests(TestCase):
@@ -101,6 +101,8 @@ class LongNameTests(TypeDocTestCase):
     def commented_object_path(self, comment):
         """Return the path segments of the object with the given comment."""
         obj = self.commented_object(comment)
+        if obj is NO_MATCH:
+            raise RuntimeError(f'No object found with the comment "{comment}".')
         return make_path_segments(obj, self._source_dir)
 
     def test_top_level(self):

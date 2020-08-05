@@ -275,10 +275,7 @@ def make_path_segments(node, base_dir, child_was_static=None):
 
     """
     # TODO: Make sure this works with properties that contain reserved chars like #.~.
-    try:
-        node_is_static = node.get('flags', {}).get('isStatic', False)
-    except AttributeError as e:
-        import pdb;pdb.set_trace()
+    node_is_static = node.get('flags', {}).get('isStatic', False)
 
     parent = node.get('__parent')
     parent_segments = (make_path_segments(parent, base_dir, child_was_static=node_is_static)
