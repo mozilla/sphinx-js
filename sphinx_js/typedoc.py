@@ -284,19 +284,24 @@ def make_path_segments(node, base_dir, child_was_static=None):
     kind = node.get('kindString')
     # TODO: See if the '~' (inner property) case ever fired on the old version of sphinx-js. I don't think TypeDoc emits inner properties.
     delimiter = '' if child_was_static is None else '.'
-    # cases to handle: Constructor signature
     # + any that occur between those and the file node.
     # Handle the cases here that are handled in convert_node(), plus any that
     # are encountered on other nodes on the way up to the root.
-    if kind in ['Function', 'Constructor', 'Call signature', 'Property', 'Accessor', 'Interface']:
+    if kind in ['Property', 'Accessor', 'Interface']:
         # We emit a segment for a Method's child Call Signature but skip the
         # Method itself. They 2 nodes have the same names, but, by taking the
         # child, we fortuitously end up without a trailing delimiter on our
         # last segment.
         segment = node['name']
+    elif kind in ['Call signature', 'Constructor signature']:
+        # Similar to above, we skip the parent Constructor and glom onto the
+        # Constructor Signature. That gets us no trailing delimiter. However,
+        # the signature has name == 'new Foo', so we go up to the parent to get
+        # the real name, which is usually (always?) "constructor".
+        segment = parent['name']
     elif kind == 'Class':
         segment = node['name']
-        if child_was_static == False:  # Interface members are always static.
+        if child_was_static == False:
             delimiter = '#'
     elif kind == 'Module':
         # TODO: Figure this out. Does it have filenames to relativize like external modules?
@@ -313,7 +318,7 @@ def make_path_segments(node, base_dir, child_was_static=None):
         # TODO: Relativize.
         segment = node.get('name')[1:-1]
     else:
-        # None, as for the root node
+        # None, as for the root node, Constructor, or Method
         segment = ''
 
     if segment:

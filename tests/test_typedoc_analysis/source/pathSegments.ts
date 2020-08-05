@@ -1,5 +1,5 @@
 /**
- * Foo function.
+ * Function
  */
 function foo(): void {
   /**
@@ -18,6 +18,7 @@ class Foo {
    * Static member
    */
   static staticMember = 8;
+
   /**
    * Num instance var
    */
@@ -28,6 +29,9 @@ class Foo {
    */
   "weird#Var": number;
 
+  /**
+   * Constructor
+   */
   constructor (num: number) {
     this.numInstanceVar = num;
   }

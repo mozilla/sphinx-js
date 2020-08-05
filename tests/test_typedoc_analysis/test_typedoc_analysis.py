@@ -94,18 +94,18 @@ class IndexByIdTests(TestCase):
 class LongNameTests(TypeDocTestCase):
     files = ['pathSegments.ts']
 
-    def commented_object(self, comment):
+    def commented_object(self, comment, **kwargs):
         """Return the object from ``json`` having the given comment short-text."""
-        return dict_where(self.json, comment={'shortText': comment})
+        return dict_where(self.json, comment={'shortText': comment}, **kwargs)
 
-    def commented_object_path(self, comment):
+    def commented_object_path(self, comment, **kwargs):
         """Return the path segments of the object with the given comment."""
-        obj = self.commented_object(comment)
+        obj = self.commented_object(comment, **kwargs)
         if obj is NO_MATCH:
             raise RuntimeError(f'No object found with the comment "{comment}".')
         return make_path_segments(obj, self._source_dir)
 
-    def test_top_level(self):
+    def test_class(self):
         assert self.commented_object_path('Foo class') == ['pathSegments.', 'Foo']
 
     def test_instance_property(self):
@@ -137,6 +137,18 @@ class LongNameTests(TypeDocTestCase):
         expect."""
         assert self.commented_object_path('Static method') == ['pathSegments.', 'Foo.', 'staticMethod']
 
+    def test_constructor(self):
+        # Pass the kindString so we're sure to find the signature (which is
+        # what convert_nodes() passes to make_path_segments()) rather than the
+        # constructor itself. They both have the same comments.
+        #
+        # Constructors get a #. They aren't static; they can see ``this``.
+        assert self.commented_object_path('Constructor', kindString='Constructor signature') == ['pathSegments.', 'Foo#', 'constructor']
+
+    def test_function(self):
+        assert self.commented_object_path('Function') == ['pathSegments.', 'foo']
+
+    # TODO: Test filename relativization and nested folders.
 
         #assert make_longname(json) self.analyzer
 
