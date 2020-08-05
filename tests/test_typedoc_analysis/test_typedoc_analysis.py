@@ -92,7 +92,7 @@ class IndexByIdTests(TestCase):
 
 
 class LongNameTests(TypeDocTestCase):
-    files = ['longnames.ts']
+    files = ['pathSegments.ts']
 
     def commented_object(self, comment):
         """Return the object from ``json`` having the given comment short-text."""
@@ -104,21 +104,22 @@ class LongNameTests(TypeDocTestCase):
         return make_path_segments(obj, self._source_dir)
 
     def test_top_level(self):
-        assert self.commented_object_path('Foo class') == ['longnames.', 'Foo']
+        assert self.commented_object_path('Foo class') == ['pathSegments.', 'Foo']
 
     def test_instance_property(self):
-        assert self.commented_object_path('Num instance var') == ['longnames.', 'Foo#', 'numInstanceVar']
+        assert self.commented_object_path('Num instance var') == ['pathSegments.', 'Foo#', 'numInstanceVar']
 
     def test_static_property(self):
-        assert self.commented_object_path('Static member') == ['longnames.', 'Foo.', 'staticMember']
+        assert self.commented_object_path('Static member') == ['pathSegments.', 'Foo.', 'staticMember']
 
     def test_interface_property(self):
-        assert self.commented_object_path('Interface property') == ['longnames.', 'Face.', 'moof']
+        assert self.commented_object_path('Interface property') == ['pathSegments.', 'Face.', 'moof']
 
     def test_weird_name(self):
         """Make sure property names that themselves contain delimiter chars
         like #./~ get their pathnames built correctly."""
-        assert self.commented_object_path('Weird var') == ['longnames.', 'Foo#', 'weird#Var']
+        assert self.commented_object_path('Weird var') == ['pathSegments.', 'Foo#', 'weird#Var']
+
 
         #assert make_longname(json) self.analyzer
 

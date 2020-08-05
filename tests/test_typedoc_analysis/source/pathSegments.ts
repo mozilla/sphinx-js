@@ -34,6 +34,19 @@ class Foo {
 
   someMethod(): void {
   }
+
+  /**
+   * Getter
+   */
+  get getter(): number {
+    return 5;
+  }
+
+  /**
+   * Setter
+   */
+  set setter(n: number) {
+  }
 }
 
 interface Face {
