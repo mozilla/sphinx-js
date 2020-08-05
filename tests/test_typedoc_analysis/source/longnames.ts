@@ -42,19 +42,3 @@ interface Face {
    */
   moof: string;
 }
-
-const smack = {
-  /**
-   * Whacker
-   */
-  whack: 3
-};
-
-const Person = function() {
-    /**
-     * Inner function
-     */
-    function say() {
-        return "I'm inner.";
-    }
-};
