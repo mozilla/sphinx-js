@@ -128,6 +128,15 @@ class LongNameTests(TypeDocTestCase):
     def test_setter(self):
         assert self.commented_object_path('Setter') == ['pathSegments.', 'Foo#', 'setter']
 
+    def test_method(self):
+        assert self.commented_object_path('Method') == ['pathSegments.', 'Foo#', 'someMethod']
+
+    def test_static_method(self):
+        """Since ``make_path_segments()`` looks at the inner Call Signature,
+        make sure the flags (which determine staticness) are on the node we
+        expect."""
+        assert self.commented_object_path('Static method') == ['pathSegments.', 'Foo.', 'staticMethod']
+
 
         #assert make_longname(json) self.analyzer
 

@@ -32,7 +32,16 @@ class Foo {
     this.numInstanceVar = num;
   }
 
+  /**
+   * Method
+   */
   someMethod(): void {
+  }
+
+  /**
+   * Static method
+   */
+  static staticMethod(): void {
   }
 
   /**

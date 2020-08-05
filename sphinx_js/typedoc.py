@@ -284,11 +284,15 @@ def make_path_segments(node, base_dir, child_was_static=None):
     kind = node.get('kindString')
     # TODO: See if the '~' (inner property) case ever fired on the old version of sphinx-js. I don't think TypeDoc emits inner properties.
     delimiter = '' if child_was_static is None else '.'
-    # cases to handle: accessor, Call signature, Constructor signature, method
+    # cases to handle: Constructor signature
     # + any that occur between those and the file node.
     # Handle the cases here that are handled in convert_node(), plus any that
     # are encountered on other nodes on the way up to the root.
-    if kind in ['Function', 'Constructor', 'Method', 'Property', 'Accessor', 'Interface']:
+    if kind in ['Function', 'Constructor', 'Call signature', 'Property', 'Accessor', 'Interface']:
+        # We emit a segment for a Method's child Call Signature but skip the
+        # Method itself. They 2 nodes have the same names, but, by taking the
+        # child, we fortuitously end up without a trailing delimiter on our
+        # last segment.
         segment = node['name']
     elif kind == 'Class':
         segment = node['name']
