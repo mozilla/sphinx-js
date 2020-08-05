@@ -3,7 +3,7 @@
 from codecs import getreader
 from errno import ENOENT
 from json import load
-from os.path import join, normpath
+from os.path import join, normpath, relpath, sep, splitext
 import subprocess
 from tempfile import NamedTemporaryFile
 from typing import List, Tuple, Union
@@ -266,15 +266,21 @@ def make_path_segments(node, base_dir, child_was_static=None):
 
     Example: ``['./', 'dir/', 'dir/', 'file.', 'object.', 'object#', 'object']``
 
-    Emitted file-path segments are relative to ``base_dir``.
-
+    :arg base_dir: Absolute path of the dir relative to which file-path
+        segments are constructed
     :arg child_was_static: True if the child node we're computing the path of
         is a static member of the node under consideration. False if it is.
         None if the current node is the one we're ultimately computing the path
         of.
 
+    TypeDoc uses a totally different, locality-sensitive resolution mechanism
+    for links: https://typedoc.org/guides/link-resolution/. It seems like a
+    less well thought-out system than JSDoc's namepaths, as it doesn't
+    distinguish between, say, static and instance properties of the same name.
+    We're sticking with our own namepath-like paths, even if we eventually
+    support {@link} syntax.
+
     """
-    # TODO: Make sure this works with properties that contain reserved chars like #.~.
     node_is_static = node.get('flags', {}).get('isStatic', False)
 
     parent = node.get('__parent')
@@ -284,7 +290,7 @@ def make_path_segments(node, base_dir, child_was_static=None):
     kind = node.get('kindString')
     # TODO: See if the '~' (inner property) case ever fired on the old version of sphinx-js. I don't think TypeDoc emits inner properties.
     delimiter = '' if child_was_static is None else '.'
-    # + any that occur between those and the file node.
+
     # Handle the cases here that are handled in convert_node(), plus any that
     # are encountered on other nodes on the way up to the root.
     if kind in ['Property', 'Accessor', 'Interface']:
@@ -292,53 +298,40 @@ def make_path_segments(node, base_dir, child_was_static=None):
         # Method itself. They 2 nodes have the same names, but, by taking the
         # child, we fortuitously end up without a trailing delimiter on our
         # last segment.
-        segment = node['name']
+        segments = [node['name']]
     elif kind in ['Call signature', 'Constructor signature']:
         # Similar to above, we skip the parent Constructor and glom onto the
         # Constructor Signature. That gets us no trailing delimiter. However,
         # the signature has name == 'new Foo', so we go up to the parent to get
         # the real name, which is usually (always?) "constructor".
-        segment = parent['name']
+        segments = [parent['name']]
     elif kind == 'Class':
-        segment = node['name']
+        segments = [node['name']]
         if child_was_static == False:
             delimiter = '#'
     elif kind == 'Module':
         # TODO: Figure this out. Does it have filenames to relativize like external modules?
-        segment = node.get('name')[1:-1]
+        segments = [node.get('name')[1:-1]]
     elif kind == 'External module':
-        # 'name' key contains folder names, starting from the root passed to
-        # TypeDoc, e.g. 'more/stuff.ts' if you pass it 'more'. When passed
-        # multiple source folders to scan, typedoc's 'name' keys for the
-        # external modules start just inside the deepest common folder of all
-        # the source folders. For example, if you pass a/b/c/d and a/b/e/f, the
-        # paths in the JSON will be c/d/... and e/f/.... Thus, we'll have to
-        # look at the 'originalName' keys, relativize relative to our
-        # root_for_relative_js_paths, and go from there.
-        # TODO: Relativize.
-        segment = node.get('name')[1:-1]
+        # 'name' contains folder names if multiple folders are passed into
+        # TypeDoc. It's also got excess quotes. So we ignore it and take
+        # 'originalName', which has a nice, absolute path.
+        segments = relpath(node['originalName'], base_dir).split(sep)
+        filename = splitext(segments[-1])[0]
+        segments = [s + '/' for s in segments[:-1]] + [filename]
     else:
-        # None, as for the root node, Constructor, or Method
-        segment = ''
+        # None, as for a root node, Constructor, or Method
+        segments = []
 
-    if segment:
+    if segments:
         # It's not some abstract thing the user doesn't think about and we skip
         # over.
-        segment += delimiter
-        return parent_segments + [segment]
+        segments[-1] += delimiter
+        return parent_segments + segments
     else:
         # Allow some levels of the JSON to not have a corresponding path segment:
         return parent_segments
-    # TODO: Take into account FS paths. Right now, we'd just starting with
-    # whatever TS's concept of modules is. I don't know if that takes into
-    # account FS paths (it does: it's all about relative paths), especially in multi-item js_source_path configurations
-    # that might lead to module name collisions. OTOH, TypeDoc uses a totally
-    # different, locality-sensitive resolution mechanism for links:
-    # https://typedoc.org/guides/link-resolution/. It seems like a less well
-    # thought-out system than JSDoc's namepaths, as it doesn't distinguish
-    # between, say, static and instance properties. I'm leaning toward
-    # requiring our own namepath-like paths, even if we eventually support
-    # {@link} syntax.
+
 
 def convert_node(node, index) -> Tuple[TopLevel, List[dict]]:
     """Convert a node of TypeScript JSON output to an IR object.

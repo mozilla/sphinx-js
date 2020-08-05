@@ -1,4 +1,5 @@
 from json import loads
+from os.path import dirname
 from unittest import TestCase
 
 from sphinx_js.ir import Attribute, Class, Exc, Function, Param, Return
@@ -75,8 +76,7 @@ class IndexByIdTests(TestCase):
             }
           ]
         }""")
-        index = {}
-        index_by_id(index, json)
+        index = index_by_id({}, json)
         # Things get indexed by ID:
         function = index[2]
         assert function['name'] == 'foo'
@@ -91,7 +91,9 @@ class IndexByIdTests(TestCase):
 
 
 
-class LongNameTests(TypeDocTestCase):
+class PathSegmentsTests(TypeDocTestCase):
+    """Make sure ``make_path_segments() `` works on all its manifold cases."""
+
     files = ['pathSegments.ts']
 
     def commented_object(self, comment, **kwargs):
@@ -148,9 +150,12 @@ class LongNameTests(TypeDocTestCase):
     def test_function(self):
         assert self.commented_object_path('Function') == ['pathSegments.', 'foo']
 
-    # TODO: Test filename relativization and nested folders.
-
-        #assert make_longname(json) self.analyzer
+    def test_relative_paths(self):
+        """Make sure FS path segments are emitted if ``base_dir`` doesn't
+        directly contain the code."""
+        obj = self.commented_object('Function')
+        segments = make_path_segments(obj, dirname(dirname(self._source_dir)))
+        assert segments == ['test_typedoc_analysis/', 'source/', 'pathSegments.', 'foo']
 
 
 # class TypeDocAnalyzerTestCase:
