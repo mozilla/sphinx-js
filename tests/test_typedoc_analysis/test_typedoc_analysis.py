@@ -120,6 +120,12 @@ class LongNameTests(TypeDocTestCase):
         like #./~ get their pathnames built correctly."""
         assert self.commented_object_path('Weird var') == ['pathSegments.', 'Foo#', 'weird#Var']
 
+    def test_getter(self):
+        assert self.commented_object_path('Getter') == ['pathSegments.', 'Foo#', 'getter']
+
+    def test_setter(self):
+        assert self.commented_object_path('Setter') == ['pathSegments.', 'Foo#', 'setter']
+
 
         #assert make_longname(json) self.analyzer
 

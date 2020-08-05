@@ -292,7 +292,7 @@ def make_path_segments(node, base_dir, child_was_static=None):
     segment = ''
     # Handle the cases here that are handled in convert_node(), plus any that
     # are encountered on other nodes on the way up to the root.
-    if kind in ['Function', 'Constructor', 'Method', 'Interface', 'Property']:
+    if kind in ['Function', 'Constructor', 'Method', 'Property', 'Accessor', 'Interface']:
         segment = node['name']
     elif kind == 'Class':
         segment = node['name']
