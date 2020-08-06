@@ -5,7 +5,7 @@ from unittest import TestCase
 from sphinx_js.ir import Attribute, Class, Exc, Function, Param, Return
 from sphinx_js.typedoc import index_by_id, make_path_segments
 
-from tests.testing import dict_where, NO_MATCH, TypeDocTestCase
+from tests.testing import dict_where, NO_MATCH, TypeDocAnalyzerTestCase, TypeDocTestCase
 
 
 class IndexByIdTests(TestCase):
@@ -162,8 +162,10 @@ class PathSegmentsTests(TypeDocTestCase):
         assert self.commented_object_path('Namespaced number') == ['./', 'pathSegments.', 'SomeSpace.', 'spacedNumber']
 
 
-# class TypeDocAnalyzerTestCase:
-#     def test_class(self):
-#         cls = self.analyzer.get_object(['ClassDefinition'])
-#         assert isinstance(cls, Class)
-#         assert the members are right
+class AnalyzerTests(TypeDocAnalyzerTestCase):
+    files = ['analysis.ts']
+
+    def test_class(self):
+        cls = self.analyzer.get_object(['SomeClass'])
+        assert isinstance(cls, Class)
+        #assert the members are right

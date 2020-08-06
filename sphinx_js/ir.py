@@ -36,31 +36,6 @@ Types = List[str]
 ReStructuredText = NewType('ReStructuredText', str)
 
 
-# Class:
-# .isAbstract
-# .isExported
-#
-# Interface:
-# # .isAbstract I don't think this is possible; it's just coded as if it is.
-# .isExported
-#
-# MEMBERS:
-# Property:
-# .isAbstract  # as of a property on a class that subclasses have to fill out
-# # .isOptional too
-# .isStatic  # probably used, from what I can infer from the code
-#
-# Function (method):
-# .isAbstract  # corollary to having abstract Properties
-# # .isOptional probably, as an optional method on an interface
-# .isStatic  # probably used, from what I can infer
-#
-# {Constructor/call} signature:
-# .isAbstract
-# .isOptional
-# # .isStatic is always true, right?
-
-
 @dataclass
 class Property:  # TODO: Do we need both this and Attribute? Maybe we should remove this and use Attribute; it has all the fields we need (and some we don't, but who cares? They can be set to sensible values.)
     """A minimal embodiment of the JSDoc @property tag's params"""

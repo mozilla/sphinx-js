@@ -12,6 +12,7 @@ from sphinx.errors import SphinxError
 
 from .analyzer_utils import Command, is_explicitly_rooted
 from .ir import Attribute, Class, Exc, Function, Interface, Param, Return, TopLevel, Types
+from .suffix_tree import SuffixTree
 
 
 class Analyzer:
@@ -24,11 +25,9 @@ class Analyzer:
         """
         self._base_dir = base_dir
         index = index_by_id({}, json)
-        ir_nodes = []
-        # Maybe index them into the suffix tree as we go, yielding from convert_all_nodes?
-        self.convert_all_nodes(json, index)
-        # self._objects_by_path = SuffixTree()
-        # and index ir_nodes by suffix.
+        ir_objects = self.convert_all_nodes(json, index)
+        self._objects_by_path = SuffixTree()
+        self._objects_by_path.add_many((obj.path_segments, obj) for obj in ir_objects)
 
     @classmethod
     def from_disk(cls, abs_source_paths, app, base_dir):
@@ -46,8 +45,7 @@ class Analyzer:
 
         """
 
-        doclet, full_path = self.doclets_by_path.get_with_path(path_suffix)
-        return doclet_as_whatever(doclet, full_path)
+        return self._objects_by_path.get(path_suffix)
 
 
     def top_level_properties(self, node):
@@ -112,9 +110,10 @@ class Analyzer:
     def convert_node(self, node, index) -> Tuple[TopLevel, List[dict]]:
         """Convert a node of TypeScript JSON output to an IR object.
 
-        :return: A tuple: (the IR object, a list of other nodes found within that
-            you can convert to other IR objects). For the second item of the tuple,
-            nodes that can't presently be converted to IR objects are omitted.
+        :return: A tuple: (the IR object, a list of other nodes found within
+            that you can convert to other IR objects). For the second item of
+            the tuple, nodes that can't presently be converted to IR objects
+            are omitted.
 
         """
         if node.get('inheritedFrom'):

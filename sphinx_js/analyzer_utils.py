@@ -44,24 +44,6 @@ def cache_to_file(get_filename):
     return decorator
 
 
-class PathsTaken(Exception):
-    """One or more JS objects had the same paths.
-
-    Rolls up multiple PathTaken exceptions for mass reporting.
-
-    """
-    def __init__(self, conflicts):
-        # List of paths, each given as a list of segments:
-        self.conflicts = conflicts
-
-    def __str__(self):
-        return ('Your JS code contains multiple documented objects at each of '
-                "these paths:\n\n  %s\n\nWe won't know which one you're "
-                'talking about. Using JSDoc tags like @class might help you '
-                'differentiate them.' %
-                '\n  '.join(''.join(c) for c in self.conflicts))
-
-
 def is_explicitly_rooted(path):
     """Return whether a relative path is explicitly rooted relative to the
     cwd, rather than starting off immediately with a file or folder name.

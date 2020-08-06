@@ -13,6 +13,13 @@ class SuffixTree(object):
         self._tree = {}
 
     def add(self, unambiguous_segments, value):
+        """Add an item to the tree.
+
+        :arg unambiguous_segments: A list of path segments that correspond
+            uniquely to the object
+        :arg value: Any value representing the JS object
+
+        """
         tree = self._tree
         for seg in reversed(unambiguous_segments[1:]):
             tree = tree.setdefault(seg, {})
@@ -21,6 +28,25 @@ class SuffixTree(object):
             raise PathTaken(unambiguous_segments)
         else:
             tree[seg] = Value(value)
+
+    def add_many(self, segments_and_values):
+        """Add a batch of items to the tree all at once, and collect any
+        errors.
+
+        :arg segments_and_values: An iterable of (unambiguous segment path,
+            value)
+
+        If any of the segment paths are duplicates, raise PathsTaken.
+
+        """
+        conflicts = []
+        for segs, value in segments_and_values:
+            try:
+                self.add(segs, value)
+            except PathTaken as conflict:
+                conflicts.append(conflict.segments)
+        if conflicts:
+            raise PathsTaken(conflicts)
 
     def get_with_path(self, segments):
         """Return the value stored at a path ending in the given segments,
@@ -70,6 +96,25 @@ class SuffixError(Exception):
 class PathTaken(SuffixError):
     """Attempted to add a suffix that was already in the tree."""
     _message = 'Attempted to add a path already in the suffix tree: %s.'
+
+
+class PathsTaken(Exception):
+    """One or more JS objects had the same paths.
+
+    Rolls up multiple PathTaken exceptions for mass reporting.
+
+    """
+    def __init__(self, conflicts):
+        """
+        :arg conflicts: A list of paths, each given as a list of segments
+        """
+        self.conflicts = conflicts
+
+    def __str__(self):
+        return ('Your code contains multiple documented objects at each of '
+                "these paths:\n\n  %s\n\nWe won't know which one you're "
+                'talking about.' %
+                '\n  '.join(''.join(c) for c in self.conflicts))
 
 
 class SuffixNotFound(SuffixError):

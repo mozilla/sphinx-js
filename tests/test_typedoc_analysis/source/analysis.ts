@@ -1,0 +1,5 @@
+/**
+ * Some class
+ */
+class SomeClass {
+}

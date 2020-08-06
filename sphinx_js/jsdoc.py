@@ -15,10 +15,10 @@ from tempfile import TemporaryFile
 
 from sphinx.errors import SphinxError
 
-from .analyzer_utils import cache_to_file, Command, is_explicitly_rooted, PathsTaken
+from .analyzer_utils import cache_to_file, Command, is_explicitly_rooted
 from .ir import Attribute, Class, Exc, Function, NO_DEFAULT, Param, Property, Return
 from .parsers import path_and_formal_params, PathVisitor
-from .suffix_tree import PathTaken, SuffixTree
+from .suffix_tree import SuffixTree
 
 
 class Analyzer:
@@ -46,16 +46,8 @@ class Analyzer:
 
         # Build table for lookup by name, which most directives use:
         self._doclets_by_path = SuffixTree()
-        conflicts = []
-        for d in doclets:
-            try:
-                self._doclets_by_path.add(
-                    full_path_segments(d, base_dir),
-                    d)
-            except PathTaken as conflict:
-                conflicts.append(conflict.segments)
-        if conflicts:
-            raise PathsTaken(conflicts)
+        self._doclets_by_path.add_many((full_path_segments(d, base_dir), d)
+                                       for d in doclets)
 
         # Build lookup table for autoclass's :members: option. This will also
         # pick up members of functions (inner variables), but it will instantly
