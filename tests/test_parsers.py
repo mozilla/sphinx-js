@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from sphinx_js.parsers import PathVisitor
+from sphinx_js.parsers import PathVisitor, path_and_formal_params
 
 
 def test_escapes():
@@ -8,3 +8,12 @@ def test_escapes():
         [r'd.i:nr/', r'ut\ils.', 'max'],
         '(whatever)',
     ]
+
+
+def test_relative_dirs():
+    """Make sure all sorts of relative-dir prefixes result in proper path
+    segment arrays."""
+    assert PathVisitor().visit(
+        path_and_formal_params['path'].parse('./hi')) == ['./', 'hi']
+    assert PathVisitor().visit(
+        path_and_formal_params['path'].parse('../../hi')) == ['../', '../', 'hi']
