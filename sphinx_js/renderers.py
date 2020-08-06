@@ -174,6 +174,11 @@ class AutoFunctionRenderer(JsRenderer):
             see_also=doclet.see_alsos,
             content='\n'.join(self._content))
 
+# TODO: Display .is_optional and .is_abstact in the templates.
+# TODO: Have autoclass say "interface" if it's an interface rather than a class.
+# List implemented .interfaces and stick :js:class: in front of each. .supers too.
+# Say `*exported from* :js:mod:{obj.exported_from}` if exported_from isn't None.
+
 
 class AutoClassRenderer(JsRenderer):
     _template = 'class.rst'
@@ -185,6 +190,7 @@ class AutoClassRenderer(JsRenderer):
         # itself too in the future.
         return dict(
             name=name,
+            # TODO: Deal with the case that the constructor is None.
             params=self._formal_params(doclet.constructor),
             fields=self._fields(doclet.constructor),
             examples=doclet.constructor.examples,

@@ -3,10 +3,10 @@
 from codecs import getreader
 from errno import ENOENT
 from json import load
-from os.path import join, normpath, relpath, sep, splitext
+from os.path import basename, join, normpath, relpath, sep, splitext
 import subprocess
 from tempfile import NamedTemporaryFile
-from typing import List, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 from sphinx.errors import SphinxError
 
@@ -19,20 +19,20 @@ class Analyzer:
         """
         :arg json: The loaded JSON output from typedoc
         :arg base_dir: The absolute path of the dir relative to which to
-            construct object paths
+            construct file-path segments of object paths
 
         """
+        self._base_dir = base_dir
         index = index_by_id({}, json)
         ir_nodes = []
         # Maybe index them into the suffix tree as we go, yielding from convert_all_nodes?
-        convert_all_nodes(json, index)
+        self.convert_all_nodes(json, index)
         # self._objects_by_path = SuffixTree()
         # and index ir_nodes by suffix.
 
     @classmethod
     def from_disk(cls, abs_source_paths, app, base_dir):
         json = typedoc_output(abs_source_paths,
-                              base_dir,
                               app.confdir,
                               app.config.jsdoc_config_path)
         return cls(json, base_dir)
@@ -50,7 +50,154 @@ class Analyzer:
         return doclet_as_whatever(doclet, full_path)
 
 
-def typedoc_output(abs_source_paths, base_dir, sphinx_conf_dir, config_path):
+    def top_level_properties(self, node):
+        source = node.get('sources')[0]
+        if node.get('flags', {}).get('isExported', False):
+            exported_from = node['__parent']['name'][1:-1]  # strip off quotes
+        else:
+            exported_from = None
+        return dict(
+            name=short_name(node),
+            path_segments=make_path_segments(node, self._base_dir),
+            filename=basename(source['fileName']),
+            description=make_description(node.get('comment', {})),
+            line=source['line'],
+
+            # These properties aren't supported by TypeDoc:
+            deprecated=False,
+            examples=[],
+            see_alsos=[],
+            properties=[],
+
+            is_private=node.get('flags', {}).get('isPrivate', False),
+            exported_from=exported_from)
+
+
+    def constructor_and_members(self, cls) -> Tuple[Optional[Function], List[Union[Function, Attribute]]]:
+        """Return the constructor and other members of a class.
+
+        In TS, a constructor may have multiple (overloaded) type signatures but
+        only one implementation. (Same with functions.) So there's at most 1
+        constructor to return. Return None for the constructor if it is inherited
+        or implied rather than explicitly present in the class.
+
+        :arg cls: A TypeDoc node of the class to take apart
+        :return: A tuple of (constructor Function, list of other members)
+
+        """
+        constructor = None
+        members = []
+        for child in cls.get('children', []):
+            ir = self.convert_node(child)
+            if ir:
+                if (child.get('kindString') == 'Constructor'):
+                    # This really, really should happen exactly once per class.
+                    constructor = ir
+                else:
+                    members.append(ir)
+        return constructor, members
+
+
+    def convert_all_nodes(self, root, index):
+        todo = [root]
+        done = []
+        while todo:
+            converted, more_todo = self.convert_node(todo.pop(), index)
+            if converted:
+                done.append(converted)
+            todo.extend(more_todo)
+        return done
+
+
+    def convert_node(self, node, index) -> Tuple[TopLevel, List[dict]]:
+        """Convert a node of TypeScript JSON output to an IR object.
+
+        :return: A tuple: (the IR object, a list of other nodes found within that
+            you can convert to other IR objects). For the second item of the tuple,
+            nodes that can't presently be converted to IR objects are omitted.
+
+        """
+        if node.get('inheritedFrom'):
+            return None, []
+        if node.get('sources'):
+            # Ignore nodes with a reference to absolute paths (like /usr/lib)
+            source = node.get('sources')[0]
+            if source.get('fileName', '.')[0] == '/':
+                return None, []
+
+        ir = None
+        kind = node.get('kindString')
+        if kind == 'External module':
+              # We shouldn't need these until we implement automodule. But what of
+              # js:mod in the templates?
+            pass
+        elif kind == 'Module':
+            # Does anybody even use TS's old internal modules anymore?
+            pass
+        elif kind == 'Interface':
+            _, members = self.constructor_and_members(node)
+            ir = Interface(
+                members=members,
+                supers=related_types(node, kind='extendedTypes'),
+                **self.top_level_properties(node))
+        elif kind == 'Class':
+            # Every class has a constructor in the JSON, even if it's only
+            # inherited.
+            constructor, members = self.constructor_and_members(node)
+            ir = Class(
+                constructor=constructor,
+                members=members,
+                supers=related_types(node, kind='extendedTypes'),
+                is_abstract=node.get('flags', {}).get('isAbstract', False),
+                interfaces=related_types(node, kind='implementedTypes'),
+                **self.top_level_properties(node))
+        elif kind in ['Property', 'Variable']:  # TODO: Handle Variables, like top-level consts.
+            ir = Attribute(
+                types=make_type(node.get('type')),
+                **self.top_level_properties(node))
+        elif kind == 'Accessor':  # NEXT: Then port longname. Then convert_node() should work. Unit-test, especially make_type(). Then write renderers.
+            doclet = self.simple_doclet('member', node)
+            get_signature = node.get('getSignature')
+            if get_signature:
+                # There's no signature to speak of for a getter: only a return type.
+                type = get_signature[0]['type']
+            else:
+                # ES6 says setters have exactly 1 param. I'm not sure if they can
+                # have multiple signatures, though.
+                type = node['setSignature'][0]['parameters'][0]['type']
+            ir = Attribute(
+                types=make_type(type),
+                **self.top_level_properties(node))
+        elif kind in ['Function', 'Constructor', 'Method']:
+            # There's really nothing in these; all the interesting bits are in the
+            # contained 'Call signature' keys. We support only the first signature
+            # at the moment, because to do otherwise would create multiple
+            # identical pathnames to the same function, which would cause the
+            # suffix tree to raise an exception while being built. An eventual
+            # solution might be to store the signatures in a one-to-many attr of
+            # Functions.
+            sigs = node.get('signatures')
+            first_sig = sigs[0]  # Should always have at least one
+            first_sig['sources'] = node['sources']
+            return self.convert_node(first_sig, index)
+        elif kind in ['Call signature', 'Constructor signature']:  # I had deleted "Constructor signature". I don't know why.
+            # This is the real meat of a function, method, or constructor.
+            parent = node['__parent']
+            flags = parent.get('flags', {})
+            ir = Function(
+                params=[make_param(p) for p in node.get('parameters', [])],
+                # Exceptions are discouraged in TS as being unrepresentable in its
+                # type system. More importantly, TypeDoc does not support them.
+                returns=make_returns(node),
+                is_abstract=flags.get('isAbstract', False),
+                is_optional=flags.get('isOptional', False),
+                is_static=flags.get('isStatic', False),
+                **self.top_level_properties(node))
+
+        return ir, node.get('children', [])
+
+
+def typedoc_output(abs_source_paths, sphinx_conf_dir, config_path):
     """Return the loaded JSON output of the TypeDoc command run over the given
     paths."""
     command = Command('typedoc')
@@ -111,49 +258,10 @@ def make_description(comment):
                        if text)
 
 
-def top_level_properties(node):
-    source = node.get('sources')[0]
-    if node.get('flags', {}).get('isExported', False):
-        exported_from = node['__parent']['name'][1:-1]  # strip off quotes
-    else:
-        exported_from = None
-    return dict(
-        name=short_name(node),
-        path_segments=make_path_segments(node),
-        filename=os.path.basename(source['fileName']),
-        description=make_description(node.get('comment', {})),
-        line=source['line'],
-        is_private=node.get('flags', {}).get('isPrivate', False),
-        exported_from=exported_from)
-
-
 def short_name(node):
     if node['kindString'] in ['Module', 'External module']:
         return node['name'][1:-1]  # strip quotes
     return node['name']
-
-
-def constructor_and_members(cls) -> Tuple[Function, List[Union[Function, Attribute]]]:
-    """Return the constructor and other members of a class.
-
-    In TS, a constructor may have multiple (overlaoded) type signatures but
-    only one implementation. (Same with functions.) So there's only 1
-    constructor to return.
-
-    :arg cls: A TypeDoc node of the class to take apart
-    :return: A tuple of (constructor Function, list of other members)
-
-    """
-    members = []
-    for child in cls.get('children', []):
-        ir = convert_node(child)
-        if ir:
-            if (child.get('kindString') == 'Constructor'):
-                # This really, really should happen exactly once per class.
-                constructor = ir
-            else:
-                members.append(ir)
-    return constructor, members
 
 
 def related_types(node, kind):
@@ -162,17 +270,6 @@ def related_types(node, kind):
     for type in node.get(kind, []):
         types.append(' '.join(make_type_name(type)))
     return types
-
-
-def convert_all_nodes(root, index):
-    todo = [root]
-    done = []
-    while todo:
-        converted, more_todo = convert_node(todo.pop(), index)
-        if converted:
-            done.append(converted)
-        todo.extend(more_todo)
-    return done
 
 
 # TODO: Unit-test me.
@@ -331,92 +428,3 @@ def make_path_segments(node, base_dir, child_was_static=None):
     else:
         # Allow some levels of the JSON to not have a corresponding path segment:
         return parent_segments
-
-
-def convert_node(node, index) -> Tuple[TopLevel, List[dict]]:
-    """Convert a node of TypeScript JSON output to an IR object.
-
-    :return: A tuple: (the IR object, a list of other nodes found within that
-        you can convert to other IR objects). For the second item of the tuple,
-        nodes that can't presently be converted to IR objects are omitted.
-
-    """
-    if node.get('inheritedFrom'):
-        return None, []
-    if node.get('sources'):
-        # Ignore nodes with a reference to absolute paths (like /usr/lib)
-        source = node.get('sources')[0]
-        if source.get('fileName', '.')[0] == '/':
-            return None, []
-
-    ir = None
-    kind = node.get('kindString')
-    if kind == 'External module':
-          # We shouldn't need these until we implement automodule. But what of
-          # js:mod in the templates?
-        pass
-    elif kind == 'Module':
-        # Does anybody even use TS's old internal modules anymore?
-        pass
-    elif kind == 'Interface':
-        _, members = constructor_and_members(node)
-        ir = Interface(
-            members=members,
-            supers=related_types(node, kind='extendedTypes'),
-            **top_level_properties(node))
-    elif kind == 'Class':
-        # Every class has a constructor in the JSON, even if it's only
-        # inherited.
-        constructor, members = constructor_and_members(node)
-        ir = Class(
-            constructor=constructor,
-            members=members,
-            supers=related_types(node, kind='extendedTypes'),
-            is_abstract=node.get('flags', {}).get('isAbstract', False),
-            interfaces=related_types(node, kind='implementedTypes'),
-            **top_level_properties(node))
-    elif kind in ['Property', 'Variable']:  # TODO: Handle Variables, like top-level consts.
-        ir = Attribute(
-            types=make_type(node.get('type')),
-            **top_level_properties(node))
-    elif kind == 'Accessor':  # NEXT: Then port longname. Then convert_node() should work. Unit-test, especially make_type() and make_longname(). Then write renderers.
-        doclet = self.simple_doclet('member', node)
-        get_signature = node.get('getSignature')
-        if get_signature:
-            # There's no signature to speak of for a getter: only a return type.
-            type = get_signature[0]['type']
-        else:
-            # ES6 says setters have exactly 1 param. I'm not sure if they can
-            # have multiple signatures, though.
-            type = node['setSignature'][0]['parameters'][0]['type']
-        ir = Attribute(
-            types=make_type(type),
-            **top_level_properties(node))
-    elif kind in ['Function', 'Constructor', 'Method']:
-        # There's really nothing in these; all the interesting bits are in the
-        # contained 'Call signature' keys. We support only the first signature
-        # at the moment, because to do otherwise would create multiple
-        # identical pathnames to the same function, which would cause the
-        # suffix tree to raise an exception while being built. An eventual
-        # solution might be to store the signatures in a one-to-many attr of
-        # Functions.
-        sigs = node.get('signatures')
-        first_sig = sigs[0]  # Should always have at least one
-        first_sig['sources'] = node['sources']
-        return convert_node(first_sig, index)
-    elif kind in ['Call signature', 'Constructor signature']:  # I had deleted "Constructor signature". I don't know why.
-        # This is the real meat of a function, method, or constructor.
-        parent = node['__parent']
-        flags = parent.get('flags', {})
-        ir = Function(
-            params=[make_param(p) for p in node.get('parameters', [])],
-            # Exceptions are discouraged in TS as being unrepresentable in its
-            # type system. More importantly, TypeDoc does not support them.
-            returns=make_returns(node),
-            is_abstract=flags.get('isAbstract', False),
-            is_optional=flags.get('isOptional', False),
-            is_static=flags.get('isStatic', False),
-            **top_level_properties(node))
-
-    return ir, node.get('children', [])
-

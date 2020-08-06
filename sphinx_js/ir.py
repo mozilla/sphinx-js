@@ -210,8 +210,9 @@ class Interface(TopLevel, _MembersAndSupers):
 
 @dataclass
 class Class(TopLevel, _MembersAndSupers):
-    #: The default constructor for this class
-    constructor: Function
+    #: The default constructor for this class. Absent if the constructor is
+    #: inherited.
+    constructor: Optional[Function]
     #: Whether this is an abstract class
     is_abstract: bool
     #: Names of interfaces this class implements

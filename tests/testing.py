@@ -75,7 +75,6 @@ class TypeDocTestCase(ThisDirTestCase):
         cls.json = typedoc_output([join(cls._source_dir, file)
                                    for file in cls.files],
                                 cls._source_dir,
-                                cls._source_dir,
                                 'tsconfig.json')
         index_by_id({}, cls.json)
 
