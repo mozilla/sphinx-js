@@ -1,5 +1,25 @@
 from sphinx_js.ir import Attribute, Class, Exc, Function, Param, Return
+from sphinx_js.jsdoc import full_path_segments
 from tests.testing import JsDocTestCase
+
+
+def test_doclet_full_path():
+    """Sanity-check full_path_segments(), including throwing it a non-.js filename."""
+    doclet = {
+        'meta': {
+            'filename': 'utils.jsm',
+            'path': '/boogie/smoo/Checkouts/fathom',
+        },
+        'longname': 'best#thing~yeah'
+    }
+    assert full_path_segments(doclet, '/boogie/smoo/Checkouts') == [
+        './',
+        'fathom/',
+        'utils.',
+        'best#',
+        'thing~',
+        'yeah',
+    ]
 
 
 class FunctionTests(JsDocTestCase):
