@@ -342,13 +342,15 @@ Version History
 ===============
 
 3.1
-  * Re-architect language analysis. There is now a well-documented intermediate representation between jsdoc- and typedoc-emitted JSON and the renderers. This should make it much faster to merge PRs.
+  * Re-architect language analysis. There is now a well-documented intermediate representation between JSDoc- and TypeDoc-emitted JSON and the renderers. This should make it much faster to merge PRs.
   * No longer show args in the arg list that are utterly uninformative, lacking both description and type info.
   * Rewrite much of the TypeScript analysis engine so it feeds into the new IR.
-  * TypeScript analysis used to crash if you used any overloaded functions. This no longer happens; we now arbitrarily use only the first function signature of the overloaded function.
+  * TypeScript analysis used to crash if your codebase contained any overloaded functions. This no longer happens; we now arbitrarily use only the first function signature of each overloaded function.
   * Remove the "exported from" module links from classes and interfaces. Functions never had them. Let's see if we miss them.
   * Add support for static properties on TS classes.
   * Support variadic args in TS.
+  * Pathnames for TypeScript objects no longer spuriously use ``~`` after the filename path segment; now they use ``.`` as in JS.
+  * More generally, TS pathnames are now just like JS ones. There is no more ``external:`` prefix in front of filenames or ``module:`` in front of namespace names.
 
 3.0
   * Make compatible with Sphinx 3, which requires Python 3.
