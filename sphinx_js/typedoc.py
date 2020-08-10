@@ -24,8 +24,8 @@ class Analyzer:
 
         """
         self._base_dir = base_dir
-        index = index_by_id({}, json)
-        ir_objects = self.convert_all_nodes(json, index)
+        self._index = index_by_id({}, json)
+        ir_objects = self.convert_all_nodes(json)
         self._objects_by_path = SuffixTree()
         self._objects_by_path.add_many((obj.path_segments, obj) for obj in ir_objects)
 
@@ -46,7 +46,6 @@ class Analyzer:
         """
 
         return self._objects_by_path.get(path_suffix)
-
 
     def top_level_properties(self, node):
         source = node.get('sources')[0]
@@ -69,7 +68,6 @@ class Analyzer:
 
             is_private=node.get('flags', {}).get('isPrivate', False),
             exported_from=exported_from)
-
 
     def constructor_and_members(self, cls) -> Tuple[Optional[Function], List[Union[Function, Attribute]]]:
         """Return the constructor and other members of a class.
@@ -95,19 +93,17 @@ class Analyzer:
                     members.append(ir)
         return constructor, members
 
-
-    def convert_all_nodes(self, root, index):
+    def convert_all_nodes(self, root):
         todo = [root]
         done = []
         while todo:
-            converted, more_todo = self.convert_node(todo.pop(), index)
+            converted, more_todo = self.convert_node(todo.pop())
             if converted:
                 done.append(converted)
             todo.extend(more_todo)
         return done
 
-
-    def convert_node(self, node, index) -> Tuple[TopLevel, List[dict]]:
+    def convert_node(self, node) -> Tuple[TopLevel, List[dict]]:
         """Convert a node of TypeScript JSON output to an IR object.
 
         :return: A tuple: (the IR object, a list of other nodes found within
@@ -137,7 +133,7 @@ class Analyzer:
             _, members = self.constructor_and_members(node)
             ir = Interface(
                 members=members,
-                supers=related_types(node, kind='extendedTypes'),
+                supers=self.related_types(node, kind='extendedTypes'),
                 **self.top_level_properties(node))
         elif kind == 'Class':
             # Every class has a constructor in the JSON, even if it's only
@@ -146,15 +142,15 @@ class Analyzer:
             ir = Class(
                 constructor=constructor,
                 members=members,
-                supers=related_types(node, kind='extendedTypes'),
+                supers=self.related_types(node, kind='extendedTypes'),
                 is_abstract=node.get('flags', {}).get('isAbstract', False),
-                interfaces=related_types(node, kind='implementedTypes'),
+                interfaces=self.related_types(node, kind='implementedTypes'),
                 **self.top_level_properties(node))
         elif kind in ['Property', 'Variable']:  # TODO: Handle Variables, like top-level consts.
             ir = Attribute(
-                types=make_type(node.get('type')),
+                types=self.make_type(node.get('type')),
                 **self.top_level_properties(node))
-        elif kind == 'Accessor':  # NEXT: Then port longname. Then convert_node() should work. Unit-test, especially make_type(). Then write renderers.
+        elif kind == 'Accessor':  # NEXT: Then convert_node() should work. Unit-test, especially make_type(). Then write renderers.
             get_signature = node.get('getSignature')
             if get_signature:
                 # There's no signature to speak of for a getter: only a return type.
@@ -164,7 +160,7 @@ class Analyzer:
                 # have multiple signatures, though.
                 type = node['setSignature'][0]['parameters'][0]['type']
             ir = Attribute(
-                types=make_type(type),
+                types=self.make_type(type),
                 **self.top_level_properties(node))
         elif kind in ['Function', 'Constructor', 'Method']:
             # There's really nothing in these; all the interesting bits are in the
@@ -177,22 +173,109 @@ class Analyzer:
             sigs = node.get('signatures')
             first_sig = sigs[0]  # Should always have at least one
             first_sig['sources'] = node['sources']
-            return self.convert_node(first_sig, index)
+            return self.convert_node(first_sig)
         elif kind in ['Call signature', 'Constructor signature']:  # I had deleted "Constructor signature". I don't know why.
             # This is the real meat of a function, method, or constructor.
             parent = node['__parent']
             flags = parent.get('flags', {})
             ir = Function(
-                params=[make_param(p) for p in node.get('parameters', [])],
+                params=[self.make_param(p) for p in node.get('parameters', [])],
                 # Exceptions are discouraged in TS as being unrepresentable in its
                 # type system. More importantly, TypeDoc does not support them.
-                returns=make_returns(node),
+                returns=self.make_returns(node),
                 is_abstract=flags.get('isAbstract', False),
                 is_optional=flags.get('isOptional', False),
                 is_static=flags.get('isStatic', False),
                 **self.top_level_properties(node))
 
         return ir, node.get('children', [])
+
+    def related_types(self, node, kind):
+        """Return the names of implemented or extended classes or interfaces or maybe paths to them. I'm not sure."""
+        types = []
+        for type in node.get(kind, []):
+            types.append(' '.join(self.make_type(type)))
+        return types
+
+    # TODO: Unit-test me.
+    def make_type(self, type) -> Types:
+        """Construct a list of types from a TypeDoc ``type`` entry.
+
+        Return a list of 1 type, or [] if none is specified.
+
+        """
+        names = []
+        type_of_type = type.get('type')
+        if type_of_type == 'reference' and type.get('id'):
+            node = self._index[type['id']]
+            # Should be: names = [ self.make_longname(node)]
+            parent = node['__parent']
+            if parent.get('kindString') == 'External module':
+                names = [parent['name'][1:-1] + '.' + node['name']]
+            else:
+                names = [node['name']]
+        elif type_of_type in ['intrinsic', 'reference', 'unknown']:
+            names = [type['name']]
+        elif type_of_type == 'stringLiteral':
+            names = ['"' + type['value'] + '"']
+        elif type_of_type == 'array':
+            names = [self.make_type(type['elementType'])[0] + '[]']
+        elif type_of_type == 'tuple' and type.get('elements'):
+            types = ['|'.join(self.make_type(t)) for t in type['elements']]
+            names = ['[' + ','.join(types) + ']']
+        elif type_of_type == 'union':
+            types = []
+            for t in type['types']:
+                mt = self.make_type(t)
+                if mt:  # Avoid []s (untyped things)
+                    types.append(mt)
+            names = ['|'.join(types)]
+        elif type_of_type == 'typeOperator':
+            target_name = self.make_type(type['target'])
+            names = [type['operator'] + ':' + ':'.join(target_name)]
+        elif type_of_type == 'typeParameter':
+            names = [type['name']]
+            constraint = type.get('constraint')
+            if constraint is not None:
+                names.extend(['extends', self.make_type(constraint)])  # TODO: Longer list than we want. Join it with spaces?
+        elif type_of_type == 'reflection':
+            names = ['<TODO>']
+
+        type_args = type.get('typeArguments')
+        if type_args:
+            arg_names = ['|'.join(self.make_type(arg)) for arg in type_args]
+            names = [names[0] + '<' + ','.join(arg_names) + '>']
+
+        return names
+
+    def make_param(self, param):
+        """Make a Param from a 'parameters' JSON item"""
+        has_default = 'defaultValue' in param
+        return Param(
+            name=param.get('name'),
+            description=make_description(param.get('comment', {})),
+            has_default=has_default,
+            is_variadic=param.get('flags', {}).get('isRest', False),
+            # For now, we just pass a single string in as the type rather than a
+            # list of types to be unioned by the renderer. There's really no
+            # disadvantage.
+            types=self.make_type(param.get('type', {})),
+            default=param['defaultValue'] if has_default else NO_DEFAULT)
+
+    def make_returns(self, signature) -> List[Return]:
+        """Return the Returns a function signature can have.
+
+        Because, in TypeDoc, each signature can have only 1 @return tag, we return
+        a list of either 0 or 1 item.
+
+        """
+        type = signature.get('type')
+        if type is None or type.get('name') == 'void':
+            # Returns nothing
+            return []
+        return [Return(
+            types=self.make_type(type),
+            description=signature.get('comment', {}).get('returns', ''))]
 
 
 def typedoc_output(abs_source_paths, sphinx_conf_dir, config_path):
@@ -260,97 +343,6 @@ def short_name(node):
     if node['kindString'] in ['Module', 'External module']:
         return node['name'][1:-1]  # strip quotes
     return node['name']
-
-
-def related_types(node, kind):
-    """Return the names of implemented or extended classes or interfaces or maybe paths to them. I'm not sure."""
-    types = []
-    for type in node.get(kind, []):
-        types.append(' '.join(make_type_name(type)))
-    return types
-
-
-# TODO: Unit-test me.
-def make_type(type, index) -> Types:
-    """Construct a list of types from a TypeDoc ``type`` entry.
-
-    Return a list of 1 type, or [] if none is specified.
-
-    """
-    names = []
-    type_of_type = type.get('type')
-    if type_of_type == 'reference' and type.get('id'):
-        node = index[type['id']]
-        # Should be: names = [ self.make_longname(node)]
-        parent = node['__parent']
-        if parent.get('kindString') == 'External module':
-            names = [parent['name'][1:-1] + '.' + node['name']]
-        else:
-            names = [node['name']]
-    elif type_of_type in ['intrinsic', 'reference', 'unknown']:
-        names = [type['name']]
-    elif type_of_type == 'stringLiteral':
-        names = ['"' + type['value'] + '"']
-    elif type_of_type == 'array':
-        names = [make_type(type['elementType'])[0] + '[]']
-    elif type_of_type == 'tuple' and type.get('elements'):
-        types = ['|'.join(make_type(t)) for t in type['elements']]
-        names = ['[' + ','.join(types) + ']']
-    elif type_of_type == 'union':
-        types = []
-        for t in type['types']:
-            mt = make_type(t)
-            if mt:  # Avoid []s (untyped things)
-                types.append(mt)
-        names = ['|'.join(types)]
-    elif type_of_type == 'typeOperator':
-        target_name = make_type(type['target'])
-        names = [type['operator'] + ':' + ':'.join(target_name)]
-    elif type_of_type == 'typeParameter':
-        names = [type['name']]
-        constraint = type.get('constraint')
-        if constraint is not None:
-            names.extend(['extends', make_type(constraint)])  # TODO: Longer list than we want. Join it with spaces?
-    elif type_of_type == 'reflection':
-        names = ['<TODO>']
-
-    type_args = type.get('typeArguments')
-    if type_args:
-        arg_names = ['|'.join(make_type(arg)) for arg in type_args]
-        names = [names[0] + '<' + ','.join(arg_names) + '>']
-
-    return names
-
-
-def make_param(param):
-    """Make a Param from a 'parameters' JSON item"""
-    has_default = 'defaultValue' in param
-    return Param(
-        name=param.get('name'),
-        description=make_description(param.get('comment', {})),
-        has_default=has_default,
-        is_variadic=param.get('flags', {}).get('isRest', False),
-        # For now, we just pass a single string in as the type rather than a
-        # list of types to be unioned by the renderer. There's really no
-        # disadvantage.
-        types=make_type(param.get('type', {})),
-        default=param['defaultValue'] if has_default else NO_DEFAULT)
-
-
-def make_returns(signature) -> List[Return]:
-    """Return the Returns a function signature can have.
-
-    Because, in TypeDoc, each signature can have only 1 @return tag, we return
-    a list of either 0 or 1 item.
-
-    """
-    type = signature.get('type')
-    if type is None or type.get('name') == 'void':
-        # Returns nothing
-        return []
-    return [Return(
-        types=make_type(type),
-        description=signature.get('comment', {}).get('returns', ''))]
 
 
 # Optimization: Could memoize this for probably a decent perf gain: every child
