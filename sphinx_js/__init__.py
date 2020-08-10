@@ -13,7 +13,7 @@ def setup(app):
     # I believe this is the best place to run jsdoc. I was tempted to use
     # app.add_source_parser(), but I think the kind of source it's referring to
     # is RSTs.
-    app.connect('builder-inited', gather_doclets)
+    app.connect('builder-inited', analyze)
 
     app.connect('env-before-read-docs', read_all_docs)
 
@@ -39,7 +39,7 @@ def setup(app):
     app.add_config_value('root_for_relative_js_paths', None, 'env')
 
 
-def gather_doclets(app):
+def analyze(app):
     """Run JSDoc or another analysis tool across a whole codebase, and squirrel
     away its results in a language-specific Analyzer."""
     # Normalize config values:

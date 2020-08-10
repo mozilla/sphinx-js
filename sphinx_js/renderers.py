@@ -62,7 +62,7 @@ class JsRenderer(object):
 
         """
         try:
-            doclet = self._app._sphinxjs_analyzer.get_object(
+            obj = self._app._sphinxjs_analyzer.get_object(
                 self._partial_path, self._renderer_type)
         except SuffixNotFound as exc:
             raise SphinxError('No JSDoc documentation was found for object "%s" or any path ending with that.'
@@ -72,7 +72,7 @@ class JsRenderer(object):
                               % (''.join(exc.segments), exc.next_possible_keys))
         else:
             rst = self.rst(self._partial_path,
-                           doclet,
+                           obj,
                            use_short_name='short-name' in self._options)
 
             # Parse the RST into docutils nodes with a fresh doc, and return
@@ -80,31 +80,32 @@ class JsRenderer(object):
             #
             # Not sure if passing the settings from the "real" doc is the right
             # thing to do here:
-            doc = new_document('%s:%s(%s)' % (doclet.filename,
-                                              ''.join(doclet.path_segments),
-                                              doclet.line),
+            doc = new_document('%s:%s(%s)' % (obj.filename,
+                                              ''.join(obj.path_segments),
+                                              obj.line),
                                settings=self._directive.state.document.settings)
             RstParser().parse(rst, doc)
             return doc.children
         return []
 
-    def rst(self, partial_path, doclet, use_short_name=False):
-        """Return rendered RST about an entity with the given name and doclet."""
+    def rst(self, partial_path, obj, use_short_name=False):
+        """Return rendered RST about an entity with the given name and IR
+        object."""
         dotted_name = partial_path[-1] if use_short_name else _dotted_path(partial_path)
 
         # Render to RST using Jinja:
         env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
         template = env.get_template(self._template)
-        return template.render(**self._template_vars(dotted_name, doclet))
+        return template.render(**self._template_vars(dotted_name, obj))
 
     def _name(self):
         """Return the JS function or class longname."""
         return self._arguments[0].split('(')[0]
 
-    def _formal_params(self, doclet):
+    def _formal_params(self, obj):
         """Return the JS function or class params, looking first to any
         explicit params written into the directive and falling back to those in
-        doclets or JS code.
+        comments or JS code.
 
         Return a ReST-escaped string ready for substitution into the template.
 
@@ -115,7 +116,7 @@ class JsRenderer(object):
         formals = []
         used_names = set()
 
-        for param in doclet.params:
+        for param in obj.params:
             # Turn "@param p2.subProperty" into just p2. We wouldn't want to
             # add subproperties to the flat formal param list:
             name = param.name.split('.')[0]
@@ -136,7 +137,7 @@ class JsRenderer(object):
 
         return '(%s)' % ', '.join(formals)
 
-    def _fields(self, doclet):
+    def _fields(self, obj):
         """Return an iterable of "info fields" to be included in the directive,
         like params, return values, and exceptions.
 
@@ -152,7 +153,7 @@ class JsRenderer(object):
                        ('exceptions', _exception_formatter),
                        ('returns', _return_formatter)]
         for collection_attr, callback in FIELD_TYPES:
-            for instance in getattr(doclet, collection_attr, []):
+            for instance in getattr(obj, collection_attr, []):
                 result = callback(instance)
                 if result:
                     heads, tail = result
@@ -163,15 +164,15 @@ class AutoFunctionRenderer(JsRenderer):
     _template = 'function.rst'
     _renderer_type = 'function'
 
-    def _template_vars(self, name, doclet):
+    def _template_vars(self, name, obj):
         return dict(
             name=name,
-            params=self._formal_params(doclet),
-            fields=self._fields(doclet),
-            description=doclet.description,
-            examples=doclet.examples,
-            deprecated=doclet.deprecated,
-            see_also=doclet.see_alsos,
+            params=self._formal_params(obj),
+            fields=self._fields(obj),
+            description=obj.description,
+            examples=obj.examples,
+            deprecated=obj.deprecated,
+            see_also=obj.see_alsos,
             content='\n'.join(self._content))
 
 # TODO: Display .is_optional and .is_abstact in the templates.
@@ -184,103 +185,101 @@ class AutoClassRenderer(JsRenderer):
     _template = 'class.rst'
     _renderer_type = 'class'
 
-    def _template_vars(self, name, doclet):
+    def _template_vars(self, name, obj):
         # At the moment, we pull most fields (params, returns, exceptions,
         # etc.) off the constructor only. We could pull them off the class
         # itself too in the future.
         return dict(
             name=name,
             # TODO: Deal with the case that the constructor is None.
-            params=self._formal_params(doclet.constructor),
-            fields=self._fields(doclet.constructor),
-            examples=doclet.constructor.examples,
-            deprecated=doclet.constructor.deprecated,
-            see_also=doclet.constructor.see_alsos,
-            class_comment=doclet.description,
-            constructor_comment=doclet.constructor.description,
+            params=self._formal_params(obj.constructor),
+            fields=self._fields(obj.constructor),
+            examples=obj.constructor.examples,
+            deprecated=obj.constructor.deprecated,
+            see_also=obj.constructor.see_alsos,
+            class_comment=obj.description,
+            constructor_comment=obj.constructor.description,
             content='\n'.join(self._content),
-            members=self._members_of(doclet,
+            members=self._members_of(obj,
                                      include=self._options['members'],
                                      exclude=self._options.get('exclude-members', set()),
                                      should_include_private='private-members' in self._options)
                     if 'members' in self._options else '')
 
-    def _members_of(self, doclet, include, exclude, should_include_private):
+    def _members_of(self, obj, include, exclude, should_include_private):
         """Return RST describing the members of a given class.
 
-        :arg doclet Class: The class we're documenting
+        :arg obj Class: The class we're documenting
         :arg include: List of names of members to include. If empty, include
             all.
         :arg exclude: Set of names of members to exclude
         :arg should_include_private: Whether to include private members
 
         """
-        def rst_for(doclet):
-            renderer = (AutoFunctionRenderer if isinstance(doclet, Function)
+        def rst_for(obj):
+            renderer = (AutoFunctionRenderer if isinstance(obj, Function)
                         else AutoAttributeRenderer)
             return renderer(self._directive, self._app, arguments=['dummy']).rst(
-                [doclet.name],
-                doclet,
+                [obj.name],
+                obj,
                 use_short_name=False)
 
-        def doclets_to_include(include):
-            """Return the doclets that should be included (before excludes and
+        def members_to_include(include):
+            """Return the members that should be included (before excludes and
             access specifiers are taken into account).
 
-            This will either be the doclets explicitly listed after the
-            ``:members:`` option, in that order; all doclets that are
-            members of the class; or listed members with remaining ones
-            inserted at the placeholder "*".
+            This will either be the ones explicitly listed after the
+            ``:members:`` option, in that order; all members of the class; or
+            listed members with remaining ones inserted at the placeholder "*".
 
             """
-            doclets = doclet.members
+            members = obj.members
             if not include:
                 # Specifying none means listing all.
-                return sorted(doclets, key=lambda d: d.path_segments)  # TODO: If path_segments is empty, fall back to d.name like this used to pre-IR.
+                return sorted(members, key=lambda d: d.path_segments)  # TODO: If path_segments is empty, fall back to d.name like this used to pre-IR.
             included_set = set(include)
 
             # If the special name * is included in the list, include
-            # all other doclets, in sorted order.
+            # all other members, in sorted order.
             if '*' in included_set:
                 star_index = include.index('*')
-                sorted_not_included_doclets = sorted(
-                    (d for d in doclets if d.name not in included_set),
+                sorted_not_included_members = sorted(
+                    (d for d in members if d.name not in included_set),
                     key=lambda d: d.path_segments  # TODO: Fall back to d.name if needed like it used to.
                 )
-                not_included = [d.name for d in sorted_not_included_doclets]
+                not_included = [d.name for d in sorted_not_included_members]
                 include = include[:star_index] + not_included + include[star_index + 1:]
                 included_set.update(not_included)
 
-            # Even if there are 2 doclets with the same short name (e.g. a
+            # Even if there are 2 members with the same short name (e.g. a
             # static member and an instance one), keep them both. This
             # prefiltering step should make the below sort less horrible, even
             # though I'm calling index().
-            included_doclets = [d for d in doclets if d.name in included_set]
-            # sort()'s stability should keep same-named doclets in the order
+            included_members = [m for m in members if m.name in included_set]
+            # sort()'s stability should keep same-named members in the order
             # JSDoc spits them out in.
-            included_doclets.sort(key=lambda d: include.index(d.name))
-            return included_doclets
-            # TODO: Quit saying "doclets" where what we really mean is IR entities.
+            included_members.sort(key=lambda d: include.index(d.name))
+            return included_members
 
         return '\n\n'.join(
-            rst_for(doclet) for doclet in doclets_to_include(include)
-            if (not doclet.is_private
-                or (doclet.is_private and should_include_private))
-            and doclet.name not in exclude)
+            rst_for(member) for member in members_to_include(include)
+            if (not member.is_private
+                or (member.is_private and should_include_private))
+            and member.name not in exclude)
 
 
 class AutoAttributeRenderer(JsRenderer):
     _template = 'attribute.rst'
     _renderer_type = 'attribute'
 
-    def _template_vars(self, name, doclet):
+    def _template_vars(self, name, obj):
         return dict(
             name=name,
-            description=doclet.description,
-            deprecated=doclet.deprecated,
-            see_also=doclet.see_alsos,
-            examples=doclet.examples,
-            type=_or_types(doclet.types),
+            description=obj.description,
+            deprecated=obj.deprecated,
+            see_also=obj.see_alsos,
+            examples=obj.examples,
+            type=_or_types(obj.types),
             content='\n'.join(self._content))
 
 
@@ -327,10 +326,7 @@ def _exception_formatter(exception):
 
 
 def _or_types(types):
-    """Return all the types in a doclet subfield like "params" or "returns"
-    with vertical bars between them, like "number|string".
-
-    """
+    """Bar-delimit a list of types."""
     return '|'.join(types)
 
 

@@ -1,4 +1,4 @@
-"""Converter from typedoc output to jsdoc doclet format"""
+"""Converter from TypeDoc output to IR format"""
 
 from codecs import getreader
 from errno import ENOENT
@@ -155,7 +155,6 @@ class Analyzer:
                 types=make_type(node.get('type')),
                 **self.top_level_properties(node))
         elif kind == 'Accessor':  # NEXT: Then port longname. Then convert_node() should work. Unit-test, especially make_type(). Then write renderers.
-            doclet = self.simple_doclet('member', node)
             get_signature = node.get('getSignature')
             if get_signature:
                 # There's no signature to speak of for a getter: only a return type.
