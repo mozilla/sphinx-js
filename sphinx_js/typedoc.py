@@ -372,8 +372,9 @@ def make_path_segments(node, base_dir, child_was_static=None):
     for links: https://typedoc.org/guides/link-resolution/. It seems like a
     less well thought-out system than JSDoc's namepaths, as it doesn't
     distinguish between, say, static and instance properties of the same name.
-    We're sticking with our own namepath-like paths, even if we eventually
-    support {@link} syntax.
+    (AFAICT, TypeDoc does not emit documentation for inner properties, as for a
+    function nested within another function.) We're sticking with our own
+    namepath-like paths, even if we eventually support {@link} syntax.
 
     """
     node_is_static = node.get('flags', {}).get('isStatic', False)
@@ -383,7 +384,6 @@ def make_path_segments(node, base_dir, child_was_static=None):
                        if parent else [])
 
     kind = node.get('kindString')
-    # TODO: See if the '~' (inner property) case ever fired on the old version of sphinx-js. I don't think TypeDoc emits inner properties.
     delimiter = '' if child_was_static is None else '.'
 
     # Handle the cases here that are handled in convert_node(), plus any that
