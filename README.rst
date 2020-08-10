@@ -341,6 +341,9 @@ Run the tests using tox, which will also install jsdoc and typedoc at pinned ver
 Version History
 ===============
 
+3.0.1
+  * Don't crash when encountering a ``../`` prefix on an object path. This can happen behind the scenes when ``root_for_relative_js_paths`` is set inward of the JS code.
+
 3.0
   * Make compatible with Sphinx 3, which requires Python 3.
   * Drop support for Python 2.
