@@ -14,3 +14,5 @@ interface Interface extends SuperInterface {
  */
 export abstract class EmptySubclass extends Superclass implements Interface {
 }
+
+const topLevelConst = 3;

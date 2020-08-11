@@ -209,3 +209,7 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
         """
         interface = self.analyzer.get_object(['Interface'])
         assert interface.supers == ['analysis.SuperInterface']
+
+    def test_variable(self):
+        """Make sure top-level consts and vars are found."""
+        const = self.analyzer.get_object(['topLevelConst']);

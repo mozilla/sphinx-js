@@ -50,6 +50,10 @@ class Analyzer:
     def top_level_properties(self, node):
         source = node.get('sources')[0]
         if node.get('flags', {}).get('isExported', False):
+            # This is how it used to be, but I doubt it's right. More likely,
+            # we should walk up the suffix tree until we hit an external module
+            # (though we don't index those atm) and then return that thing's
+            # path_segments.
             exported_from = node['__parent']['name'][1:-1]  # strip off quotes
         else:
             exported_from = None
@@ -123,8 +127,8 @@ class Analyzer:
         ir = None
         kind = node.get('kindString')
         if kind == 'External module':
-              # We shouldn't need these until we implement automodule. But what of
-              # js:mod in the templates?
+            # We shouldn't need these until we implement automodule. But what of
+            # js:mod in the templates?
             pass
         elif kind == 'Module':
             # Does anybody even use TS's old internal modules anymore?
@@ -146,9 +150,12 @@ class Analyzer:
                 is_abstract=node.get('flags', {}).get('isAbstract', False),
                 interfaces=self.related_types(node, kind='implementedTypes'),
                 **self.top_level_properties(node))
-        elif kind in ['Property', 'Variable']:  # TODO: Handle Variables, like top-level consts.
+        elif kind in ['Property', 'Variable']:
             ir = Attribute(
                 types=self.make_type(node.get('type')),
+                is_abstract=False,
+                is_optional=False,
+                is_static=False,
                 **self.top_level_properties(node))
         elif kind == 'Accessor':  # NEXT: Then convert_node() should work. Unit-test, especially make_type(). Then write renderers.
             get_signature = node.get('getSignature')
