@@ -213,3 +213,4 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
     def test_variable(self):
         """Make sure top-level consts and vars are found."""
         const = self.analyzer.get_object(['topLevelConst']);
+        assert const.types == []

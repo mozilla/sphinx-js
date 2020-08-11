@@ -4,6 +4,7 @@ from codecs import getreader
 from errno import ENOENT
 from json import load
 from os.path import basename, join, normpath, relpath, sep, splitext
+import re
 import subprocess
 from tempfile import NamedTemporaryFile
 from typing import List, Optional, Tuple, Union
@@ -222,7 +223,14 @@ class Analyzer:
                 names = [parent['name'][1:-1] + '.' + node['name']]
             else:
                 names = [node['name']]
-        elif type_of_type in ['intrinsic', 'reference', 'unknown']:
+        elif type_of_type == 'unknown':
+            if re.match(r'-?\d*(\.\d+)?', type['name']):  # It's a number.
+                # TypeDoc apparently sticks numeric constants' values into the
+                # type name. String constants? Nope. Function ones? Nope.
+                names = []
+            else:
+                names = [type['name']]
+        elif type_of_type in ['intrinsic', 'reference']:
             names = [type['name']]
         elif type_of_type == 'stringLiteral':
             names = ['"' + type['value'] + '"']
