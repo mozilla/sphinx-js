@@ -171,6 +171,11 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
         super = self.analyzer.get_object(['Superclass'])
         assert not super.is_abstract
 
+        # There should be a single member representing method():
+        method, = super.members
+        assert isinstance(method, Function)
+        assert method.name == 'method'
+
         # Class-specific attrs:
         subclass = self.analyzer.get_object(['EmptySubclass'])
         assert isinstance(subclass, Class)
@@ -180,3 +185,4 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
 
         # _MembersAndSupers attrs:
         assert subclass.supers == ['analysis.Superclass']
+        assert subclass.members == []

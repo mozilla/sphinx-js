@@ -84,7 +84,7 @@ class Analyzer:
         constructor = None
         members = []
         for child in cls.get('children', []):
-            ir = self.convert_node(child)
+            ir, _ = self.convert_node(child)
             if ir:
                 if (child.get('kindString') == 'Constructor'):
                     # This really, really should happen exactly once per class.
