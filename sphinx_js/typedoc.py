@@ -182,6 +182,7 @@ class Analyzer:
                 params=[self.make_param(p) for p in node.get('parameters', [])],
                 # Exceptions are discouraged in TS as being unrepresentable in its
                 # type system. More importantly, TypeDoc does not support them.
+                exceptions=[],
                 returns=self.make_returns(node),
                 is_abstract=flags.get('isAbstract', False),
                 is_optional=flags.get('isOptional', False),

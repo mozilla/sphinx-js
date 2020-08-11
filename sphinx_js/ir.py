@@ -27,10 +27,10 @@ from dataclasses import dataclass, field, InitVar
 from typing import Any, List, NewType, Optional, Union
 
 
-#: List of types, which are strings. These are taken to be a unioned set of
-#: types. Types could even be parametrized by other types, but we probably
-#: don't care for IR purposes: let whichever analyzer boil them down to
-#: strings.
+#: List of types, which are whole-segment suffixes of pathnames, like
+#: 'foo.bar.Baz'. These are taken to be a unioned set of types. Types could
+#: even be parametrized by other types, but we probably don't care for IR
+#: purposes: let whichever analyzer boil them down to strings.
 Types = List[str]
 
 ReStructuredText = NewType('ReStructuredText', str)

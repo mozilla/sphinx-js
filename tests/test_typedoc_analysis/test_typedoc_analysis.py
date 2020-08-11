@@ -90,7 +90,6 @@ class IndexByIdTests(TestCase):
         assert root.get('__parent') is None
 
 
-
 class PathSegmentsTests(TypeDocTestCase):
     """Make sure ``make_path_segments() `` works on all its manifold cases."""
 
@@ -166,6 +165,18 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
     files = ['analysis.ts']
 
     def test_class(self):
-        cls = self.analyzer.get_object(['SomeClass'])
-        assert isinstance(cls, Class)
-        #assert the members are right
+        """Test that superclasses, implemented interfaces, abstractness, and
+        nonexistent constructors are surfaced."""
+        # Make sure is_abstract is sometimes false:
+        super = self.analyzer.get_object(['Superclass'])
+        assert not super.is_abstract
+
+        # Class-specific attrs:
+        subclass = self.analyzer.get_object(['EmptySubclass'])
+        assert isinstance(subclass, Class)
+        assert subclass.constructor is None
+        assert subclass.is_abstract
+        assert subclass.interfaces == ['analysis.Interface']
+
+        # _MembersAndSupers attrs:
+        assert subclass.supers == ['analysis.Superclass']
