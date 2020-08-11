@@ -166,7 +166,7 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
 
     def test_class(self):
         """Test that superclasses, implemented interfaces, abstractness, and
-        nonexistent constructors are surfaced."""
+        nonexistent constructors, members, and top-level attrs are surfaced."""
         # Make sure is_abstract is sometimes false:
         super = self.analyzer.get_object(['Superclass'])
         assert not super.is_abstract
@@ -199,3 +199,13 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
         assert subclass.see_alsos == []
         assert subclass.properties == []
         assert subclass.exported_from == 'analysis'
+
+    def test_interface(self):
+        """Test that interfaces get indexed and have their supers exposed.
+
+        Members and top-level properties should be covered in test_class()
+        assuming node structure is the same as for classes.
+
+        """
+        interface = self.analyzer.get_object(['Interface'])
+        assert interface.supers == ['analysis.SuperInterface']

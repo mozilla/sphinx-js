@@ -3,7 +3,10 @@ class Superclass {
   }
 }
 
-interface Interface {
+interface SuperInterface {
+}
+
+interface Interface extends SuperInterface {
 }
 
 /**
