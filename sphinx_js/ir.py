@@ -142,7 +142,7 @@ class TopLevel:
     properties: List[Property]
     is_private: bool
     #: None if not exported for use by outside code. Otherwise, the Sphinx
-    #: dotted path to the module it is exported from
+    #: dotted path to the module it is exported from, e.g. 'foo.bar'
     exported_from: Optional[str]
 
 

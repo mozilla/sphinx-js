@@ -186,3 +186,16 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
         # _MembersAndSupers attrs:
         assert subclass.supers == ['analysis.Superclass']
         assert subclass.members == []
+
+        # TopLevel attrs. This should cover them for other kinds of objs as
+        # well (if node structures are the same across object kinds), since we
+        # have the filling of them factored out.
+        assert subclass.name == 'EmptySubclass'
+        assert subclass.path_segments == ['./', 'analysis.', 'EmptySubclass']
+        assert subclass.filename == 'analysis.ts'
+        assert subclass.description == 'An empty subclass'
+        assert subclass.deprecated == False
+        assert subclass.examples == []
+        assert subclass.see_alsos == []
+        assert subclass.properties == []
+        assert subclass.exported_from == 'analysis'

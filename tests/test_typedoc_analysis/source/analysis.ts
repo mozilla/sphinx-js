@@ -6,6 +6,8 @@ class Superclass {
 interface Interface {
 }
 
-abstract class EmptySubclass extends Superclass implements Interface {
+/**
+ * An empty subclass
+ */
+export abstract class EmptySubclass extends Superclass implements Interface {
 }
-
