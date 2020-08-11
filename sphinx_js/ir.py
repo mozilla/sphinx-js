@@ -79,7 +79,7 @@ class Param:
     types: Types = field(default_factory=list)
     #: Return the default value of this parameter, string-formatted so it can
     #: be immediately suffixed to an equal sign in a formal param list. For
-    #: example, the number 6 becomes the string "6" to create ``foo="6"``. If
+    #: example, the number 6 becomes the string "6" to create ``foo=6``. If
     #: has_default=True, this must be set.
     default: InitVar[Any] = NO_DEFAULT
 

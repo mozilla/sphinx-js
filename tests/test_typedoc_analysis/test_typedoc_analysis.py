@@ -214,3 +214,24 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
         """Make sure top-level consts and vars are found."""
         const = self.analyzer.get_object(['topLevelConst']);
         assert const.types == []
+
+    def test_function(self):
+        """Make sure Functions, Params, and Returns are built properly for
+        top-level functions."""
+        func = self.analyzer.get_object(['func'])
+        assert isinstance(func, Function)
+        assert func.params == [
+                Param(name='a',
+                      description='Some number',
+                      has_default=True,
+                      is_variadic=False,
+                      types=['number'],
+                      default='1'),
+                Param(name='b',
+                      description='Some strings',
+                      has_default=False,
+                      is_variadic=True,
+                      types=['string[]'])
+            ]
+        assert func.exceptions == []
+        assert func.returns == [Return(types=['number'], description='The best number')]

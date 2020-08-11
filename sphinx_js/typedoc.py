@@ -291,7 +291,7 @@ class Analyzer:
             return []
         return [Return(
             types=self.make_type(type),
-            description=signature.get('comment', {}).get('returns', ''))]
+            description=signature.get('comment', {}).get('returns', '').strip())]
 
 
 def typedoc_output(abs_source_paths, sphinx_conf_dir, config_path):
@@ -350,9 +350,10 @@ def index_by_id(index, node, parent=None):
 
 def make_description(comment):
     """Construct a single comment string from a fancy object."""
-    return '\n\n'.join(text for text in [comment.get('shortText'),
-                                         comment.get('text')]
-                       if text)
+    ret = '\n\n'.join(text for text in [comment.get('shortText'),
+                                        comment.get('text')]
+                      if text)
+    return ret.strip()
 
 
 def short_name(node):
