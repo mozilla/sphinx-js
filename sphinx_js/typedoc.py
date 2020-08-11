@@ -11,7 +11,7 @@ from typing import List, Optional, Tuple, Union
 from sphinx.errors import SphinxError
 
 from .analyzer_utils import Command, is_explicitly_rooted
-from .ir import Attribute, Class, Exc, Function, Interface, Param, Return, TopLevel, Types
+from .ir import Attribute, Class, Exc, Function, Interface, NO_DEFAULT, Param, Return, TopLevel, Types
 from .suffix_tree import SuffixTree
 
 
