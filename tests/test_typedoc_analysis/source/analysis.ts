@@ -25,3 +25,8 @@ const topLevelConst = 3;
 function func(a: number = 1, ...b: string[]): number {
   return 4;
 }
+
+class ClassWithMethods {
+  constructor(a: number) {
+  }
+}

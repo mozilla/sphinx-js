@@ -10,7 +10,7 @@ from tests.testing import dict_where, NO_MATCH, TypeDocAnalyzerTestCase, TypeDoc
 
 class IndexByIdTests(TestCase):
     def test_top_level_function(self):
-        """Make sure nodes get indexed"""
+        """Make sure nodes get indexed."""
         # A simple TypeDoc JSON dump of a soruce file with a single, top-level
         # function with no params or return value:
         json = loads(r"""{
@@ -235,3 +235,13 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
             ]
         assert func.exceptions == []
         assert func.returns == [Return(types=['number'], description='The best number')]
+
+    def test_constructor(self):
+        """Make sure constructors get attached to classes and analyzed into
+        Functions.
+
+        The rest of their analysis should share a code path with functions.
+
+        """
+        cls = self.analyzer.get_object(['ClassWithMethods'])
+        assert isinstance(cls.constructor, Function)
