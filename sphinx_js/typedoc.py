@@ -152,11 +152,12 @@ class Analyzer:
                 interfaces=self.related_types(node, kind='implementedTypes'),
                 **self.top_level_properties(node))
         elif kind in ['Property', 'Variable']:
+            flags = node.get('flags', {})
             ir = Attribute(
                 types=self.make_type(node.get('type')),
-                is_abstract=False,
-                is_optional=False,
-                is_static=False,
+                is_abstract=flags.get('isAbstract', False),
+                is_optional=flags.get('isOptional', False),
+                is_static=flags.get('isStatic', False),
                 **self.top_level_properties(node))
         elif kind == 'Accessor':  # NEXT: Then convert_node() should work. Unit-test, especially make_type(). Then write renderers.
             get_signature = node.get('getSignature')
@@ -186,6 +187,9 @@ class Analyzer:
             # This is the real meat of a function, method, or constructor.
             parent = node['__parent']
             flags = parent.get('flags', {})
+            # Constructors' .name attrs end up being like 'new Foo'. They
+            # should probably be called "constructor", but I'm not bothering
+            # with that yet because nobody uses that attr on constructors atm.
             ir = Function(
                 params=[self.make_param(p) for p in node.get('parameters', [])],
                 # Exceptions are discouraged in TS as being unrepresentable in its

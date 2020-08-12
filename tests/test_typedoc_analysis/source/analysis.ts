@@ -26,7 +26,14 @@ function func(a: number = 1, ...b: string[]): number {
   return 4;
 }
 
-class ClassWithMethods {
+class ClassWithProperties {
+  static someStatic: number;
+  someOptional?: number;
+  /**
+   * This is totally normal!
+   */
+  someNormal: number;
+
   constructor(a: number) {
   }
 }
