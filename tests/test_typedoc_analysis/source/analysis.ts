@@ -29,6 +29,7 @@ function func(a: number = 1, ...b: string[]): number {
 class ClassWithProperties {
   static someStatic: number;
   someOptional?: number;
+  private somePrivate: number;
   /**
    * This is totally normal!
    */

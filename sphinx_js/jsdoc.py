@@ -134,6 +134,7 @@ class Analyzer:
             is_abstract=False,
             is_optional=False,
             is_static=False,
+            is_private=is_private(doclet),
             exceptions=exceptions_to_ir(doclet.get('exceptions', [])),
             returns=returns_to_ir(doclet.get('returns', [])),
             params=params_to_ir(doclet),
@@ -147,9 +148,14 @@ class Analyzer:
             is_abstract=False,
             is_optional=False,
             is_static=False,
+            is_private=is_private(doclet),
             types=get_types(doclet),
             **top_level_properties(doclet, full_path)
         )
+
+
+def is_private(doclet):
+    return doclet.get('access') == 'private'
 
 
 def full_path_segments(d, base_dir, longname_field='longname'):
@@ -278,8 +284,7 @@ def top_level_properties(doclet, full_path):
         deprecated=doclet.get('deprecated', False),
         examples=doclet.get('examples', []),
         see_alsos=doclet.get('see', []),
-        properties=properties_to_ir(doclet.get('properties', [])),
-        is_private=doclet.get('access') == 'private')
+        properties=properties_to_ir(doclet.get('properties', [])))
 
 
 def properties_to_ir(properties):

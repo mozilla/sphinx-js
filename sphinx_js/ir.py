@@ -66,6 +66,8 @@ class _Member:
     #: Whether this member can be accessed on the container itself rather than
     #: just on instances of it
     is_static: bool
+    #: Is a private member of a class or, at least in JSDoc, a @namespace:
+    is_private: bool
 
 
 @dataclass
@@ -140,7 +142,6 @@ class TopLevel:
     see_alsos: List[str]
     #: Explicitly documented sub-properties of the object, a la jsdoc's @properties
     properties: List[Property]
-    is_private: bool
     #: None if not exported for use by outside code. Otherwise, the Sphinx
     #: dotted path to the module it is exported from, e.g. 'foo.bar'
     exported_from: Optional[str]

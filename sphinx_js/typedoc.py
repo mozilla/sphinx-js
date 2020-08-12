@@ -25,7 +25,7 @@ class Analyzer:
 
         """
         self._base_dir = base_dir
-        self._index = index_by_id({}, json)
+        self._index = index_by_id({}, json)  # TODO: Toss this overboard when we're done with it to save RAM.
         ir_objects = self.convert_all_nodes(json)
         self._objects_by_path = SuffixTree()
         self._objects_by_path.add_many((obj.path_segments, obj) for obj in ir_objects)
@@ -71,7 +71,6 @@ class Analyzer:
             see_alsos=[],
             properties=[],
 
-            is_private=node.get('flags', {}).get('isPrivate', False),
             exported_from=exported_from)
 
     def constructor_and_members(self, cls) -> Tuple[Optional[Function], List[Union[Function, Attribute]]]:
@@ -158,6 +157,7 @@ class Analyzer:
                 is_abstract=flags.get('isAbstract', False),
                 is_optional=flags.get('isOptional', False),
                 is_static=flags.get('isStatic', False),
+                is_private=flags.get('isPrivate', False),
                 **self.top_level_properties(node))
         elif kind == 'Accessor':  # NEXT: Then convert_node() should work. Unit-test, especially make_type(). Then write renderers.
             get_signature = node.get('getSignature')
@@ -170,6 +170,8 @@ class Analyzer:
                 type = node['setSignature'][0]['parameters'][0]['type']
             ir = Attribute(
                 types=self.make_type(type),
+                # Should this and other _Member properties be set here?
+                #is_private=flags.get('isPrivate', False),
                 **self.top_level_properties(node))
         elif kind in ['Function', 'Constructor', 'Method']:
             # There's really nothing in these; all the interesting bits are in the
@@ -199,6 +201,7 @@ class Analyzer:
                 is_abstract=flags.get('isAbstract', False),
                 is_optional=flags.get('isOptional', False),
                 is_static=flags.get('isStatic', False),
+                is_private=flags.get('isPrivate', False),
                 **self.top_level_properties(node))
 
         return ir, node.get('children', [])

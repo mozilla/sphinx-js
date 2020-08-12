@@ -251,12 +251,14 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
         flags."""
         cls = self.analyzer.get_object(['ClassWithProperties'])
         # The properties are on the class:
-        assert len([m for m in cls.members if isinstance(m, Attribute)]) == 3
+        assert len([m for m in cls.members if isinstance(m, Attribute)]) == 4
         # The unique things about properties (over and above Variables) are set
         # right:
         assert self.analyzer.get_object(['ClassWithProperties.', 'someStatic']).is_static
         assert self.analyzer.get_object(['ClassWithProperties#', 'someOptional']).is_optional
+        assert self.analyzer.get_object(['ClassWithProperties#', 'somePrivate']).is_private
         normal_property = self.analyzer.get_object(['ClassWithProperties#', 'someNormal'])
         assert (not normal_property.is_optional and
                 not normal_property.is_static and
-                not normal_property.is_abstract)
+                not normal_property.is_abstract and
+                not normal_property.is_private)
