@@ -16,7 +16,7 @@ from tempfile import TemporaryFile
 from sphinx.errors import SphinxError
 
 from .analyzer_utils import cache_to_file, Command, is_explicitly_rooted
-from .ir import Attribute, Class, Exc, Function, NO_DEFAULT, Param, Property, Return
+from .ir import Attribute, Class, Exc, Function, NO_DEFAULT, Param, Return
 from .parsers import path_and_formal_params, PathVisitor
 from .suffix_tree import SuffixTree
 
@@ -289,9 +289,23 @@ def top_level_properties(doclet, full_path):
 
 def properties_to_ir(properties):
     """Turn jsdoc-emitted properties JSON into a list of Properties."""
-    return [Property(name=p['name'],
-                     types=get_types(p),
-                     description=unwrapped_description(p))
+    return [Attribute(types=get_types(p),
+                      name=p['name'],
+                      # We can get away with setting null values for these
+                      # because we never use them for anything:
+                      path_segments=[],
+                      filename='',
+                      description=unwrapped_description(p),
+                      line=0,
+                      deprecated=False,
+                      examples=[],
+                      see_alsos=[],
+                      properties=[],
+                      exported_from=None,
+                      is_abstract=False,
+                      is_optional=False,
+                      is_static=False,
+                      is_private=False)
             for p in properties]
 
 

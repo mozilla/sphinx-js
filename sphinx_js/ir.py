@@ -36,14 +36,6 @@ Types = List[str]
 ReStructuredText = NewType('ReStructuredText', str)
 
 
-@dataclass
-class Property:  # TODO: Do we need both this and Attribute? Maybe we should remove this and use Attribute; it has all the fields we need (and some we don't, but who cares? They can be set to sensible values.)
-    """A minimal embodiment of the JSDoc @property tag's params"""
-    name: str
-    types: Types
-    description: ReStructuredText
-
-
 class _NoDefault:
     """A conspicuous no-default value that will show up in templates to help
     troubleshoot code paths that grab ``Param.default`` without checking
@@ -141,7 +133,7 @@ class TopLevel:
     #: List of paths to also refer the reader to
     see_alsos: List[str]
     #: Explicitly documented sub-properties of the object, a la jsdoc's @properties
-    properties: List[Property]
+    properties: List['Attribute']
     #: None if not exported for use by outside code. Otherwise, the Sphinx
     #: dotted path to the module it is exported from, e.g. 'foo.bar'
     exported_from: Optional[str]
