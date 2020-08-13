@@ -41,4 +41,7 @@ class ClassWithProperties {
   get gettable(): number {
     return 5;
   }
+
+  set settable(value: string) {
+  }
 }

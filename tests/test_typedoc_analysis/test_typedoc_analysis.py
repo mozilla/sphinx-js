@@ -271,3 +271,10 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
         getter = self.analyzer.get_object(['gettable'])
         assert isinstance(getter, Attribute)
         assert getter.types == ['number']
+
+    def test_setter(self):
+        """Test that we represent setters as Attributes and find the type of
+        their 1 param."""
+        setter = self.analyzer.get_object(['settable'])
+        assert isinstance(setter, Attribute)
+        assert setter.types == ['string']
