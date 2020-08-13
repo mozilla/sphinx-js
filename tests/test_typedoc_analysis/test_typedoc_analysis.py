@@ -161,8 +161,11 @@ class PathSegmentsTests(TypeDocTestCase):
         assert self.commented_object_path('Namespaced number') == ['./', 'pathSegments.', 'SomeSpace.', 'spacedNumber']
 
 
-class AnalyzerTests(TypeDocAnalyzerTestCase):
-    files = ['analysis.ts']
+class ConvertNodeTests(TypeDocAnalyzerTestCase):
+    """Test all the branches of ``convert_node()`` by analyzing every kind of
+    TypeDoc JSON object."""
+
+    files = ['nodes.ts']
 
     def test_class(self):
         """Test that superclasses, implemented interfaces, abstractness, and
@@ -181,24 +184,24 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
         assert isinstance(subclass, Class)
         assert subclass.constructor is None
         assert subclass.is_abstract
-        assert subclass.interfaces == ['analysis.Interface']
+        assert subclass.interfaces == ['nodes.Interface']
 
         # _MembersAndSupers attrs:
-        assert subclass.supers == ['analysis.Superclass']
+        assert subclass.supers == ['nodes.Superclass']
         assert subclass.members == []
 
         # TopLevel attrs. This should cover them for other kinds of objs as
         # well (if node structures are the same across object kinds), since we
         # have the filling of them factored out.
         assert subclass.name == 'EmptySubclass'
-        assert subclass.path_segments == ['./', 'analysis.', 'EmptySubclass']
-        assert subclass.filename == 'analysis.ts'
+        assert subclass.path_segments == ['./', 'nodes.', 'EmptySubclass']
+        assert subclass.filename == 'nodes.ts'
         assert subclass.description == 'An empty subclass'
         assert subclass.deprecated == False
         assert subclass.examples == []
         assert subclass.see_alsos == []
         assert subclass.properties == []
-        assert subclass.exported_from == 'analysis'
+        assert subclass.exported_from == 'nodes'
 
     def test_interface(self):
         """Test that interfaces get indexed and have their supers exposed.
@@ -208,7 +211,7 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
 
         """
         interface = self.analyzer.get_object(['Interface'])
-        assert interface.supers == ['analysis.SuperInterface']
+        assert interface.supers == ['nodes.SuperInterface']
 
     def test_variable(self):
         """Make sure top-level consts and vars are found."""
