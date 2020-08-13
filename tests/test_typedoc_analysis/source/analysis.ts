@@ -37,4 +37,8 @@ class ClassWithProperties {
 
   constructor(a: number) {
   }
+
+  get gettable(): number {
+    return 5;
+  }
 }

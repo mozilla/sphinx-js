@@ -151,13 +151,9 @@ class Analyzer:
                 interfaces=self.related_types(node, kind='implementedTypes'),
                 **self.top_level_properties(node))
         elif kind in ['Property', 'Variable']:
-            flags = node.get('flags', {})
             ir = Attribute(
                 types=self.make_type(node.get('type')),
-                is_abstract=flags.get('isAbstract', False),
-                is_optional=flags.get('isOptional', False),
-                is_static=flags.get('isStatic', False),
-                is_private=flags.get('isPrivate', False),
+                **member_properties(node),
                 **self.top_level_properties(node))
         elif kind == 'Accessor':  # NEXT: Then convert_node() should work. Unit-test, especially make_type(). Then write renderers.
             get_signature = node.get('getSignature')
@@ -170,8 +166,7 @@ class Analyzer:
                 type = node['setSignature'][0]['parameters'][0]['type']
             ir = Attribute(
                 types=self.make_type(type),
-                # Should this and other _Member properties be set here?
-                #is_private=flags.get('isPrivate', False),
+                **member_properties(node),
                 **self.top_level_properties(node))
         elif kind in ['Function', 'Constructor', 'Method']:
             # There's really nothing in these; all the interesting bits are in the
@@ -185,10 +180,9 @@ class Analyzer:
             first_sig = sigs[0]  # Should always have at least one
             first_sig['sources'] = node['sources']
             return self.convert_node(first_sig)
-        elif kind in ['Call signature', 'Constructor signature']:  # I had deleted "Constructor signature". I don't know why.
+        elif kind in ['Call signature', 'Constructor signature']:
             # This is the real meat of a function, method, or constructor.
-            parent = node['__parent']
-            flags = parent.get('flags', {})
+            #
             # Constructors' .name attrs end up being like 'new Foo'. They
             # should probably be called "constructor", but I'm not bothering
             # with that yet because nobody uses that attr on constructors atm.
@@ -198,10 +192,7 @@ class Analyzer:
                 # type system. More importantly, TypeDoc does not support them.
                 exceptions=[],
                 returns=self.make_returns(node),
-                is_abstract=flags.get('isAbstract', False),
-                is_optional=flags.get('isOptional', False),
-                is_static=flags.get('isStatic', False),
-                is_private=flags.get('isPrivate', False),
+                **member_properties(node),
                 **self.top_level_properties(node))
 
         return ir, node.get('children', [])
@@ -361,6 +352,15 @@ def make_description(comment):
                                         comment.get('text')]
                       if text)
     return ret.strip()
+
+
+def member_properties(node):
+    flags = node.get('flags', {})
+    return dict(
+        is_abstract=flags.get('isAbstract', False),
+        is_optional=flags.get('isOptional', False),
+        is_static=flags.get('isStatic', False),
+        is_private=flags.get('isPrivate', False))
 
 
 def short_name(node):

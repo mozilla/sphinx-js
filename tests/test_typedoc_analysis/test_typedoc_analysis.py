@@ -250,8 +250,10 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
         """Make sure properties are hooked onto classes and expose their
         flags."""
         cls = self.analyzer.get_object(['ClassWithProperties'])
-        # The properties are on the class:
-        assert len([m for m in cls.members if isinstance(m, Attribute)]) == 4
+        # The properties are on the class and are Attributes:
+        assert len([m for m in cls.members
+                    if isinstance(m, Attribute)
+                    and m.name in ['someStatic', 'someOptional', 'somePrivate', 'someNormal']]) == 4
         # The unique things about properties (over and above Variables) are set
         # right:
         assert self.analyzer.get_object(['ClassWithProperties.', 'someStatic']).is_static
@@ -262,3 +264,10 @@ class AnalyzerTests(TypeDocAnalyzerTestCase):
                 not normal_property.is_static and
                 not normal_property.is_abstract and
                 not normal_property.is_private)
+
+    def test_getter(self):
+        """Test that we represent getters as Attributes and find their return
+        types."""
+        getter = self.analyzer.get_object(['gettable'])
+        assert isinstance(getter, Attribute)
+        assert getter.types == ['number']
