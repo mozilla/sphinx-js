@@ -27,12 +27,10 @@ from dataclasses import dataclass, field, InitVar
 from typing import Any, List, NewType, Optional, Union
 
 
-#: List of types, which are whole-segment suffixes of pathnames, like
-#: 'foo.bar.Baz'. These are taken to be a unioned set of types. Types could
-#: even be parametrized by other types, but we probably don't care for IR
-#: purposes: let whichever analyzer boil them down to strings.
-Types = List[str]
-
+#: Human-readable type of a value. None if we don't know the type.
+Type = NewType('Type', Optional[str])
+#: Pathname, full or not, to an object:
+Pathname = NewType('Pathname', str)
 ReStructuredText = NewType('ReStructuredText', str)
 
 
@@ -70,7 +68,7 @@ class Param:
     description: ReStructuredText = ''
     has_default: bool = False
     is_variadic: bool = False
-    types: Types = field(default_factory=list)
+    type: Type = None
     #: Return the default value of this parameter, string-formatted so it can
     #: be immediately suffixed to an equal sign in a formal param list. For
     #: example, the number 6 becomes the string "6" to create ``foo=6``. If
@@ -86,16 +84,16 @@ class Param:
 @dataclass
 class Exc:
     """One kind of exception that can be raised by a function"""
-    #: The types the exception can have
-    types: Types
+    #: The type of exception can have
+    type: Type
     description: ReStructuredText
 
 
 @dataclass
 class Return:
     """One kind of thing a function can return"""
-    #: The types this kind of return value can have
-    types: Types
+    #: The type this kind of return value can have
+    type: Type
     description: ReStructuredText
 
 
@@ -147,8 +145,8 @@ class Attribute(TopLevel, _Member):
     directive which is used to display them.
 
     """
-    #: The types this property's value can have
-    types: Types
+    #: The type this property's value can have
+    type: Type
 
 
 @dataclass
@@ -168,7 +166,7 @@ class _MembersAndSupers:
     members: List[Union[Function, Attribute]]
     #: Objects this one extends: for example, superclasses of a class or
     #: superinterfaces of an interface
-    supers: Types
+    supers: List[Pathname]
 
 
 @dataclass
@@ -183,8 +181,8 @@ class Class(TopLevel, _MembersAndSupers):
     constructor: Optional[Function]
     #: Whether this is an abstract class
     is_abstract: bool
-    #: Names of interfaces this class implements
-    interfaces: Types
+    #: Interfaces this class implements
+    interfaces: List[Pathname]
     # There's room here for additional fields like @example on the class doclet
     # itself. These are supported and extracted by jsdoc, but they end up in an
     # `undocumented: True` doclet and so are presently filtered out. But we do

@@ -279,27 +279,25 @@ class AutoAttributeRenderer(JsRenderer):
             deprecated=obj.deprecated,
             see_also=obj.see_alsos,
             examples=obj.examples,
-            type=_or_types(obj.types),
+            type=obj.type,
             content='\n'.join(self._content))
 
 
 def _return_formatter(return_):
     """Derive heads and tail from ``@returns`` blocks."""
-    types = _or_types(return_.types)
-    tail = ('**%s** -- ' % rst.escape(types)) if types else ''
+    tail = ('**%s** -- ' % rst.escape(return_.type)) if return_.type else ''
     tail += return_.description
     return ['returns'], tail
 
 
 def _param_formatter(param):
     """Derive heads and tail from ``@param`` blocks."""
-    if not param.types and not param.description:
+    if not param.type and not param.description:
         # There's nothing worth saying about this param.
         return None
     heads = ['param']
-    types = _or_types(param.types)
-    if types:
-        heads.append(types)
+    if param.type:
+        heads.append(param.type)
     heads.append(param.name)
     tail = param.description
     return heads, tail
@@ -307,27 +305,21 @@ def _param_formatter(param):
 
 def _param_type_formatter(param):
     """Generate types for function parameters specified in field."""
-    if not param.types and not param.description:
+    if not param.type:
         return None
     # TODO: I'm not sure what this function is for.
     heads = ['type', param.name]
-    tail = rst.escape(_or_types(param.types))
+    tail = rst.escape(param.type)
     return heads, tail
 
 
 def _exception_formatter(exception):
     """Derive heads and tail from ``@throws`` blocks."""
     heads = ['throws']
-    types = _or_types(exception.types)
-    if types:
-        heads.append(types)
+    if exception.type:
+        heads.append(exception.type)
     tail = exception.description
     return heads, tail
-
-
-def _or_types(types):
-    """Bar-delimit a list of types."""
-    return '|'.join(types)
 
 
 def _dotted_path(segments):

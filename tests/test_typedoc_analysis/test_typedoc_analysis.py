@@ -216,7 +216,7 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
     def test_variable(self):
         """Make sure top-level consts and vars are found."""
         const = self.analyzer.get_object(['topLevelConst']);
-        assert const.types == []
+        assert const.type == None
 
     def test_function(self):
         """Make sure Functions, Params, and Returns are built properly for
@@ -228,16 +228,16 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
                       description='Some number',
                       has_default=True,
                       is_variadic=False,
-                      types=['number'],
+                      type='number',
                       default='1'),
                 Param(name='b',
                       description='Some strings',
                       has_default=False,
                       is_variadic=True,
-                      types=['string[]'])
+                      type='string[]')
             ]
         assert func.exceptions == []
-        assert func.returns == [Return(types=['number'], description='The best number')]
+        assert func.returns == [Return(type='number', description='The best number')]
 
     def test_constructor(self):
         """Make sure constructors get attached to classes and analyzed into
@@ -273,11 +273,11 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
         types."""
         getter = self.analyzer.get_object(['gettable'])
         assert isinstance(getter, Attribute)
-        assert getter.types == ['number']
+        assert getter.type == 'number'
 
     def test_setter(self):
         """Test that we represent setters as Attributes and find the type of
         their 1 param."""
         setter = self.analyzer.get_object(['settable'])
         assert isinstance(setter, Attribute)
-        assert setter.types == ['string']
+        assert setter.type == 'string'

@@ -149,7 +149,7 @@ class Analyzer:
             is_optional=False,
             is_static=False,
             is_private=is_private(doclet),
-            types=get_types(doclet),
+            type=get_type(doclet),
             **top_level_properties(doclet, full_path)
         )
 
@@ -210,7 +210,7 @@ def jsdoc_output(cache, abs_source_paths, base_dir, sphinx_conf_dir, config_path
             raise SphinxError('jsdoc found no JS files in the directories %s. Make sure js_source_path is set correctly in conf.py. It is also possible (though unlikely) that jsdoc emitted invalid JSON.' % abs_source_paths)
 
 
-def format_default_according_to_type_hints(value, declared_types):
+def format_default_according_to_type_hints(value, declared_types, first_type_is_string):
     """Return the default value for a param, formatted as a string
     ready to be used in a formal parameter list.
 
@@ -223,23 +223,17 @@ def format_default_according_to_type_hints(value, declared_types):
     :arg declared_types: A list of types declared in the doclet for
         this param. For example ``{string|number}`` would yield ['string',
         'number'].
+    :arg first_type_is_string: Whether the first declared type for this param
+        is string, which we use as a signal that any string-typed default value
+        in the JSON is legitimately string-typed rather than some arrow
+        function or something just encased in quotes because they couldn't
+        think what else to do. Thus, if you want your ambiguously documented
+        default like ``@param {string|Array} [foo=[]]`` to be treated as a
+        string, make sure "string" comes first.
 
     """
-    def first(list, default):
-        try:
-            return list[0]
-        except IndexError:
-            return default
-
-    declared_type_implies_string = first(declared_types, '') == 'string'
-
-    # If the first item of the type disjunction is "string", we treat
-    # the default value as a string. Otherwise, we don't. So, if you
-    # want your ambiguously documented default like ``@param
-    # {string|Array} [foo=[]]`` to be treated as a string, make sure
-    # "string" comes first.
     if isinstance(value, str):  # JSDoc threw it to us as a string in the JSON.
-        if declared_types and not declared_type_implies_string:
+        if declared_types and not first_type_is_string:
             # It's a spurious string, like ``() => 5`` or a variable name.
             # Let it through verbatim.
             return value
@@ -247,7 +241,7 @@ def format_default_according_to_type_hints(value, declared_types):
             # It's a real string.
             return dumps(value)  # Escape any contained quotes.
     else:  # It came in as a non-string.
-        if declared_type_implies_string:
+        if first_type_is_string:
             # It came in as an int, null, or bool, and we have to
             # convert it back to a string.
             return '"%s"' % (dumps(value),)
@@ -260,10 +254,12 @@ def unwrapped_description(obj):
     return sub(r'[ \t]*[\r\n]+[ \t]*', ' ', obj.get('description', ''))  # TODO: Don't unwrap unless totally unindented. Maybe this would let us support OLs and ULs in param descriptions.
 
 
-def get_types(props):
+def get_type(props):
     """Given an arbitrary object from a jsdoc-emitted JSON file, go get the
-    ``type`` property, and return a list of all the type names."""
-    return props.get('type', {}).get('names', [])
+    ``type`` property, and return the textual rendering of the type, possibly a
+    union like ``Foo | Bar``, or None if we don't know the type."""
+    names = props.get('type', {}).get('names', [])
+    return '|'.join(names) if names else None
 
 
 def top_level_properties(doclet, full_path):
@@ -289,7 +285,7 @@ def top_level_properties(doclet, full_path):
 
 def properties_to_ir(properties):
     """Turn jsdoc-emitted properties JSON into a list of Properties."""
-    return [Attribute(types=get_types(p),
+    return [Attribute(type=get_type(p),
                       name=p['name'],
                       # We can get away with setting null values for these
                       # because we never use them for anything:
@@ -307,6 +303,11 @@ def properties_to_ir(properties):
                       is_static=False,
                       is_private=False)
             for p in properties]
+
+
+def first_type_is_string(type):
+    type_names = type.get('names', [])
+    return type_names and type_names[0] == 'string'
 
 
 def params_to_ir(doclet):
@@ -338,16 +339,21 @@ def params_to_ir(doclet):
 
     # First, go through the explicitly documented params:
     for p in doclet.get('params', []):
-        types = get_types(p)
+        type = get_type(p)
         default = p.get('defaultvalue', NO_DEFAULT)
-        formatted_default = 'dummy' if default is NO_DEFAULT else format_default_according_to_type_hints(default, types)
+        formatted_default = (
+            'dummy' if default is NO_DEFAULT else
+            format_default_according_to_type_hints(
+                default,
+                type,
+                first_type_is_string(p.get('type', {}))))
         ret.append(Param(
             name=p['name'],
             description=p.get('description', ''),
             has_default=default is not NO_DEFAULT,
             default=formatted_default,
             is_variadic=p.get('variable', False),
-            types=get_types(p)))
+            type=get_type(p)))
 
     # Use params from JS code if there are no documented @params.
     if not ret:
@@ -359,12 +365,12 @@ def params_to_ir(doclet):
 
 def exceptions_to_ir(exceptions):
     """Turn jsdoc's JSON-formatted exceptions into a list of Exceptions."""
-    return [Exc(types=get_types(e),
+    return [Exc(type=get_type(e),
                 description=unwrapped_description(e))
             for e in exceptions]
 
 
 def returns_to_ir(returns):
-    return [Return(types=get_types(r),
+    return [Return(type=get_type(r),
                    description=unwrapped_description(r))
             for r in returns]

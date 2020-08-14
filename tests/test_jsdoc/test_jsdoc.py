@@ -51,17 +51,17 @@ class FunctionTests(JsDocTestCase):
                           description='Which bar',
                           has_default=False,
                           is_variadic=False,
-                          types=['String']),
+                          type='String'),
                     Param(name='baz',
                           description='',
                           has_default=True,
                           default='8',
                           is_variadic=False,
-                          types=[])],
-            exceptions=[Exc(types=[],
+                          type=None)],
+            exceptions=[Exc(type=None,
                             description='ExplosionError It went boom.')],
             returns=[
-                Return(types=['Number'],
+                Return(type='Number',
                        description='How many things there are')])  # Test text unwrapping.
 
 
@@ -102,4 +102,4 @@ class ClassTests(JsDocTestCase):
                                             description='A thing',
                                             has_default=False,
                                             is_variadic=False,
-                                            types=[])]
+                                            type=None)]

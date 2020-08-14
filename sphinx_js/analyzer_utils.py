@@ -1,4 +1,5 @@
 """Conveniences shared among analyzers"""
+
 from functools import wraps
 import os
 

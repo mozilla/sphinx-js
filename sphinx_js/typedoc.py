@@ -12,7 +12,7 @@ from typing import List, Optional, Tuple, Union
 from sphinx.errors import SphinxError
 
 from .analyzer_utils import Command, is_explicitly_rooted
-from .ir import Attribute, Class, Exc, Function, Interface, NO_DEFAULT, Param, Return, TopLevel, Types
+from .ir import Attribute, Class, Exc, Function, Interface, NO_DEFAULT, Param, Return, TopLevel
 from .suffix_tree import SuffixTree
 
 
@@ -152,7 +152,7 @@ class Analyzer:
                 **self.top_level_properties(node))
         elif kind in ['Property', 'Variable']:
             ir = Attribute(
-                types=self.make_type(node.get('type')),
+                type=self.make_type(node.get('type')),
                 **member_properties(node),
                 **self.top_level_properties(node))
         elif kind == 'Accessor':  # NEXT: Then convert_node() should work. Unit-test, especially make_type(). Then write renderers.
@@ -165,7 +165,7 @@ class Analyzer:
                 # have multiple signatures, though.
                 type = node['setSignature'][0]['parameters'][0]['type']
             ir = Attribute(
-                types=self.make_type(type),
+                type=self.make_type(type),
                 **member_properties(node),
                 **self.top_level_properties(node))
         elif kind in ['Function', 'Constructor', 'Method']:
@@ -205,7 +205,7 @@ class Analyzer:
         return types
 
     # TODO: Unit-test me.
-    def make_type(self, type) -> Types:
+    def make_type(self, type):
         """Construct a list of types from a TypeDoc ``type`` entry.
 
         Return a list of 1 type, or [] if none is specified.
@@ -273,7 +273,7 @@ class Analyzer:
             # For now, we just pass a single string in as the type rather than a
             # list of types to be unioned by the renderer. There's really no
             # disadvantage.
-            types=self.make_type(param.get('type', {})),
+            type=self.make_type(param.get('type', {})),
             default=param['defaultValue'] if has_default else NO_DEFAULT)
 
     def make_returns(self, signature) -> List[Return]:
@@ -288,7 +288,7 @@ class Analyzer:
             # Returns nothing
             return []
         return [Return(
-            types=self.make_type(type),
+            type=self.make_type(type),
             description=signature.get('comment', {}).get('returns', '').strip())]
 
 
