@@ -152,10 +152,10 @@ class Analyzer:
                 **self.top_level_properties(node))
         elif kind in ['Property', 'Variable']:
             ir = Attribute(
-                type=self.make_type(node.get('type')),
+                type=self.type_name(node.get('type')),
                 **member_properties(node),
                 **self.top_level_properties(node))
-        elif kind == 'Accessor':  # NEXT: Then convert_node() should work. Unit-test, especially make_type(). Then write renderers.
+        elif kind == 'Accessor':  # NEXT: Unit-test type_name(). Then write renderers.
             get_signature = node.get('getSignature')
             if get_signature:
                 # There's no signature to speak of for a getter: only a return type.
@@ -165,7 +165,7 @@ class Analyzer:
                 # have multiple signatures, though.
                 type = node['setSignature'][0]['parameters'][0]['type']
             ir = Attribute(
-                type=self.make_type(type),
+                type=self.type_name(type),
                 **member_properties(node),
                 **self.top_level_properties(node))
         elif kind in ['Function', 'Constructor', 'Method']:
@@ -198,69 +198,76 @@ class Analyzer:
         return ir, node.get('children', [])
 
     def related_types(self, node, kind):
-        """Return the names of implemented or extended classes or interfaces or maybe paths to them. I'm not sure."""
+        """Return the unambiguous pathnames of implemented interfaces or
+        extended classes.
+
+        If we encounter a formulation of interface or class reference that we
+        don't understand (which I expect to occur only if it turns out you can
+        use a class or interface literal rather than referencing a declared
+        one), return 'UNIMPLEMENTED' for that interface or class so somebody
+        files a bug requesting we fix it. (It's not worth crashing for.)
+
+        """
         types = []
         for type in node.get(kind, []):
-            types.append(' '.join(self.make_type(type)))
+            if type['type'] == 'reference':
+                pathname = ''.join(make_path_segments(self._index[type['id']],
+                                                      self._base_dir))
+            else:
+                pathname = 'UNIMPLEMENTED'
+            types.append(pathname)
         return types
 
     # TODO: Unit-test me.
-    def make_type(self, type):
-        """Construct a list of types from a TypeDoc ``type`` entry.
+    def type_name(self, type):
+        """Return a string description of a type.
 
-        Return a list of 1 type, or [] if none is specified.
+        :arg type: A TypeDoc-emitted type node
 
         """
-        names = []
         type_of_type = type.get('type')
+
         if type_of_type == 'reference' and type.get('id'):
             node = self._index[type['id']]
-            # Should be: names = [ self.make_longname(node)]
-            parent = node['__parent']
-            if parent.get('kindString') == 'External module':
-                names = [parent['name'][1:-1] + '.' + node['name']]
-            else:
-                names = [node['name']]
+            name = node['name']
         elif type_of_type == 'unknown':
             if re.match(r'-?\d*(\.\d+)?', type['name']):  # It's a number.
                 # TypeDoc apparently sticks numeric constants' values into the
                 # type name. String constants? Nope. Function ones? Nope.
-                names = []
+                name = 'number'
             else:
-                names = [type['name']]
+                name = type['name']
         elif type_of_type in ['intrinsic', 'reference']:
-            names = [type['name']]
+            name = type['name']
         elif type_of_type == 'stringLiteral':
-            names = ['"' + type['value'] + '"']
+            name = '"' + type['value'] + '"'
         elif type_of_type == 'array':
-            names = [self.make_type(type['elementType'])[0] + '[]']
+            name = self.type_name(type['elementType']) + '[]'
         elif type_of_type == 'tuple' and type.get('elements'):
-            types = ['|'.join(self.make_type(t)) for t in type['elements']]
-            names = ['[' + ','.join(types) + ']']
+            types = [self.type_name(t) for t in type['elements']]
+            name = '[' + ', '.join(types) + ']'
         elif type_of_type == 'union':
-            types = []
-            for t in type['types']:
-                mt = self.make_type(t)
-                if mt:  # Avoid []s (untyped things)
-                    types.append(mt)
-            names = ['|'.join(types)]
+            name = '|'.join(self.type_name(t) for t in type['types'])
         elif type_of_type == 'typeOperator':
-            target_name = self.make_type(type['target'])
-            names = [type['operator'] + ':' + ':'.join(target_name)]
+            name = type['operator'] + ' ' + self.type_name(type['target'])
+            # e.g. "keyof T"
         elif type_of_type == 'typeParameter':
-            names = [type['name']]
+            name = type['name']
             constraint = type.get('constraint')
             if constraint is not None:
-                names.extend(['extends', self.make_type(constraint)])  # TODO: Longer list than we want. Join it with spaces?
+                name += ' extends ' + self.type_name(constraint)
+                # e.g. K += extends + keyof T
         elif type_of_type == 'reflection':
-            names = ['<TODO>']
+            name = '<TODO: reflection>'
+        else:
+            name = 'UNIMPLEMENTED'
 
         type_args = type.get('typeArguments')
         if type_args:
-            arg_names = ['|'.join(self.make_type(arg)) for arg in type_args]
-            names = [names[0] + '<' + ','.join(arg_names) + '>']
+            arg_names = ', '.join(self.type_name(arg) for arg in type_args)
+            name += f'<{arg_names}>'
 
-        return names
+        return name
 
     def make_param(self, param):
         """Make a Param from a 'parameters' JSON item"""
@@ -273,7 +280,7 @@ class Analyzer:
             # For now, we just pass a single string in as the type rather than a
             # list of types to be unioned by the renderer. There's really no
             # disadvantage.
-            type=self.make_type(param.get('type', {})),
+            type=self.type_name(param.get('type', {})),
             default=param['defaultValue'] if has_default else NO_DEFAULT)
 
     def make_returns(self, signature) -> List[Return]:
@@ -288,7 +295,7 @@ class Analyzer:
             # Returns nothing
             return []
         return [Return(
-            type=self.make_type(type),
+            type=self.type_name(type),
             description=signature.get('comment', {}).get('returns', '').strip())]
 
 
@@ -331,8 +338,9 @@ def index_by_id(index, node, parent=None):
             node['__parent'] = parent  # Parents are used for (1) building longnames, (2) setting memberof (which we shouldn't have to do anymore; we can just traverse children), (3) getting the module a class or interface is defined in so we can link to it, and (4) one other things, so it's worth setting them.
             index[id] = node
 
-        # Burrow into everything that could contain more ID'd items:
-        for tag in ['children', 'signatures', 'parameters']:  # TODO: Add setSignature, probably. And getSignature. Do we need indexSignature?
+        # Burrow into everything that could contain more ID'd items. We don't
+        # need setSignature or getSignature for now. Do we need indexSignature?
+        for tag in ['children', 'signatures', 'parameters']:
             for child in node.get(tag, []):
                 index_by_id(index, child, parent=node)
 
@@ -343,7 +351,7 @@ def index_by_id(index, node, parent=None):
 #         if isinstance(type, dict) and type['type'] != 'reference':
 #             # index_by_id(index, type, parent=node)  # I don't think any non-reference type has an ID, so this never does anything.
 #             # I found these only in "type" properties:
-#             index_by_id(index, node.get('declaration'), parent=None)  # Seems like this should be parent=parent, since "type" properties never have seem to have IDs.  # Further, I don't see what good assigning any parent here does, since make_type_name() doesn't implement reference types yet.
+#             index_by_id(index, node.get('declaration'), parent=None)  # Seems like this should be parent=parent, since "type" properties never have seem to have IDs.  # Further, I don't see what good assigning any parent here does, since type_name() doesn't implement reference types yet.
 
 
 def make_description(comment):

@@ -134,7 +134,7 @@ class TopLevel:
     properties: List['Attribute']
     #: None if not exported for use by outside code. Otherwise, the Sphinx
     #: dotted path to the module it is exported from, e.g. 'foo.bar'
-    exported_from: Optional[str]
+    exported_from: Optional[str]  # TODO: Should this be a Pathname instead?
 
 
 @dataclass

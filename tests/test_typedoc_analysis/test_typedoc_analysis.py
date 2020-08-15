@@ -184,10 +184,10 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
         assert isinstance(subclass, Class)
         assert subclass.constructor is None
         assert subclass.is_abstract
-        assert subclass.interfaces == ['nodes.Interface']
+        assert subclass.interfaces == ['./nodes.Interface']
 
         # _MembersAndSupers attrs:
-        assert subclass.supers == ['nodes.Superclass']
+        assert subclass.supers == ['./nodes.Superclass']
         assert subclass.members == []
 
         # TopLevel attrs. This should cover them for other kinds of objs as
@@ -211,16 +211,20 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
 
         """
         interface = self.analyzer.get_object(['Interface'])
-        assert interface.supers == ['nodes.SuperInterface']
+        assert interface.supers == ['./nodes.SuperInterface']
 
     def test_variable(self):
         """Make sure top-level consts and vars are found."""
         const = self.analyzer.get_object(['topLevelConst']);
-        assert const.type == None
+        assert const.type == 'number'
 
     def test_function(self):
         """Make sure Functions, Params, and Returns are built properly for
-        top-level functions."""
+        top-level functions.
+
+        This covers a few simple function typing cases as well.
+
+        """
         func = self.analyzer.get_object(['func'])
         assert isinstance(func, Function)
         assert func.params == [
@@ -281,3 +285,31 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
         setter = self.analyzer.get_object(['settable'])
         assert isinstance(setter, Attribute)
         assert setter.type == 'string'
+
+
+class TypeNameTests(TypeDocAnalyzerTestCase):
+    """Make sure our rendering of TypeScript types into text works."""
+
+    files = ['types.ts']
+
+    def test_basic(self):
+        """Test intrinsic types."""
+        for obj_name, type_name in [
+                    ('bool', 'boolean'),
+                    ('num', 'number'),
+                    ('str', 'string'),
+                    ('array', 'number[]'),
+                    ('genericArray', 'Array<number>'),
+                    ('tuple', '[string, number]'),
+                    ('color', 'Color'),
+                    ('unk', 'unknown'),
+                    ('whatever', 'any'),
+                    ('voidy', 'void'),
+                    ('undef', 'undefined'),
+                    ('nully', 'null'),
+                    ('nev', 'never'),
+                    ('obj', 'object'),
+                    ('sym', 'symbol'),
+                ]:
+            obj = self.analyzer.get_object([obj_name])
+            assert obj.type == type_name
