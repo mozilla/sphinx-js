@@ -24,27 +24,16 @@ let sym: symbol;
 
 // Interfaces (https://www.typescriptlang.org/docs/handbook/interfaces.html)
 
-function objProps(a: {label: string}) {
-}
-
 interface Interface {
-  label: string;
-  [someProp: number]: string;
   readonly readOnlyNum: number;
+  [someProp: number]: string;  // Just a smoketest for now. We'll need more work to handle members with no names.
 }
 
 function interfacer(a: Interface) {
 }
 
-let option: {a: number; b?: string};
-
 interface FunctionInterface {
-  (thing: string, ding: number): boolean;
-  additionalCallableProperty(): void;
-}
-
-interface StringArray {
-  [index: number]: string;
+  (thing: string, ding: number): boolean;  // just a smoketest for now
 }
 
 // Functions. Basic function types are covered by ConvertNodeTests.test_function.
@@ -114,3 +103,7 @@ let partial: Partial<string>;
 
 // Complex: nested nightmares that show our ability to handle compound typing constructs
 
+function objProps(a: {label: string}) {
+}
+
+let option: {a: number; b?: string};

@@ -213,6 +213,13 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
         interface = self.analyzer.get_object(['Interface'])
         assert interface.supers == ['./nodes.SuperInterface']
 
+    def test_interface_function_member(self):
+        """Make sure function-like properties are understood."""
+        obj = self.analyzer.get_object(['InterfaceWithMembers'])
+        prop = obj.members[0]
+        assert isinstance(prop, Function)
+        assert prop.name == 'callableProperty'
+
     def test_variable(self):
         """Make sure top-level consts and vars are found."""
         const = self.analyzer.get_object(['topLevelConst']);
@@ -313,3 +320,16 @@ class TypeNameTests(TypeDocAnalyzerTestCase):
                 ]:
             obj = self.analyzer.get_object([obj_name])
             assert obj.type == type_name
+
+    def test_named_interface(self):
+        """Make sure interfaces can be referenced by name."""
+        obj = self.analyzer.get_object(['interfacer'])
+        assert obj.params[0].type == 'Interface'
+
+    def test_interface_readonly_member(self):
+        """Make sure the readonly modifier doesn't keep us from computing the
+        type of a property."""
+        obj = self.analyzer.get_object(['Interface'])
+        read_only_num = obj.members[0]
+        assert read_only_num.name == 'readOnlyNum'
+        assert read_only_num.type == 'number'

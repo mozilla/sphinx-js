@@ -9,6 +9,10 @@ interface SuperInterface {
 interface Interface extends SuperInterface {
 }
 
+interface InterfaceWithMembers {
+  callableProperty(): void;
+}
+
 /**
  * An empty subclass
  */
