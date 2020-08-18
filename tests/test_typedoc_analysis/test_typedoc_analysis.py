@@ -354,3 +354,7 @@ class TypeNameTests(TypeDocAnalyzerTestCase):
         """Make sure unions get rendered properly."""
         obj = self.analyzer.get_object(['union'])
         assert obj.type == 'number | string | Color'
+
+    def test_intersection(self):
+        obj = self.analyzer.get_object(['intersection'])
+        assert obj.type == 'FooHaver & BarHaver'
