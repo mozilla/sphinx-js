@@ -29,6 +29,14 @@ from typing import Any, List, NewType, Optional, Union
 
 #: Human-readable type of a value. None if we don't know the type.
 Type = NewType('Type', Optional[str])
+# In the far future, we may take full control of our RST templates rather than
+# using the js-domain directives provided by Sphinx. This would give us the
+# freedom to link type names in formal param lists and param description lists
+# to their definitions. To do this, we could replace the string-based Type with
+# a class-based Type which internally preserves the structure of the type
+# (simple for JS, fancy for TS) and can, on request, render it out as either
+# text or link-having RST.
+
 #: Pathname, full or not, to an object:
 Pathname = NewType('Pathname', str)
 ReStructuredText = NewType('ReStructuredText', str)
