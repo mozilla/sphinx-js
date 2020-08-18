@@ -72,9 +72,6 @@ function aryIdentity<T>(things: T[]): T[] {
   return things;
 }
 
-// This has a creative default value: " aryIdentity(['str'])".
-const identityString = aryIdentity(['str']);
-
 class GenericNumber<T> {
   add: (x: T, y: T) => T;
 }
