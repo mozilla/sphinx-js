@@ -26,7 +26,7 @@ let sym: symbol;
 
 interface Interface {
   readonly readOnlyNum: number;
-  [someProp: number]: string;  // Just a smoketest for now. We'll need more work to handle members with no names.
+  [someProp: number]: string;  // Just a smoketest for now. (IOW, make sure the analysis engine doesn't crash on it.) We'll need more work to handle members with no names.
 }
 
 function interfacer(a: Interface) {
@@ -38,7 +38,7 @@ interface FunctionInterface {
 
 // Functions. Basic function types are covered by ConvertNodeTests.test_function.
 
-function noThis(this: void) {
+function noThis(this: void) {  // smoketest
 }
 
 // Make sure multi-signature functions don't crash us:

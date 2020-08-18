@@ -333,3 +333,13 @@ class TypeNameTests(TypeDocAnalyzerTestCase):
         read_only_num = obj.members[0]
         assert read_only_num.name == 'readOnlyNum'
         assert read_only_num.type == 'number'
+
+    def test_array(self):
+        """Make sure array types are rendered correctly.
+
+        As a bonus, make sure we grab the first signature of an overloaded
+        function.
+
+        """
+        obj = self.analyzer.get_object(['overload'])
+        assert obj.params[0].type == 'string[]'
