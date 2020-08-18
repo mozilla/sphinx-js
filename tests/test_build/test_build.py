@@ -279,8 +279,8 @@ FIELDS = u"""
       * **node** (*Node*) -- Something of a single type
 
    Throws:
-      **PartyError|FartyError** -- Something with multiple types and a
-      line that wraps
+      **PartyError | FartyError** -- Something with multiple types and
+      a line that wraps
 
    Returns:
       **Number** -- What a thing

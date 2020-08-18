@@ -343,3 +343,14 @@ class TypeNameTests(TypeDocAnalyzerTestCase):
         """
         obj = self.analyzer.get_object(['overload'])
         assert obj.params[0].type == 'string[]'
+
+    def test_literal_types(self):
+        """Make sure a thing of a named literal type has that type name
+        attached."""
+        obj = self.analyzer.get_object(['certainNumbers'])
+        assert obj.type == 'CertainNumbers'
+
+    def test_unions(self):
+        """Make sure unions get rendered properly."""
+        obj = self.analyzer.get_object(['union'])
+        assert obj.type == 'number | string | Color'

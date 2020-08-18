@@ -247,7 +247,7 @@ class Analyzer:
             types = [self.type_name(t) for t in type['elements']]
             name = '[' + ', '.join(types) + ']'
         elif type_of_type == 'union':
-            name = '|'.join(self.type_name(t) for t in type['types'])
+            name = ' | '.join(self.type_name(t) for t in type['types'])
         elif type_of_type == 'typeOperator':
             name = type['operator'] + ' ' + self.type_name(type['target'])
             # e.g. "keyof T"

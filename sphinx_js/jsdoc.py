@@ -259,7 +259,7 @@ def get_type(props):
     ``type`` property, and return the textual rendering of the type, possibly a
     union like ``Foo | Bar``, or None if we don't know the type."""
     names = props.get('type', {}).get('names', [])
-    return '|'.join(names) if names else None
+    return ' | '.join(names) if names else None
 
 
 def top_level_properties(doclet, full_path):
