@@ -49,3 +49,7 @@ class ClassWithProperties {
   set settable(value: string) {
   }
 }
+
+class Indexable {
+  [id:string]: any;  // smoketest
+}
