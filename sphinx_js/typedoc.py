@@ -261,6 +261,7 @@ class Analyzer:
                 # e.g. K += extends + keyof T
         elif type_of_type == 'reflection':
             name = '<TODO: reflection>'
+            # test_generic_member() (currently skipped) tests this.
         else:
             name = 'UNIMPLEMENTED'
 

@@ -386,3 +386,25 @@ class TypeNameTests(TypeDocAnalyzerTestCase):
         obj = self.analyzer.get_object(['getProperty'])
         assert obj.params[1].type == 'K extends keyof T'
 
+    @pytest.mark.xfail(reason='reflection not implemented yet')
+    def test_constrained_by_constructor(self):
+        """Make sure ``new ()`` expressions and, more generally, per-property
+        constraints are rendered properly."""
+        obj = self.analyzer.get_object(['create'])
+        assert obj.params[0].type == '{new (): T}'
+
+    def test_utility_types(self):
+        """Test that a representative one of TS's utility types renders."""
+        obj = self.analyzer.get_object(['partial'])
+        assert obj.type == 'Partial<string>'
+
+    @pytest.mark.xfail(reason='reflection not implemented yet')
+    def test_constrained_by_property(self):
+        obj = self.analyzer.get_object(['objProps'])
+        assert obj.params[0].type == '{label: string}'
+
+    @pytest.mark.xfail(reason='reflection not implemented yet')
+    def test_optional_property(self):
+        """Make sure optional properties render properly."""
+        obj = self.analyzer.get_object(['option'])
+        assert obj.type == '{a: number; b?: string}'
