@@ -2,6 +2,8 @@ from json import loads
 from os.path import dirname
 from unittest import TestCase
 
+import pytest
+
 from sphinx_js.ir import Attribute, Class, Exc, Function, Param, Return
 from sphinx_js.typedoc import index_by_id, make_path_segments
 
@@ -364,3 +366,11 @@ class TypeNameTests(TypeDocAnalyzerTestCase):
         obj = self.analyzer.get_object(['aryIdentity'])
         assert obj.params[0].type == 'T[]'
         assert obj.returns[0].type == 'T[]'
+
+    @pytest.mark.xfail(reason='reflection not implemented yet')
+    def test_generic_member(self):
+        """Make sure members of a class have their type params taken into
+        account."""
+        obj = self.analyzer.get_object(['add'])
+        assert obj.type == 'T'
+        assert obj.params[0].type == 'T'
