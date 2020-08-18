@@ -358,3 +358,9 @@ class TypeNameTests(TypeDocAnalyzerTestCase):
     def test_intersection(self):
         obj = self.analyzer.get_object(['intersection'])
         assert obj.type == 'FooHaver & BarHaver'
+
+    def test_generic_function(self):
+        """Make sure type params appear in args and return types."""
+        obj = self.analyzer.get_object(['aryIdentity'])
+        assert obj.params[0].type == 'T[]'
+        assert obj.returns[0].type == 'T[]'
