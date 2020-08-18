@@ -374,3 +374,15 @@ class TypeNameTests(TypeDocAnalyzerTestCase):
         obj = self.analyzer.get_object(['add'])
         assert obj.type == 'T'
         assert obj.params[0].type == 'T'
+
+    def test_constrained_by_interface(self):
+        """Make sure ``extends SomeInterface`` constraints are rendered."""
+        obj = self.analyzer.get_object(['constrainedIdentity'])
+        assert obj.params[0].type == 'T extends Lengthwise'
+        assert obj.returns[0].type == 'T extends Lengthwise'
+
+    def test_constrained_by_key(self):
+        """Make sure ``extends keyof SomeObject`` constraints are rendered."""
+        obj = self.analyzer.get_object(['getProperty'])
+        assert obj.params[1].type == 'K extends keyof T'
+
