@@ -349,6 +349,7 @@ Version History
   * Remove the "exported from" module links from classes and interfaces. Functions never had them. Let's see if we miss them.
   * Add support for static properties on TS classes.
   * Support variadic args in TS.
+  * Support intersection types (``foo & bar``) in TS.
   * Pathnames for TypeScript objects no longer spuriously use ``~`` after the filename path segment; now they use ``.`` as in JS.
   * More generally, TS pathnames are now just like JS ones. There is no more ``external:`` prefix in front of filenames or ``module:`` in front of namespace names.
 

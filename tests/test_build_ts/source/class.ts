@@ -27,3 +27,16 @@ class ClassDefinition {
 
     }
 }
+
+interface Interface {
+}
+
+abstract class ClassWithSupersAndInterfacesAndAbstract extends ClassDefinition implements Interface {
+  /** I construct. */
+  constructor() {
+    super(8);
+  }
+}
+
+interface InterfaceWithSupers extends Interface {
+}

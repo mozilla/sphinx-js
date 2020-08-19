@@ -191,7 +191,9 @@ class Analyzer:
                 # Exceptions are discouraged in TS as being unrepresentable in its
                 # type system. More importantly, TypeDoc does not support them.
                 exceptions=[],
-                returns=self.make_returns(node),
+                # Though perhaps technically true, it looks weird to the user
+                # (and in the template) if constructors have a return value:
+                returns=self.make_returns(node) if kind != 'Constructor signature' else [],
                 **member_properties(node),
                 **self.top_level_properties(node))
 
@@ -218,7 +220,6 @@ class Analyzer:
             types.append(pathname)
         return types
 
-    # TODO: Unit-test me.
     def type_name(self, type):
         """Return a string description of a type.
 
@@ -263,7 +264,7 @@ class Analyzer:
             name = '<TODO: reflection>'
             # test_generic_member() (currently skipped) tests this.
         else:
-            name = 'UNIMPLEMENTED'
+            name = '<TODO: other type>'
 
         type_args = type.get('typeArguments')
         if type_args:

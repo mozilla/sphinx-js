@@ -110,7 +110,6 @@ class Analyzer:
             member_full_path = full_path_segments(member_doclet, self._base_dir)
             # Typedefs should still fit into function-shaped holes:
             doclet_as_whatever = self._doclet_as_function if (kind == 'function' or kind == 'typedef') else self._doclet_as_attribute
-            # TODO: What about inner classes? Can they happen?
             member = doclet_as_whatever(member_doclet, member_full_path)
             members.append(member)
         return Class(

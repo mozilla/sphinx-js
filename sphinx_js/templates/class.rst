@@ -8,6 +8,14 @@
      {{ class_comment|indent(3) }}
    {%- endif %}
 
+   {% if is_abstract -%}
+     *abstract*
+   {%- endif %}
+
+   {% if is_interface -%}
+     *interface*
+   {%- endif %}
+
    {% if constructor_comment -%}
      {{ constructor_comment|indent(3) }}
    {%- endif %}

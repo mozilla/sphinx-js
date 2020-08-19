@@ -5,7 +5,7 @@ from jinja2 import Environment, PackageLoader
 from sphinx.errors import SphinxError
 from sphinx.util import rst
 
-from .ir import Function
+from .ir import Class, Function, Interface
 from .parsers import PathVisitor
 from .suffix_tree import SuffixAmbiguous, SuffixNotFound
 
@@ -175,7 +175,7 @@ class AutoFunctionRenderer(JsRenderer):
             see_also=obj.see_alsos,
             content='\n'.join(self._content))
 
-# TODO: Display .is_optional and .is_abstact in the templates.
+# TODO: Display .is_optional in the templates.
 # TODO: Have autoclass say "interface" if it's an interface rather than a class.
 # List implemented .interfaces and stick :js:class: in front of each. .supers too.
 # Say `*exported from* :js:mod:{obj.exported_from}` if exported_from isn't None.
@@ -186,19 +186,21 @@ class AutoClassRenderer(JsRenderer):
     _renderer_type = 'class'
 
     def _template_vars(self, name, obj):
-        # At the moment, we pull most fields (params, returns, exceptions,
-        # etc.) off the constructor only. We could pull them off the class
-        # itself too in the future.
+        # TODO: At the moment, we pull most fields (params, returns,
+        # exceptions, etc.) off the constructor only. We could pull them off
+        # the class itself too in the future.
         return dict(
             name=name,
             # TODO: Deal with the case that the constructor is None.
-            params=self._formal_params(obj.constructor),
-            fields=self._fields(obj.constructor),
-            examples=obj.constructor.examples,
-            deprecated=obj.constructor.deprecated,
-            see_also=obj.constructor.see_alsos,
+            params=self._formal_params(obj.constructor) if isinstance(obj, Class) else '',
+            fields=self._fields(obj.constructor) if isinstance(obj, Class) else [],
+            examples=obj.constructor.examples if isinstance(obj, Class) else [],
+            deprecated=obj.constructor.deprecated if isinstance(obj, Class) else [],
+            see_also=obj.constructor.see_alsos if isinstance(obj, Class) else [],
             class_comment=obj.description,
-            constructor_comment=obj.constructor.description,
+            is_abstract=isinstance(obj, Class) and obj.is_abstract,
+            is_interface=isinstance(obj, Interface),  # TODO: Make interfaces not look so much like classes. This will require taking complete control of templating from Sphinx.
+            constructor_comment=obj.constructor.description if isinstance(obj, Class) else '',
             content='\n'.join(self._content),
             members=self._members_of(obj,
                                      include=self._options['members'],
