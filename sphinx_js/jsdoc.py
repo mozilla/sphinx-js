@@ -16,7 +16,7 @@ from tempfile import TemporaryFile
 from sphinx.errors import SphinxError
 
 from .analyzer_utils import cache_to_file, Command, is_explicitly_rooted
-from .ir import Attribute, Class, Exc, Function, NO_DEFAULT, Param, Return
+from .ir import Attribute, Class, Exc, Function, NO_DEFAULT, Param, Pathname, Return
 from .parsers import path_and_formal_params, PathVisitor
 from .suffix_tree import SuffixTree
 
@@ -270,7 +270,7 @@ def top_level_properties(doclet, full_path):
     """
     return dict(
         name=doclet['name'],
-        path_segments=full_path,
+        path=Pathname(full_path),
         #fs_path=join(doclet['meta']['path'], doclet['meta']['filename']),
         filename=doclet['meta']['filename'],
         # description's source varies depending on whether the doclet is a
@@ -288,7 +288,7 @@ def properties_to_ir(properties):
                       name=p['name'],
                       # We can get away with setting null values for these
                       # because we never use them for anything:
-                      path_segments=[],
+                      path=Pathname([]),
                       filename='',
                       description=unwrapped_description(p),
                       line=0,

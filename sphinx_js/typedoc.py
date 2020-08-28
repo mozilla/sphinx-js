@@ -28,7 +28,7 @@ class Analyzer:
         self._index = index_by_id({}, json)  # TODO: Toss this overboard when we're done with it to save RAM.
         ir_objects = self.convert_all_nodes(json)
         self._objects_by_path = SuffixTree()
-        self._objects_by_path.add_many((obj.path_segments, obj) for obj in ir_objects)
+        self._objects_by_path.add_many((obj.path.segments, obj) for obj in ir_objects)
 
     @classmethod
     def from_disk(cls, abs_source_paths, app, base_dir):
@@ -68,7 +68,7 @@ class Analyzer:
             exported_from = None
         return dict(
             name=short_name(node),
-            path_segments=make_path_segments(node, self._base_dir),
+            path=Pathname(make_path_segments(node, self._base_dir)),
             filename=basename(source['fileName']),
             description=make_description(node.get('comment', {})),
             line=source['line'],

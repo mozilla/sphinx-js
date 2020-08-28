@@ -6,7 +6,7 @@ from sphinx.errors import SphinxError
 from sphinx.util import rst
 
 from .analyzer_utils import dotted_path
-from .ir import Class, Function, Interface
+from .ir import Class, Function, Interface, Pathname
 from .parsers import PathVisitor
 from .suffix_tree import SuffixAmbiguous, SuffixNotFound
 
@@ -82,7 +82,7 @@ class JsRenderer(object):
             # Not sure if passing the settings from the "real" doc is the right
             # thing to do here:
             doc = new_document('%s:%s(%s)' % (obj.filename,
-                                              ''.join(obj.path_segments),
+                                              obj.path,
                                               obj.line),
                                settings=self._directive.state.document.settings)
             RstParser().parse(rst, doc)
@@ -192,7 +192,7 @@ class AutoClassRenderer(JsRenderer):
             # line in the dict() call:
             constructor = Function(
                 name='',
-                path_segments=[],
+                path=Pathname([]),
                 filename='',
                 description='',
                 line=0,
@@ -261,7 +261,7 @@ class AutoClassRenderer(JsRenderer):
             members = obj.members
             if not include:
                 # Specifying none means listing all.
-                return sorted(members, key=lambda d: d.path_segments)  # TODO: If path_segments is empty, fall back to d.name like this used to pre-IR.
+                return sorted(members, key=lambda d: d.path.segments)  # TODO: If path is empty, fall back to d.name like this used to pre-IR.
             included_set = set(include)
 
             # If the special name * is included in the list, include
@@ -270,7 +270,7 @@ class AutoClassRenderer(JsRenderer):
                 star_index = include.index('*')
                 sorted_not_included_members = sorted(
                     (d for d in members if d.name not in included_set),
-                    key=lambda d: d.path_segments  # TODO: Fall back to d.name if needed like it used to.
+                    key=lambda d: d.path.segments  # TODO: Fall back to d.name if needed like it used to.
                 )
                 not_included = [d.name for d in sorted_not_included_members]
                 include = include[:star_index] + not_included + include[star_index + 1:]

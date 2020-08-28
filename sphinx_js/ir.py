@@ -53,7 +53,7 @@ class Pathname:
         self.segments = segments
 
     def __str__(self):
-        return ''.join(segments)
+        return ''.join(self.segments)
 
     def __repr__(self):
         return '<Pathname(%r)>' % self.segments
@@ -148,7 +148,7 @@ class TopLevel:
     name: str
     #: The namepath-like unambiguous identifier of the object, e.g. ``['./',
     #: 'dir/', 'dir/', 'file/', 'object.', 'object#', 'object']``
-    path_segments: List[str]
+    path: Pathname
     #: The basename of the file the object is from, e.g. "foo.js"
     filename: str
     #: The human-readable description of the entity or '' if absent

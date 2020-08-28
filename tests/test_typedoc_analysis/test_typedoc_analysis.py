@@ -196,7 +196,7 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
         # well (if node structures are the same across object kinds), since we
         # have the filling of them factored out.
         assert subclass.name == 'EmptySubclass'
-        assert subclass.path_segments == ['./', 'nodes.', 'EmptySubclass']
+        assert subclass.path == Pathname(['./', 'nodes.', 'EmptySubclass'])
         assert subclass.filename == 'nodes.ts'
         assert subclass.description == 'An empty subclass'
         assert subclass.deprecated == False
