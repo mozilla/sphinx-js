@@ -203,7 +203,7 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
         assert subclass.examples == []
         assert subclass.see_alsos == []
         assert subclass.properties == []
-        assert subclass.exported_from == 'nodes'
+        assert subclass.exported_from == Pathname(['./', 'nodes'])
 
     def test_interface(self):
         """Test that interfaces get indexed and have their supers exposed.

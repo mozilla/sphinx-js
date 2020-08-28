@@ -48,14 +48,22 @@ class Analyzer:
 
         return self._objects_by_path.get(path_suffix)
 
+    def containing_module(self, node) -> Optional[Pathname]:
+        """Return the Pathname pointing to the module containing the given
+        node, None if one isn't found."""
+        while True:
+            node = node.get('__parent')
+            if not node or node['id'] == 0:
+                # We went all the way up but didn't find a containing module.
+                return
+            elif node.get('kindString') == 'External module':
+                # Found one!
+                return Pathname(make_path_segments(node, self._base_dir))
+
     def top_level_properties(self, node):
         source = node.get('sources')[0]
         if node.get('flags', {}).get('isExported', False):
-            # This is how it used to be, but I doubt it's right. More likely,
-            # we should walk up the suffix tree until we hit an external module
-            # (though we don't index those atm) and then return that thing's
-            # path_segments.
-            exported_from = node['__parent']['name'][1:-1]  # strip off quotes
+            exported_from = self.containing_module(node)
         else:
             exported_from = None
         return dict(

@@ -56,7 +56,7 @@ class Pathname:
         return ''.join(segments)
 
     def __repr__(self):
-        return '<Pathname %r>' % self.segments
+        return '<Pathname(%r)>' % self.segments
 
     def __eq__(self, other):
         return isinstance(other, self.__class__) and self.segments == other.segments
@@ -165,7 +165,7 @@ class TopLevel:
     properties: List['Attribute']
     #: None if not exported for use by outside code. Otherwise, the Sphinx
     #: dotted path to the module it is exported from, e.g. 'foo.bar'
-    exported_from: Optional[str]  # TODO: Should this be a Pathname instead?
+    exported_from: Optional[Pathname]
 
 
 @dataclass
