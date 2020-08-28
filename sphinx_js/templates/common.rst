@@ -28,3 +28,9 @@
    {% endfor %}
 {%- endif %}
 {% endmacro %}
+
+{% macro exported_from(pathname) %}
+{% if pathname -%}
+    *exported from* :js:mod:`{{ pathname.dotted() }}`
+{%- endif %}
+{% endmacro %}

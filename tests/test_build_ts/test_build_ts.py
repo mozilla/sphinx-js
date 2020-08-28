@@ -36,8 +36,8 @@ class TextBuilderTests(SphinxBuildTestCase):
 
         """
         # The quotes around ClassDefinition() must be some weird decision in
-        # Sphinx's templates. I don't care if they go away in a future version
-        # of Sphinx.
+        # Sphinx's text output. I don't care if they go away in a future
+        # version of Sphinx. It doesn't affect the HTML output.
         self._file_contents_eq(
             'autoclass_class_with_interface_and_supers',
             'class ClassWithSupersAndInterfacesAndAbstract()\n'
@@ -51,6 +51,20 @@ class TextBuilderTests(SphinxBuildTestCase):
             '      * "Interface()"\n'
             '\n'
             '   I construct.\n')
+
+    def test_exported_from(self):
+        """Make sure classes say where they were exported from.
+
+        I'm divided on whether this is even useful. Maybe people should just
+        specify full.path.Names in the js:autoclass directives if they want to
+        surface that info.
+
+        """
+        self._file_contents_eq(
+            'autoclass_exported',
+            'class ExportedClass()\n'
+            '\n'
+            '   *exported from* "class"\n')
 
 
 class HtmlBuilderTests(SphinxBuildTestCase):

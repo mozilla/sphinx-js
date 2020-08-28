@@ -16,6 +16,8 @@
      *interface*
    {%- endif %}
 
+   {{ common.exported_from(exported_from)|indent(3) }}
+
    {% if supers -%}
      **Extends:**
        {% for super in supers -%}

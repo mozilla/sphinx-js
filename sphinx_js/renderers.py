@@ -177,8 +177,6 @@ class AutoFunctionRenderer(JsRenderer):
             content='\n'.join(self._content))
 
 # TODO: Display .is_optional in the templates.
-# Say `*exported from* :js:mod:{obj.exported_from}` if exported_from isn't None.
-
 
 class AutoClassRenderer(JsRenderer):
     _template = 'class.rst'
@@ -196,6 +194,7 @@ class AutoClassRenderer(JsRenderer):
             examples=obj.constructor.examples if isinstance(obj, Class) else [],
             deprecated=obj.constructor.deprecated if isinstance(obj, Class) else [],
             see_also=obj.constructor.see_alsos if isinstance(obj, Class) else [],
+            exported_from=obj.exported_from,
             class_comment=obj.description,
             is_abstract=isinstance(obj, Class) and obj.is_abstract,
             interfaces=obj.interfaces if isinstance(obj, Class) else [],

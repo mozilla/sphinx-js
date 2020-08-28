@@ -40,3 +40,8 @@ abstract class ClassWithSupersAndInterfacesAndAbstract extends ClassDefinition i
 
 interface InterfaceWithSupers extends Interface {
 }
+
+export class ExportedClass {
+  constructor() {
+  }
+}
