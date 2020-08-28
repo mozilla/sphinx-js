@@ -16,6 +16,13 @@
      *interface*
    {%- endif %}
 
+   {% if supers -%}
+     **Extends:**
+       {% for super in supers -%}
+         - :js:class:`~{{ super.dotted() }}`
+       {% endfor %}
+   {%- endif %}
+
    {% if constructor_comment -%}
      {{ constructor_comment|indent(3) }}
    {%- endif %}

@@ -280,7 +280,7 @@ Saving Keystrokes By Setting The Primary Domain
 
 To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and then say (for example) ``autofunction`` rather than ``js:autofunction``.
 
-TypeScript support
+TypeScript Support
 ------------------
 
 There is experimental TypeScript support in sphinx-js. Enable it by setting the config variable ``js_language = 'typescript'``. Then, instead of installing JSDoc, install TypeDoc (version 0.15.0 is known to work)::
@@ -288,6 +288,16 @@ There is experimental TypeScript support in sphinx-js. Enable it by setting the 
     npm install -g typedoc
 
 The main difference you'll notice is additional **type** fields in function documentation.
+
+Getting Superclass and Interface Links To Work
+----------------------------------------------
+
+To have a class link to its superclasses and implemented interfaces, you'll need to document the superclass (or interface) elsewhere using ``js:autoclass`` or ``js:class`` and use the class's full (but dotted) path when you do::
+
+    .. js:autoclass:: someFile.SomeClass
+
+Unfortunately, Sphinx's ``~`` syntax doesn't work in these spots, so users will see the full paths in the documentation.
+
 
 Configuration Reference
 -----------------------

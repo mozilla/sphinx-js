@@ -5,6 +5,7 @@ from jinja2 import Environment, PackageLoader
 from sphinx.errors import SphinxError
 from sphinx.util import rst
 
+from .analyzer_utils import dotted_path
 from .ir import Class, Function, Interface
 from .parsers import PathVisitor
 from .suffix_tree import SuffixAmbiguous, SuffixNotFound
@@ -91,7 +92,7 @@ class JsRenderer(object):
     def rst(self, partial_path, obj, use_short_name=False):
         """Return rendered RST about an entity with the given name and IR
         object."""
-        dotted_name = partial_path[-1] if use_short_name else _dotted_path(partial_path)
+        dotted_name = partial_path[-1] if use_short_name else dotted_path(partial_path)
 
         # Render to RST using Jinja:
         env = Environment(loader=PackageLoader('sphinx_js', 'templates'))
@@ -177,7 +178,7 @@ class AutoFunctionRenderer(JsRenderer):
 
 # TODO: Display .is_optional in the templates.
 # TODO: Have autoclass say "interface" if it's an interface rather than a class.
-# List implemented .interfaces and stick :js:class: in front of each. .supers too.
+# List implemented .interfaces and stick :js:class: in front of each.
 # Say `*exported from* :js:mod:{obj.exported_from}` if exported_from isn't None.
 
 
@@ -200,6 +201,7 @@ class AutoClassRenderer(JsRenderer):
             class_comment=obj.description,
             is_abstract=isinstance(obj, Class) and obj.is_abstract,
             is_interface=isinstance(obj, Interface),  # TODO: Make interfaces not look so much like classes. This will require taking complete control of templating from Sphinx.
+            supers=obj.supers,
             constructor_comment=obj.constructor.description if isinstance(obj, Class) else '',
             content='\n'.join(self._content),
             members=self._members_of(obj,
@@ -322,11 +324,3 @@ def _exception_formatter(exception):
         heads.append(exception.type)
     tail = exception.description
     return heads, tail
-
-
-def _dotted_path(segments):
-    """Convert a JS object path (``['dir/', 'file/', 'class#',
-    'instanceMethod']``) to a dotted style that Sphinx will better index."""
-    segments_without_separators = [s[:-1] for s in segments[:-1]]
-    segments_without_separators.append(segments[-1])
-    return '.'.join(segments_without_separators)

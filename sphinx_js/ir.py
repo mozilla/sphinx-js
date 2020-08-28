@@ -26,6 +26,8 @@ survive template changes.
 from dataclasses import dataclass, field, InitVar
 from typing import Any, List, NewType, Optional, Union
 
+from .analyzer_utils import dotted_path
+
 
 #: Human-readable type of a value. None if we don't know the type.
 Type = NewType('Type', Optional[str])
@@ -38,8 +40,29 @@ Type = NewType('Type', Optional[str])
 # text or link-having RST.
 
 #: Pathname, full or not, to an object:
-Pathname = NewType('Pathname', str)
 ReStructuredText = NewType('ReStructuredText', str)
+
+
+class Pathname:
+    """A partial or full path to a language entity.
+
+    Example: ``['./', 'dir/', 'dir/', 'file.', 'object.', 'object#', 'object']``
+
+    """
+    def __init__(self, segments):
+        self.segments = segments
+
+    def __str__(self):
+        return ''.join(segments)
+
+    def __repr__(self):
+        return '<Pathname %r>' % self.segments
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.segments == other.segments
+
+    def dotted(self):
+        return dotted_path(self.segments)
 
 
 class _NoDefault:

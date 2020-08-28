@@ -29,13 +29,15 @@ class SphinxBuildTestCase(ThisDirTestCase):
     deleted afterward
 
     """
+    builder = 'text'
+
     @classmethod
     def setup_class(cls):
         """Run Sphinx against the dir adjacent to the testcase."""
         cls.docs_dir = join(cls.this_dir(), 'source', 'docs')
         with cd(cls.docs_dir):  # Matters only to keep test_build_ts tests passing. Remove once we clean that module up. Its cwd-sensitivity still means it doesn't work for actual users if the cwd isn't just right.
             # -v for better tracebacks:
-            if sphinx_main([cls.docs_dir, '-b', 'text', '-v', '-E', join(cls.docs_dir, '_build')]):
+            if sphinx_main([cls.docs_dir, '-b', cls.builder, '-v', '-E', join(cls.docs_dir, '_build')]):
                 raise RuntimeError('Sphinx build exploded.')
 
     @classmethod
@@ -43,7 +45,8 @@ class SphinxBuildTestCase(ThisDirTestCase):
         rmtree(join(cls.docs_dir, '_build'))
 
     def _file_contents(self, filename):
-        with open(join(self.docs_dir, '_build', '%s.txt' % filename),
+        extension = 'txt' if self.builder == 'text' else 'html'
+        with open(join(self.docs_dir, '_build', '%s.%s' % (filename, extension)),
                   encoding='utf8') as file:
             return file.read()
 

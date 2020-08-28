@@ -12,7 +12,7 @@ from typing import List, Optional, Tuple, Union
 from sphinx.errors import SphinxError
 
 from .analyzer_utils import Command, is_explicitly_rooted
-from .ir import Attribute, Class, Exc, Function, Interface, NO_DEFAULT, Param, Return, TopLevel
+from .ir import Attribute, Class, Exc, Function, Interface, NO_DEFAULT, Param, Pathname, Return, TopLevel
 from .suffix_tree import SuffixTree
 
 
@@ -155,7 +155,7 @@ class Analyzer:
                 type=self.type_name(node.get('type')),
                 **member_properties(node),
                 **self.top_level_properties(node))
-        elif kind == 'Accessor':  # NEXT: Unit-test type_name(). Then write renderers.
+        elif kind == 'Accessor':  # NEXT: Write renderers.
             get_signature = node.get('getSignature')
             if get_signature:
                 # There's no signature to speak of for a getter: only a return type.
@@ -213,11 +213,10 @@ class Analyzer:
         types = []
         for type in node.get(kind, []):
             if type['type'] == 'reference':
-                pathname = ''.join(make_path_segments(self._index[type['id']],
-                                                      self._base_dir))
-            else:
-                pathname = 'UNIMPLEMENTED'
-            types.append(pathname)
+                pathname = Pathname(make_path_segments(self._index[type['id']],
+                                                       self._base_dir))
+                types.append(pathname)
+            # else it's some other thing we should go implement
         return types
 
     def type_name(self, type):

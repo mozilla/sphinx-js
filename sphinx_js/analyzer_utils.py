@@ -54,3 +54,18 @@ def is_explicitly_rooted(path):
 
     """
     return path.startswith(('../', './')) or path in ('..', '.')
+
+
+def dotted_path(segments):
+    """Convert a JS object path (``['dir/', 'file/', 'class#',
+    'instanceMethod']``) to a dotted style that Sphinx will better index.
+
+    Strip off any leading relative-dir segments (./ or ../) because they lead
+    to invalid paths like ".....foo". Ultimately, we should thread ``base_dir``
+    into this and construct a full path based on that.
+
+    """
+    segments_without_separators = [s[:-1] for s in segments[:-1]
+                                   if s not in ['./', '../']]
+    segments_without_separators.append(segments[-1])
+    return '.'.join(segments_without_separators)

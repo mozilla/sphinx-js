@@ -2,8 +2,8 @@
 from tests.testing import SphinxBuildTestCase
 
 
-class Tests(SphinxBuildTestCase):
-    """Tests which require our one big Sphinx tree to be built (typescript version)"""
+class TextBuilderTests(SphinxBuildTestCase):
+    """Tests which require our one big Sphinx tree to be built (as text)"""
 
     def test_autoclass_constructor(self):
         """Make sure class constructor comes before methods."""
@@ -35,10 +35,28 @@ class Tests(SphinxBuildTestCase):
         These are all TypeScript-specific features.
 
         """
+        # The quotes around ClassDefinition() must be some weird decision in
+        # Sphinx's templates. I don't care if they go away in a future version
+        # of Sphinx.
         self._file_contents_eq(
             'autoclass_class_with_interface_and_supers',
             'class ClassWithSupersAndInterfacesAndAbstract()\n'
             '\n'
             '   *abstract*\n'
             '\n'
+            '   **Extends:**\n'
+            '      * "ClassDefinition()"\n'
+            '\n'
             '   I construct.\n')
+            # TODO: Add interfaces.
+
+
+class HtmlBuilderTests(SphinxBuildTestCase):
+    """Tests which require an HTML build of our Sphinx tree, for checking
+    links"""
+
+    builder = 'html'
+
+    def test_extends_links(self):
+        """Make sure superclass mentions link to their definitions."""
+        assert 'href="index.html#class.ClassDefinition"' in self._file_contents('autoclass_class_with_interface_and_supers')

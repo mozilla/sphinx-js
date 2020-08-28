@@ -4,7 +4,7 @@ from unittest import TestCase
 
 import pytest
 
-from sphinx_js.ir import Attribute, Class, Exc, Function, Param, Return
+from sphinx_js.ir import Attribute, Class, Exc, Function, Param, Pathname, Return
 from sphinx_js.typedoc import index_by_id, make_path_segments
 
 from tests.testing import dict_where, NO_MATCH, TypeDocAnalyzerTestCase, TypeDocTestCase
@@ -186,10 +186,10 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
         assert isinstance(subclass, Class)
         assert subclass.constructor is None
         assert subclass.is_abstract
-        assert subclass.interfaces == ['./nodes.Interface']
+        assert subclass.interfaces == [Pathname(['./', 'nodes.', 'Interface'])]
 
         # _MembersAndSupers attrs:
-        assert subclass.supers == ['./nodes.Superclass']
+        assert subclass.supers == [Pathname(['./', 'nodes.', 'Superclass'])]
         assert subclass.members == []
 
         # TopLevel attrs. This should cover them for other kinds of objs as
@@ -213,7 +213,7 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
 
         """
         interface = self.analyzer.get_object(['Interface'])
-        assert interface.supers == ['./nodes.SuperInterface']
+        assert interface.supers == [Pathname(['./', 'nodes.', 'SuperInterface'])]
 
     def test_interface_function_member(self):
         """Make sure function-like properties are understood."""
