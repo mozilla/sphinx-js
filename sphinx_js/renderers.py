@@ -177,8 +177,6 @@ class AutoFunctionRenderer(JsRenderer):
             content='\n'.join(self._content))
 
 # TODO: Display .is_optional in the templates.
-# TODO: Have autoclass say "interface" if it's an interface rather than a class.
-# List implemented .interfaces and stick :js:class: in front of each.
 # Say `*exported from* :js:mod:{obj.exported_from}` if exported_from isn't None.
 
 
@@ -200,6 +198,7 @@ class AutoClassRenderer(JsRenderer):
             see_also=obj.constructor.see_alsos if isinstance(obj, Class) else [],
             class_comment=obj.description,
             is_abstract=isinstance(obj, Class) and obj.is_abstract,
+            interfaces=obj.interfaces if isinstance(obj, Class) else [],
             is_interface=isinstance(obj, Interface),  # TODO: Make interfaces not look so much like classes. This will require taking complete control of templating from Sphinx.
             supers=obj.supers,
             constructor_comment=obj.constructor.description if isinstance(obj, Class) else '',
@@ -311,7 +310,6 @@ def _param_type_formatter(param):
     """Generate types for function parameters specified in field."""
     if not param.type:
         return None
-    # TODO: I'm not sure what this function is for.
     heads = ['type', param.name]
     tail = rst.escape(param.type)
     return heads, tail

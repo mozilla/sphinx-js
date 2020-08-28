@@ -47,8 +47,10 @@ class TextBuilderTests(SphinxBuildTestCase):
             '   **Extends:**\n'
             '      * "ClassDefinition()"\n'
             '\n'
+            '   **Implements:**\n'
+            '      * "Interface()"\n'
+            '\n'
             '   I construct.\n')
-            # TODO: Add interfaces.
 
 
 class HtmlBuilderTests(SphinxBuildTestCase):
@@ -60,3 +62,7 @@ class HtmlBuilderTests(SphinxBuildTestCase):
     def test_extends_links(self):
         """Make sure superclass mentions link to their definitions."""
         assert 'href="index.html#class.ClassDefinition"' in self._file_contents('autoclass_class_with_interface_and_supers')
+
+    def test_implements_links(self):
+        """Make sure implemented interfaces link to their definitions."""
+        assert 'href="index.html#class.Interface"' in self._file_contents('autoclass_class_with_interface_and_supers')
