@@ -45,3 +45,6 @@ export class ExportedClass {
   constructor() {
   }
 }
+
+class ConstructorlessClass {
+}

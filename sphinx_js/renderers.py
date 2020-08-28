@@ -186,21 +186,44 @@ class AutoClassRenderer(JsRenderer):
         # TODO: At the moment, we pull most fields (params, returns,
         # exceptions, etc.) off the constructor only. We could pull them off
         # the class itself too in the future.
+        if not isinstance(obj, Class) or not obj.constructor:
+            # One way or another, it has no constructor, so make a blank one to
+            # keep from repeating this long test for every constructor-using
+            # line in the dict() call:
+            constructor = Function(
+                name='',
+                path_segments=[],
+                filename='',
+                description='',
+                line=0,
+                deprecated=False,
+                examples=[],
+                see_alsos=[],
+                properties=[],
+                exported_from=None,
+                is_abstract=False,
+                is_optional=False,
+                is_static=False,
+                is_private=False,
+                params=[],
+                exceptions=[],
+                returns=[])
+        else:
+            constructor = obj.constructor
         return dict(
             name=name,
-            # TODO: Deal with the case that the constructor is None.
-            params=self._formal_params(obj.constructor) if isinstance(obj, Class) else '',
-            fields=self._fields(obj.constructor) if isinstance(obj, Class) else [],
-            examples=obj.constructor.examples if isinstance(obj, Class) else [],
-            deprecated=obj.constructor.deprecated if isinstance(obj, Class) else [],
-            see_also=obj.constructor.see_alsos if isinstance(obj, Class) else [],
+            params=self._formal_params(constructor),
+            fields=self._fields(constructor),
+            examples=constructor.examples,
+            deprecated=constructor.deprecated,
+            see_also=constructor.see_alsos,
             exported_from=obj.exported_from,
             class_comment=obj.description,
             is_abstract=isinstance(obj, Class) and obj.is_abstract,
             interfaces=obj.interfaces if isinstance(obj, Class) else [],
             is_interface=isinstance(obj, Interface),  # TODO: Make interfaces not look so much like classes. This will require taking complete control of templating from Sphinx.
             supers=obj.supers,
-            constructor_comment=obj.constructor.description if isinstance(obj, Class) else '',
+            constructor_comment=constructor.description,
             content='\n'.join(self._content),
             members=self._members_of(obj,
                                      include=self._options['members'],

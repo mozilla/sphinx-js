@@ -66,6 +66,12 @@ class TextBuilderTests(SphinxBuildTestCase):
             '\n'
             '   *exported from* "class"\n')
 
+    def test_constructorless_class(self):
+        """Make sure constructorless classes don't crash the renderer."""
+        self._file_contents_eq(
+            'autoclass_constructorless',
+            'class ConstructorlessClass()\n')
+
 
 class HtmlBuilderTests(SphinxBuildTestCase):
     """Tests which require an HTML build of our Sphinx tree, for checking
