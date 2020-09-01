@@ -1,6 +1,6 @@
 {% import 'common.rst' as common %}
 
-.. js:function:: {{ name }}{{ params }}
+.. js:function:: {{ name }}{{ '?' if is_optional else '' }}{{ params }}
 
    {{ common.deprecated(deprecated)|indent(3) }}
 

@@ -1,6 +1,6 @@
 {% import 'common.rst' as common %}
 
-.. js:attribute:: {{ name }}
+.. js:attribute:: {{ name }}{{ '?' if is_optional else '' }}
 
    {{ common.deprecated(deprecated)|indent(3) }}
 

@@ -1,0 +1,2 @@
+.. js:autoclass:: OptionalThings
+   :members:

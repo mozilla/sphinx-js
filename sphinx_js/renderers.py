@@ -173,10 +173,10 @@ class AutoFunctionRenderer(JsRenderer):
             description=obj.description,
             examples=obj.examples,
             deprecated=obj.deprecated,
+            is_optional=obj.is_optional,
             see_also=obj.see_alsos,
             content='\n'.join(self._content))
 
-# TODO: Display .is_optional in the templates.
 
 class AutoClassRenderer(JsRenderer):
     _template = 'class.rst'
@@ -302,6 +302,7 @@ class AutoAttributeRenderer(JsRenderer):
             name=name,
             description=obj.description,
             deprecated=obj.deprecated,
+            is_optional=obj.is_optional,
             see_also=obj.see_alsos,
             examples=obj.examples,
             type=obj.type,

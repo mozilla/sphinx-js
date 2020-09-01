@@ -72,6 +72,21 @@ class TextBuilderTests(SphinxBuildTestCase):
             'autoclass_constructorless',
             'class ConstructorlessClass()\n')
 
+    def test_optional_members(self):
+        """Make sure optional attributes and functions of interfaces get
+        question marks sticking out of them."""
+        self._file_contents_eq(
+            'autoclass_interface_optionals',
+            'class OptionalThings()\n'
+            '\n'
+            '   *interface*\n'
+            '\n'
+            '   OptionalThings.boop?\n'
+            '\n'
+            '      **type:** boolean\n'
+            '\n'
+            '   OptionalThings.foop?()\n')
+
 
 class HtmlBuilderTests(SphinxBuildTestCase):
     """Tests which require an HTML build of our Sphinx tree, for checking

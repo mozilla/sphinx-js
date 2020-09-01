@@ -48,3 +48,8 @@ export class ExportedClass {
 
 class ConstructorlessClass {
 }
+
+interface OptionalThings {
+  foop?(): void;
+  boop?: boolean;
+}

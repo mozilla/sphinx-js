@@ -202,7 +202,7 @@ class Analyzer:
                 # Though perhaps technically true, it looks weird to the user
                 # (and in the template) if constructors have a return value:
                 returns=self.make_returns(node) if kind != 'Constructor signature' else [],
-                **member_properties(node),
+                **member_properties(node['__parent']),
                 **self.top_level_properties(node))
 
         return ir, node.get('children', [])
