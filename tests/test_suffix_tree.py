@@ -16,3 +16,10 @@ def test_things():
         s.get(['quacks.', 'max'])
     with pytest.raises(SuffixAmbiguous):
         s.get(['max'])
+
+
+def test_full_path():
+    """Looking up a full path should not crash."""
+    s = SuffixTree()
+    s.add(['./', 'dir/', 'footils.', 'jacks'], 4)
+    assert s.get(['./', 'dir/', 'footils.', 'jacks']) == 4

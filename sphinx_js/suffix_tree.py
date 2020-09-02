@@ -69,14 +69,13 @@ class SuffixTree(object):
 
         # Follow all the 1-key dicts. These are the paths that are unambiguous.
         while len(tree) == 1:
-            key = next(iter(tree.keys()))
-            value = tree[key]
-            full_path.append(key)
-            if isinstance(value, Value):
+            if isinstance(tree, Value):
                 full_path.reverse()
-                return value.value, full_path
-            else:
-                tree = value
+                return tree.value, full_path
+            # It's a dict. Traverse the only key:
+            key = next(iter(tree.keys()))
+            tree = tree[key]
+            full_path.append(key)
 
         # We hit a >1-key dict, an ambiguous path:
         raise SuffixAmbiguous(segments, list(tree.keys()))
