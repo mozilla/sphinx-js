@@ -9,14 +9,20 @@ When you write a JavaScript library, how do you explain it to people? If it's a 
 
 sphinx-js lets you use the industry-leading `Sphinx <http://sphinx-doc.org/>`_ documentation tool with JS projects. It provides a handful of directives, patterned after the Python-centric `autodoc <www.sphinx-doc.org/en/latest/ext/autodoc.html>`_ ones, for pulling JSDoc-formatted documentation into reStructuredText pages. And, because you can keep using JSDoc in your code, you remain compatible with the rest of your JS tooling, like Google's Closure Compiler.
 
+sphinx-js also works with TypeScript, using the TypeDoc tool in place of JSDoc and emitting all the type information you would expect.
+
 Setup
 =====
 
-1. Install JSDoc using npm. ``jsdoc`` must be on your ``$PATH``, so you might want to install it globally::
+1. Install JSDoc (or TypeDoc if you're writing TypeScript). The tool must be on your ``$PATH``, so you might want to install it globally::
 
         npm install -g jsdoc
 
-   We work with jsdoc 3.6.3 and quite possibly other versions.
+   ...or... ::
+
+        npm install -g typedoc
+
+   We work with JSDoc 3.6.3 and quite possibly other versions. TypeDoc 0.15.0 is known to work.
 
 2. Install sphinx-js, which will pull in Sphinx itself as a dependency::
 
@@ -55,9 +61,10 @@ Setup
 
         extensions = ['sphinx_js']
 
-5. If your JS source code is anywhere but at the root of your project, add ``js_source_path = '../somewhere/else'`` on a line by itself in conf.py. The root of your JS source tree should be where that setting points, relative to the conf.py file. (The default, ``../``, works well when there is a ``docs`` folder at the root of your project and your source code lives directly inside the root.)
-6. If you have special jsdoc configuration, add ``jsdoc_config_path = '../conf.json'`` (for example) to conf.py as well.
-7. If you're documenting only JS and no other languages, you can set your "primary domain" to JS in conf.py::
+5. If you want to document TypeScript, add ``js_language = 'typescript'`` to conf.py as well.
+6. If your JS source code is anywhere but at the root of your project, add ``js_source_path = '../somewhere/else'`` on a line by itself in conf.py. The root of your JS source tree should be where that setting points, relative to the conf.py file. (The default, ``../``, works well when there is a ``docs`` folder at the root of your project and your source code lives directly inside the root.)
+7. If you have special JSDoc or TypeDoc configuration, add ``jsdoc_config_path = '../conf.json'`` (for example) to conf.py as well.
+8. If you're documenting only JS/TS and no other languages, you can set your "primary domain" to JS in conf.py::
 
         primary_domain = 'js'
 
@@ -181,7 +188,7 @@ You can add private members by saying... ::
        :members:
        :private-members:
 
-Privacy is determined by JSDoc ``@private`` tags.
+Privacy is determined by JSDoc ``@private`` tags or TypeScript's ``private`` keyword.
 
 Exclude certain members by name with ``:exclude-members:``::
 
@@ -264,7 +271,7 @@ For conciseness, you can use any unique suffix, as long as it consists of comple
 
 Things to note:
 
-* We use simple file paths rather than JSDoc's ``module:`` prefix.
+* We use simple file paths rather than JSDoc's ``module:`` prefix or TypeDoc's ``external:`` or ``module:`` ones.
 * We use simple backslash escaping exclusively rather than switching escaping schemes halfway through the path; JSDoc itself `is headed that way as well <https://github.com/jsdoc3/jsdoc/issues/876>`_. The characters that need to be escaped are ``#.~(/``, though you do not need to escape the dots in a leading ``./`` or ``../``. A really horrible path might be... ::
 
     some/path\ with\ spaces/file.topLevelObject#instanceMember.staticMember\(with\(parens
@@ -280,24 +287,14 @@ Saving Keystrokes By Setting The Primary Domain
 
 To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and then say (for example) ``autofunction`` rather than ``js:autofunction``.
 
-TypeScript Support
-------------------
+TypeScript: Getting Superclass and Interface Links To Work
+----------------------------------------------------------
 
-There is experimental TypeScript support in sphinx-js. Enable it by setting the config variable ``js_language = 'typescript'``. Then, instead of installing JSDoc, install TypeDoc (version 0.15.0 is known to work)::
-
-    npm install -g typedoc
-
-The main difference you'll notice is additional **type** fields in function documentation.
-
-Getting Superclass and Interface Links To Work
-----------------------------------------------
-
-To have a class link to its superclasses and implemented interfaces, you'll need to document the superclass (or interface) elsewhere using ``js:autoclass`` or ``js:class`` and use the class's full (but dotted) path when you do::
+To have a class link to its superclasses and implemented interfaces, you'll need to document the superclass (or interface) somewhere using ``js:autoclass`` or ``js:class`` and use the class's full (but dotted) path when you do::
 
     .. js:autoclass:: someFile.SomeClass
 
 Unfortunately, Sphinx's ``~`` syntax doesn't work in these spots, so users will see the full paths in the documentation.
-
 
 Configuration Reference
 -----------------------
@@ -306,16 +303,16 @@ Configuration Reference
   Use 'javascript' or 'typescript' depending on the language you use. The default is 'javascript'.
 
 ``js_source_path``
-  A list of directories to scan (non-recursively) for JS files, relative to Sphinx's conf.py file. Can be a string instead if there is only one. If there is more than one, ``root_for_relative_js_paths`` must be specified as well. Defaults to '../'.
+  A list of directories to scan (non-recursively) for JS or TS source files, relative to Sphinx's conf.py file. Can be a string instead if there is only one. If there is more than one, ``root_for_relative_js_paths`` must be specified as well. Defaults to '../'.
 
 ``jsdoc_config_path``
-  A conf.py-relative path to a jsdoc or typedoc config file, which is useful if you want to specify your own jsdoc options, like recursion and custom filename matching.
+  A conf.py-relative path to a JSDoc config file, which is useful if you want to specify your own JSDoc options, like recursion and custom filename matching. If using TypeDoc, you can also point to a ``tsconfig.json`` file.
 
 ``root_for_relative_js_paths``
   Relative JS entity paths are resolved relative to this path. Defaults to ``js_source_path`` if it is only one item.
 
 ``jsdoc_cache``
-  Path to a file where jsdoc output will be cached. If omitted, jsdoc will be run every time Sphinx is. If you have a large number of source files, it may be beneficial to configure this value. But be careful: the cache is not automatically flushed if your source code changes; you must delete it manually.
+  Path to a file where JSDoc output will be cached. If omitted, JSDoc will be run every time Sphinx is. If you have a large number of source files, it may help to configure this value. But be careful: the cache is not automatically flushed if your source code changes; you must delete it manually.
 
 Example
 =======
@@ -330,7 +327,7 @@ A good example using most of sphinx-js's functionality is the Fathom documentati
 
 Then put the version of sphinx-js you want in ``docs/requirements.txt``. For example... ::
 
-    sphinx-js==3.0
+    sphinx-js==3.1
 
 Or, if you prefer, the Fathom repo carries a `Travis CI configuration <https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/.travis.yml#L41>`_ and a `deployment script <https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/tooling/travis-deploy-docs>`_ for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them.
 
@@ -343,7 +340,7 @@ Caveats
 Tests
 =====
 
-Run the tests using tox, which will also install jsdoc and typedoc at pinned versions::
+Run the tests using tox, which will also install JSDoc and TypeDoc at pinned versions::
 
     pip install tox
     tox
@@ -375,14 +372,14 @@ Version History
   * Display generic TypeScript types properly. Make fields come before methods. (Paul Grau)
   * Combine constructor and class documentation at the top TypeScript classes. (Sebastian Weigand)
   * Switch to pytest as the testrunner. (Sebastian Weigand)
-  * Add optional caching of jsdoc output, for large codebases. (Patrick Browne)
+  * Add optional caching of JSDoc output, for large codebases. (Patrick Browne)
   * Fix the display of union types in TypeScript. (Sebastian Weigand)
   * Fix parsing breakage that began in typedoc 0.14.0. (Paul Grau)
   * Fix a data-intake crash with TypeScript. (Cristiano Santos)
 
 2.7.1
   * Fix a crash that would happen sometimes with UTF-8 on Windows. #67.
-  * Always use conf.py's dir for jsdoc's working dir. #78. (Thomas Khyn)
+  * Always use conf.py's dir for JSDoc's working dir. #78. (Thomas Khyn)
 
 2.7
   * Add experimental TypeScript support. (Wim Yedema)
@@ -395,7 +392,7 @@ Version History
 2.5
   * Use documented ``@params`` to help fill out the formal param list for a
     function. This keeps us from missing params that use destructuring. (flozz)
-  * Improve error reporting when jsdoc is missing.
+  * Improve error reporting when JSDoc is missing.
   * Add extracted default values to generated formal param lists. (flozz and erikrose)
 
 2.4
@@ -406,7 +403,7 @@ Version History
   * Fix build-time crash when using recommonmark (for Markdown support) under Sphinx >=1.7.1. (jamrizzi)
 
 2.3.1
-  * Find the jsdoc command on Windows, where it has a different name. Then
+  * Find the ``jsdoc`` command on Windows, where it has a different name. Then
     patch up process communication so it doesn't hang.
 
 2.3
@@ -415,14 +412,14 @@ Version History
 2.2
   * Add ``autofunction`` support for ``@callback`` tags. (krassowski)
   * Add experimental ``autofunction`` support for ``@typedef`` tags. (krassowski)
-  * Add a nice error message for when jsdoc can't find any JS files.
+  * Add a nice error message for when JSDoc can't find any JS files.
   * Pin six more tightly so ``python_2_unicode_compatible`` is sure to be around.
 
 2.1
-  * Allow multiple folders in ``js_source_path``. This is useful for gradually migrating large projects, one folder at a time, to jsdoc. Introduce ``root_for_relative_js_paths`` to keep relative paths unambiguous in the face of multiple source paths.
+  * Allow multiple folders in ``js_source_path``. This is useful for gradually migrating large projects, one folder at a time, to JSDoc. Introduce ``root_for_relative_js_paths`` to keep relative paths unambiguous in the face of multiple source paths.
   * Aggregate PathTaken errors, and report them all at once. This means you don't have to run JSDoc repeatedly while cleaning up large projects.
   * Fix a bytes-vs-strings issue that crashed on versions of Python 3 before 3.6. (jhkennedy)
-  * Tolerate JS files that have filename extensions other than ".js". Before, when combined with custom jsdoc configuration that ingested such files, incorrect object pathnames were generated, which led to spurious "No JSDoc documentation was found for object ..." errors.
+  * Tolerate JS files that have filename extensions other than ".js". Before, when combined with custom JSDoc configuration that ingested such files, incorrect object pathnames were generated, which led to spurious "No JSDoc documentation was found for object ..." errors.
 
 2.0.1
   * Fix spurious syntax errors while loading large JSDoc output by writing it to a temp file first. (jhkennedy)
