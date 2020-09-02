@@ -341,7 +341,10 @@ def index_by_id(index, node, parent=None):
     :arg parent: The parent node of ``node``
 
     """
-    # TODO: Can we just uniformly set __parent on nodes rather than doing it differently in different cases? I think the reason for the cases is that we used to set a parent ID rather than a parent pointer and not all nodes have IDs.
+    # TODO: Can we just uniformly set __parent on nodes rather than doing it
+    # differently in different cases? I think the reason for the cases is that
+    # we used to set a parent ID rather than a parent pointer and not all nodes
+    # have IDs.
     if node is not None:
         id = node.get('id')
         if id is not None:  # 0 is okay; it's the root node.
@@ -356,13 +359,6 @@ def index_by_id(index, node, parent=None):
                 index_by_id(index, child, parent=node)
 
         return index
-
-        # Index type declarations:
-#         type = node.get('type')
-#         if isinstance(type, dict) and type['type'] != 'reference':
-#             # index_by_id(index, type, parent=node)  # I don't think any non-reference type has an ID, so this never does anything.
-#             # I found these only in "type" properties:
-#             index_by_id(index, node.get('declaration'), parent=None)  # Seems like this should be parent=parent, since "type" properties never have seem to have IDs.  # Further, I don't see what good assigning any parent here does, since type_name() doesn't implement reference types yet.
 
 
 def make_description(comment):

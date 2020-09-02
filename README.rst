@@ -362,6 +362,7 @@ Version History
   * Support intersection types (``foo & bar``) in TS.
   * Pathnames for TypeScript objects no longer spuriously use ``~`` after the filename path segment; now they use ``.`` as in JS.
   * More generally, TS pathnames are now just like JS ones. There is no more ``external:`` prefix in front of filenames or ``module:`` in front of namespace names.
+  * Class attributes are now listed before methods unless manally ordered with ``:members:``.
 
 3.0
   * Make compatible with Sphinx 3, which requires Python 3.

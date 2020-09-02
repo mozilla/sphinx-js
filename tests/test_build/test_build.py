@@ -133,7 +133,33 @@ class Tests(SphinxBuildTestCase):
         """
         self._file_contents_eq(
             'autoclass_members',
-            u'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n\n   ContainingClass.anotherMethod()\n\n      Another.\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n\n   ContainingClass.someVar\n\n      A var\n\n   ContainingClass.yetAnotherMethod()\n\n      More.\n')
+            'class ContainingClass(ho)\n\n'
+            '   Class doc.\n'
+            '\n'
+            '   Constructor doc.\n'
+            '\n'
+            '   Arguments:\n'
+            '      * **ho** -- A thing\n'
+            '\n'
+            '   ContainingClass.bar\n'
+            '\n'
+            '      Setting this also frobs the frobnicator.\n'
+            '\n'
+            '   ContainingClass.someVar\n'
+            '\n'
+            '      A var\n'
+            '\n'
+            '   ContainingClass.anotherMethod()\n'
+            '\n'
+            '      Another.\n'
+            '\n'
+            '   ContainingClass.someMethod(hi)\n'
+            '\n'
+            '      Here.\n'
+            '\n'
+            '   ContainingClass.yetAnotherMethod()\n'
+            '\n'
+            '      More.\n')
 
     def test_autoclass_members_list(self):
         """Make sure including a list of names after ``members`` limits it to
@@ -148,7 +174,34 @@ class Tests(SphinxBuildTestCase):
         at that point."""
         self._file_contents_eq(
             'autoclass_members_list_star',
-            u'class ContainingClass(ho)\n\n   Class doc.\n\n   Constructor doc.\n\n   Arguments:\n      * **ho** -- A thing\n\n   ContainingClass.bar\n\n      Setting this also frobs the frobnicator.\n\n   ContainingClass.anotherMethod()\n\n      Another.\n\n   ContainingClass.someVar\n\n      A var\n\n   ContainingClass.yetAnotherMethod()\n\n      More.\n\n   ContainingClass.someMethod(hi)\n\n      Here.\n')
+            'class ContainingClass(ho)\n'
+            '\n'
+            '   Class doc.\n'
+            '\n'
+            '   Constructor doc.\n'
+            '\n'
+            '   Arguments:\n'
+            '      * **ho** -- A thing\n'
+            '\n'
+            '   ContainingClass.bar\n'
+            '\n'
+            '      Setting this also frobs the frobnicator.\n'
+            '\n'
+            '   ContainingClass.someVar\n'
+            '\n'
+            '      A var\n'
+            '\n'
+            '   ContainingClass.anotherMethod()\n'
+            '\n'
+            '      Another.\n'
+            '\n'
+            '   ContainingClass.yetAnotherMethod()\n'
+            '\n'
+            '      More.\n'
+            '\n'
+            '   ContainingClass.someMethod(hi)\n'
+            '\n'
+            '      Here.\n')
 
     def test_autoclass_alphabetical(self):
         """Make sure members sort alphabetically when not otherwise specified."""

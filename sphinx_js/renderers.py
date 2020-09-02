@@ -258,19 +258,23 @@ class AutoClassRenderer(JsRenderer):
             listed members with remaining ones inserted at the placeholder "*".
 
             """
+            def sort_attributes_first_then_by_path(obj):
+                """Return a sort key for IR objects."""
+                return isinstance(obj, Function), obj.path.segments
+
             members = obj.members
             if not include:
                 # Specifying none means listing all.
-                return sorted(members, key=lambda d: d.path.segments)  # TODO: If path is empty, fall back to d.name like this used to pre-IR.
+                return sorted(members, key=sort_attributes_first_then_by_path)
             included_set = set(include)
 
-            # If the special name * is included in the list, include
-            # all other members, in sorted order.
+            # If the special name * is included in the list, include all other
+            # members, in sorted order.
             if '*' in included_set:
                 star_index = include.index('*')
                 sorted_not_included_members = sorted(
                     (d for d in members if d.name not in included_set),
-                    key=lambda d: d.path.segments  # TODO: Fall back to d.name if needed like it used to.
+                    key=sort_attributes_first_then_by_path
                 )
                 not_included = [d.name for d in sorted_not_included_members]
                 include = include[:star_index] + not_included + include[star_index + 1:]
