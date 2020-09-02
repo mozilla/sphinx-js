@@ -27,10 +27,10 @@ class Analyzer:
         self._base_dir = base_dir
         self._index = index_by_id({}, json)
         ir_objects = self._convert_all_nodes(json)
-        self._objects_by_path = SuffixTree()
-        self._objects_by_path.add_many((obj.path.segments, obj) for obj in ir_objects)
         # Toss this overboard to save RAM. We're done with it now:
         del self._index
+        self._objects_by_path = SuffixTree()
+        self._objects_by_path.add_many((obj.path.segments, obj) for obj in ir_objects)
 
     @classmethod
     def from_disk(cls, abs_source_paths, app, base_dir):
