@@ -99,10 +99,6 @@ class JsRenderer(object):
         template = env.get_template(self._template)
         return template.render(**self._template_vars(dotted_name, obj))
 
-    def _name(self):
-        """Return the JS function or class longname."""
-        return self._arguments[0].split('(')[0]
-
     def _formal_params(self, obj):
         """Return the JS function or class params, looking first to any
         explicit params written into the directive and falling back to those in
