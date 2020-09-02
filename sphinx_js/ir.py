@@ -142,9 +142,15 @@ class TopLevel:
     include the kinds of subentities referenced by the fields defined herein.
 
     """
-    # TODO: See if name is always the last item of path_segments. If so, don't make them pass name in.
     #: The short name of the object, regardless of whether it's a class or
-    #: function or typedef or param
+    #: function or typedef or param.
+    #:
+    #: This is usually the same as the last item of path.segments but not
+    #: always. For example, in JSDoc Attributes defined with @property, name is
+    #: defined but path is empty. This was a shortcut and could be corrected at
+    #: some point. If it is, we can stop storing name as a separate field. Also
+    #: TypeScript constructors are named "new WhateverClass". They should
+    #: instead be called "constructor".
     name: str
     #: The namepath-like unambiguous identifier of the object, e.g. ``['./',
     #: 'dir/', 'dir/', 'file/', 'object.', 'object#', 'object']``
