@@ -6,7 +6,6 @@ from unittest import TestCase
 import sys
 
 from sphinx.cmd.build import main as sphinx_main
-from sphinx.util.osutil import cd
 
 from sphinx_js.jsdoc import Analyzer as JsAnalyzer, jsdoc_output
 from sphinx_js.typedoc import Analyzer as TsAnalyzer, index_by_id, typedoc_output
@@ -35,10 +34,9 @@ class SphinxBuildTestCase(ThisDirTestCase):
     def setup_class(cls):
         """Run Sphinx against the dir adjacent to the testcase."""
         cls.docs_dir = join(cls.this_dir(), 'source', 'docs')
-        with cd(cls.docs_dir):  # Matters only to keep test_build_ts tests passing. Remove once we clean that module up. Its cwd-sensitivity still means it doesn't work for actual users if the cwd isn't just right.
-            # -v for better tracebacks:
-            if sphinx_main([cls.docs_dir, '-b', cls.builder, '-v', '-E', join(cls.docs_dir, '_build')]):
-                raise RuntimeError('Sphinx build exploded.')
+        # -v for better tracebacks:
+        if sphinx_main([cls.docs_dir, '-b', cls.builder, '-v', '-E', join(cls.docs_dir, '_build')]):
+            raise RuntimeError('Sphinx build exploded.')
 
     @classmethod
     def teardown_class(cls):
