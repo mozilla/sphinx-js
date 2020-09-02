@@ -273,10 +273,10 @@ class AutoClassRenderer(JsRenderer):
             if '*' in included_set:
                 star_index = include.index('*')
                 sorted_not_included_members = sorted(
-                    (d for d in members if d.name not in included_set),
+                    (m for m in members if m.name not in included_set),
                     key=sort_attributes_first_then_by_path
                 )
-                not_included = [d.name for d in sorted_not_included_members]
+                not_included = [m.name for m in sorted_not_included_members]
                 include = include[:star_index] + not_included + include[star_index + 1:]
                 included_set.update(not_included)
 
@@ -287,7 +287,7 @@ class AutoClassRenderer(JsRenderer):
             included_members = [m for m in members if m.name in included_set]
             # sort()'s stability should keep same-named members in the order
             # JSDoc spits them out in.
-            included_members.sort(key=lambda d: include.index(d.name))
+            included_members.sort(key=lambda m: include.index(m.name))
             return included_members
 
         return '\n\n'.join(
