@@ -25,10 +25,12 @@ class Analyzer:
 
         """
         self._base_dir = base_dir
-        self._index = index_by_id({}, json)  # TODO: Toss this overboard when we're done with it to save RAM.
-        ir_objects = self.convert_all_nodes(json)
+        self._index = index_by_id({}, json)
+        ir_objects = self._convert_all_nodes(json)
         self._objects_by_path = SuffixTree()
         self._objects_by_path.add_many((obj.path.segments, obj) for obj in ir_objects)
+        # Toss this overboard to save RAM. We're done with it now:
+        del self._index
 
     @classmethod
     def from_disk(cls, abs_source_paths, app, base_dir):
@@ -45,10 +47,9 @@ class Analyzer:
         Well, we can't scan through the raw TypeDoc output at runtime, because it's just a linear list of files, each containing a linear list of nodes. They're not indexed at all. And since we need to index by suffix, we need to traverse all the way down, eagerly. Also, we will keep the flattening, because we need it to resolve the IDs of references. (Some of the references are potentially important in the future: that's how TypeDoc points to superclass definitions of methods inherited by subclasses.
 
         """
-
         return self._objects_by_path.get(path_suffix)
 
-    def containing_module(self, node) -> Optional[Pathname]:
+    def _containing_module(self, node) -> Optional[Pathname]:
         """Return the Pathname pointing to the module containing the given
         node, None if one isn't found."""
         while True:
@@ -60,10 +61,10 @@ class Analyzer:
                 # Found one!
                 return Pathname(make_path_segments(node, self._base_dir))
 
-    def top_level_properties(self, node):
+    def _top_level_properties(self, node):
         source = node.get('sources')[0]
         if node.get('flags', {}).get('isExported', False):
-            exported_from = self.containing_module(node)
+            exported_from = self._containing_module(node)
         else:
             exported_from = None
         return dict(
@@ -81,7 +82,7 @@ class Analyzer:
 
             exported_from=exported_from)
 
-    def constructor_and_members(self, cls) -> Tuple[Optional[Function], List[Union[Function, Attribute]]]:
+    def _constructor_and_members(self, cls) -> Tuple[Optional[Function], List[Union[Function, Attribute]]]:
         """Return the constructor and other members of a class.
 
         In TS, a constructor may have multiple (overloaded) type signatures but
@@ -96,7 +97,7 @@ class Analyzer:
         constructor = None
         members = []
         for child in cls.get('children', []):
-            ir, _ = self.convert_node(child)
+            ir, _ = self._convert_node(child)
             if ir:
                 if (child.get('kindString') == 'Constructor'):
                     # This really, really should happen exactly once per class.
@@ -105,17 +106,17 @@ class Analyzer:
                     members.append(ir)
         return constructor, members
 
-    def convert_all_nodes(self, root):
+    def _convert_all_nodes(self, root):
         todo = [root]
         done = []
         while todo:
-            converted, more_todo = self.convert_node(todo.pop())
+            converted, more_todo = self._convert_node(todo.pop())
             if converted:
                 done.append(converted)
             todo.extend(more_todo)
         return done
 
-    def convert_node(self, node) -> Tuple[TopLevel, List[dict]]:
+    def _convert_node(self, node) -> Tuple[TopLevel, List[dict]]:
         """Convert a node of TypeScript JSON output to an IR object.
 
         :return: A tuple: (the IR object, a list of other nodes found within
@@ -142,27 +143,27 @@ class Analyzer:
             # Does anybody even use TS's old internal modules anymore?
             pass
         elif kind == 'Interface':
-            _, members = self.constructor_and_members(node)
+            _, members = self._constructor_and_members(node)
             ir = Interface(
                 members=members,
-                supers=self.related_types(node, kind='extendedTypes'),
-                **self.top_level_properties(node))
+                supers=self._related_types(node, kind='extendedTypes'),
+                **self._top_level_properties(node))
         elif kind == 'Class':
             # Every class has a constructor in the JSON, even if it's only
             # inherited.
-            constructor, members = self.constructor_and_members(node)
+            constructor, members = self._constructor_and_members(node)
             ir = Class(
                 constructor=constructor,
                 members=members,
-                supers=self.related_types(node, kind='extendedTypes'),
+                supers=self._related_types(node, kind='extendedTypes'),
                 is_abstract=node.get('flags', {}).get('isAbstract', False),
-                interfaces=self.related_types(node, kind='implementedTypes'),
-                **self.top_level_properties(node))
+                interfaces=self._related_types(node, kind='implementedTypes'),
+                **self._top_level_properties(node))
         elif kind in ['Property', 'Variable']:
             ir = Attribute(
-                type=self.type_name(node.get('type')),
+                type=self._type_name(node.get('type')),
                 **member_properties(node),
-                **self.top_level_properties(node))
+                **self._top_level_properties(node))
         elif kind == 'Accessor':  # NEXT: Write renderers.
             get_signature = node.get('getSignature')
             if get_signature:
@@ -173,9 +174,9 @@ class Analyzer:
                 # have multiple signatures, though.
                 type = node['setSignature'][0]['parameters'][0]['type']
             ir = Attribute(
-                type=self.type_name(type),
+                type=self._type_name(type),
                 **member_properties(node),
-                **self.top_level_properties(node))
+                **self._top_level_properties(node))
         elif kind in ['Function', 'Constructor', 'Method']:
             # There's really nothing in these; all the interesting bits are in the
             # contained 'Call signature' keys. We support only the first signature
@@ -187,7 +188,7 @@ class Analyzer:
             sigs = node.get('signatures')
             first_sig = sigs[0]  # Should always have at least one
             first_sig['sources'] = node['sources']
-            return self.convert_node(first_sig)
+            return self._convert_node(first_sig)
         elif kind in ['Call signature', 'Constructor signature']:
             # This is the real meat of a function, method, or constructor.
             #
@@ -195,19 +196,19 @@ class Analyzer:
             # should probably be called "constructor", but I'm not bothering
             # with that yet because nobody uses that attr on constructors atm.
             ir = Function(
-                params=[self.make_param(p) for p in node.get('parameters', [])],
+                params=[self._make_param(p) for p in node.get('parameters', [])],
                 # Exceptions are discouraged in TS as being unrepresentable in its
                 # type system. More importantly, TypeDoc does not support them.
                 exceptions=[],
                 # Though perhaps technically true, it looks weird to the user
                 # (and in the template) if constructors have a return value:
-                returns=self.make_returns(node) if kind != 'Constructor signature' else [],
+                returns=self._make_returns(node) if kind != 'Constructor signature' else [],
                 **member_properties(node['__parent']),
-                **self.top_level_properties(node))
+                **self._top_level_properties(node))
 
         return ir, node.get('children', [])
 
-    def related_types(self, node, kind):
+    def _related_types(self, node, kind):
         """Return the unambiguous pathnames of implemented interfaces or
         extended classes.
 
@@ -227,7 +228,7 @@ class Analyzer:
             # else it's some other thing we should go implement
         return types
 
-    def type_name(self, type):
+    def _type_name(self, type):
         """Return a string description of a type.
 
         :arg type: A TypeDoc-emitted type node
@@ -250,22 +251,22 @@ class Analyzer:
         elif type_of_type == 'stringLiteral':
             name = '"' + type['value'] + '"'
         elif type_of_type == 'array':
-            name = self.type_name(type['elementType']) + '[]'
+            name = self._type_name(type['elementType']) + '[]'
         elif type_of_type == 'tuple' and type.get('elements'):
-            types = [self.type_name(t) for t in type['elements']]
+            types = [self._type_name(t) for t in type['elements']]
             name = '[' + ', '.join(types) + ']'
         elif type_of_type == 'union':
-            name = ' | '.join(self.type_name(t) for t in type['types'])
+            name = ' | '.join(self._type_name(t) for t in type['types'])
         elif type_of_type == 'intersection':
-            name = ' & '.join(self.type_name(t) for t in type['types'])
+            name = ' & '.join(self._type_name(t) for t in type['types'])
         elif type_of_type == 'typeOperator':
-            name = type['operator'] + ' ' + self.type_name(type['target'])
+            name = type['operator'] + ' ' + self._type_name(type['target'])
             # e.g. "keyof T"
         elif type_of_type == 'typeParameter':
             name = type['name']
             constraint = type.get('constraint')
             if constraint is not None:
-                name += ' extends ' + self.type_name(constraint)
+                name += ' extends ' + self._type_name(constraint)
                 # e.g. K += extends + keyof T
         elif type_of_type == 'reflection':
             name = '<TODO: reflection>'
@@ -275,12 +276,12 @@ class Analyzer:
 
         type_args = type.get('typeArguments')
         if type_args:
-            arg_names = ', '.join(self.type_name(arg) for arg in type_args)
+            arg_names = ', '.join(self._type_name(arg) for arg in type_args)
             name += f'<{arg_names}>'
 
         return name
 
-    def make_param(self, param):
+    def _make_param(self, param):
         """Make a Param from a 'parameters' JSON item"""
         has_default = 'defaultValue' in param
         return Param(
@@ -291,10 +292,10 @@ class Analyzer:
             # For now, we just pass a single string in as the type rather than a
             # list of types to be unioned by the renderer. There's really no
             # disadvantage.
-            type=self.type_name(param.get('type', {})),
+            type=self._type_name(param.get('type', {})),
             default=param['defaultValue'] if has_default else NO_DEFAULT)
 
-    def make_returns(self, signature) -> List[Return]:
+    def _make_returns(self, signature) -> List[Return]:
         """Return the Returns a function signature can have.
 
         Because, in TypeDoc, each signature can have only 1 @return tag, we return
@@ -306,7 +307,7 @@ class Analyzer:
             # Returns nothing
             return []
         return [Return(
-            type=self.type_name(type),
+            type=self._type_name(type),
             description=signature.get('comment', {}).get('returns', '').strip())]
 
 
@@ -417,7 +418,7 @@ def make_path_segments(node, base_dir, child_was_static=None):
     kind = node.get('kindString')
     delimiter = '' if child_was_static is None else '.'
 
-    # Handle the cases here that are handled in convert_node(), plus any that
+    # Handle the cases here that are handled in _convert_node(), plus any that
     # are encountered on other nodes on the way up to the root.
     if kind in ['Variable', 'Property', 'Accessor', 'Interface', 'Module']:
         # We emit a segment for a Method's child Call Signature but skip the
