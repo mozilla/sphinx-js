@@ -12,7 +12,7 @@ from typing import List, Optional, Tuple, Union
 from sphinx.errors import SphinxError
 
 from .analyzer_utils import Command, is_explicitly_rooted
-from .ir import Attribute, Class, Exc, Function, Interface, NO_DEFAULT, Param, Pathname, Return, TopLevel
+from .ir import Attribute, Class, Function, Interface, NO_DEFAULT, Param, Pathname, Return, TopLevel
 from .suffix_tree import SuffixTree
 
 
@@ -434,7 +434,7 @@ def make_path_segments(node, base_dir, child_was_static=None):
         segments = [parent['name']]
     elif kind == 'Class':
         segments = [node['name']]
-        if child_was_static == False:
+        if child_was_static is False:
             delimiter = '#'
     elif kind == 'External module':
         # 'name' contains folder names if multiple folders are passed into

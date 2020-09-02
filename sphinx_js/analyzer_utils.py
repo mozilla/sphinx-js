@@ -1,6 +1,7 @@
 """Conveniences shared among analyzers"""
 
 from functools import wraps
+from json import dump, load
 import os
 
 

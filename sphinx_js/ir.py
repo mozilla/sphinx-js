@@ -23,7 +23,7 @@ let's at least have a well-documented one and one slightly more likely to
 survive template changes.
 
 """
-from dataclasses import dataclass, field, InitVar
+from dataclasses import dataclass, InitVar
 from typing import Any, List, NewType, Optional, Union
 
 from .analyzer_utils import dotted_path
@@ -104,7 +104,7 @@ class Param:
     #: be immediately suffixed to an equal sign in a formal param list. For
     #: example, the number 6 becomes the string "6" to create ``foo=6``. If
     #: has_default=True, this must be set.
-    default: InitVar[Any] = NO_DEFAULT
+    default: InitVar[Any] = NO_DEFAULT  # noqa: flake8 thinks this is a "def".
 
     def __post_init__(self, default):
         if self.has_default and default is NO_DEFAULT:
@@ -189,7 +189,7 @@ class Attribute(TopLevel, _Member):
 @dataclass
 class Function(TopLevel, _Member):
     params: List[Param]
-    exceptions: List[Exc]
+    exceptions: List[Exc]  # noqa: Linter is buggy.
     returns: List[Return]
 
 

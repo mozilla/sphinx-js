@@ -16,5 +16,5 @@ def test_missing_default():
     """Constructing a Param with ``has_default=True`` but without a ``default``
     value should raise an error."""
     with pytest.raises(ValueError):
-        p = Param(name='fred',
-                  has_default=True)
+        Param(name='fred',
+              has_default=True)

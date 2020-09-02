@@ -4,9 +4,8 @@ from unittest import TestCase
 
 import pytest
 
-from sphinx_js.ir import Attribute, Class, Exc, Function, Param, Pathname, Return
+from sphinx_js.ir import Attribute, Class, Function, Param, Pathname, Return
 from sphinx_js.typedoc import index_by_id, make_path_segments
-
 from tests.testing import dict_where, NO_MATCH, TypeDocAnalyzerTestCase, TypeDocTestCase
 
 
@@ -199,7 +198,7 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
         assert subclass.path == Pathname(['./', 'nodes.', 'EmptySubclass'])
         assert subclass.filename == 'nodes.ts'
         assert subclass.description == 'An empty subclass'
-        assert subclass.deprecated == False
+        assert subclass.deprecated is False
         assert subclass.examples == []
         assert subclass.see_alsos == []
         assert subclass.properties == []
@@ -224,7 +223,7 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
 
     def test_variable(self):
         """Make sure top-level consts and vars are found."""
-        const = self.analyzer.get_object(['topLevelConst']);
+        const = self.analyzer.get_object(['topLevelConst'])
         assert const.type == 'number'
 
     def test_function(self):
@@ -237,18 +236,17 @@ class ConvertNodeTests(TypeDocAnalyzerTestCase):
         func = self.analyzer.get_object(['func'])
         assert isinstance(func, Function)
         assert func.params == [
-                Param(name='a',
-                      description='Some number',
-                      has_default=True,
-                      is_variadic=False,
-                      type='number',
-                      default='1'),
-                Param(name='b',
-                      description='Some strings',
-                      has_default=False,
-                      is_variadic=True,
-                      type='string[]')
-            ]
+            Param(name='a',
+                  description='Some number',
+                  has_default=True,
+                  is_variadic=False,
+                  type='number',
+                  default='1'),
+            Param(name='b',
+                  description='Some strings',
+                  has_default=False,
+                  is_variadic=True,
+                  type='string[]')]
         assert func.exceptions == []
         assert func.returns == [Return(type='number', description='The best number')]
 
@@ -304,22 +302,21 @@ class TypeNameTests(TypeDocAnalyzerTestCase):
     def test_basic(self):
         """Test intrinsic types."""
         for obj_name, type_name in [
-                    ('bool', 'boolean'),
-                    ('num', 'number'),
-                    ('str', 'string'),
-                    ('array', 'number[]'),
-                    ('genericArray', 'Array<number>'),
-                    ('tuple', '[string, number]'),
-                    ('color', 'Color'),
-                    ('unk', 'unknown'),
-                    ('whatever', 'any'),
-                    ('voidy', 'void'),
-                    ('undef', 'undefined'),
-                    ('nully', 'null'),
-                    ('nev', 'never'),
-                    ('obj', 'object'),
-                    ('sym', 'symbol'),
-                ]:
+                ('bool', 'boolean'),
+                ('num', 'number'),
+                ('str', 'string'),
+                ('array', 'number[]'),
+                ('genericArray', 'Array<number>'),
+                ('tuple', '[string, number]'),
+                ('color', 'Color'),
+                ('unk', 'unknown'),
+                ('whatever', 'any'),
+                ('voidy', 'void'),
+                ('undef', 'undefined'),
+                ('nully', 'null'),
+                ('nev', 'never'),
+                ('obj', 'object'),
+                ('sym', 'symbol')]:
             obj = self.analyzer.get_object([obj_name])
             assert obj.type == type_name
 

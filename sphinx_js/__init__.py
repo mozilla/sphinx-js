@@ -54,7 +54,7 @@ def analyze(app):
         analyzer = {'javascript': JsAnalyzer,
                     'typescript': TsAnalyzer}[app.config.js_language]
     except KeyError:
-        raise SphinxError('Unsupported value of js_language in config: %s' % language)
+        raise SphinxError('Unsupported value of js_language in config: %s' % app.config.js_language)
 
     # Analyze source code:
     app._sphinxjs_analyzer = analyzer.from_disk(abs_source_paths,

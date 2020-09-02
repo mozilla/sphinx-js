@@ -1,4 +1,4 @@
-from sphinx_js.ir import Attribute, Class, Exc, Function, Param, Pathname, Return
+from sphinx_js.ir import Attribute, Exc, Function, Param, Pathname, Return
 from sphinx_js.jsdoc import full_path_segments
 from tests.testing import JsDocTestCase
 
@@ -84,7 +84,7 @@ class ClassTests(JsDocTestCase):
         assert private_method.name == 'secret'
         assert private_method.path == Pathname(['./', 'class.', 'Foo#', 'secret'])
         assert private_method.description == 'Private method.'
-        assert private_method.is_private == True
+        assert private_method.is_private is True
         assert isinstance(getter, Attribute)
         assert getter.name == 'bar'
         assert getter.path == Pathname(['./', 'class.', 'Foo#', 'bar'])

@@ -271,7 +271,6 @@ def top_level_properties(doclet, full_path):
     return dict(
         name=doclet['name'],
         path=Pathname(full_path),
-        #fs_path=join(doclet['meta']['path'], doclet['meta']['filename']),
         filename=doclet['meta']['filename'],
         # description's source varies depending on whether the doclet is a
         #    class, so it gets filled out elsewhere.
