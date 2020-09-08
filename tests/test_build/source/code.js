@@ -215,3 +215,9 @@ const SeeAttribute = null;
  * @see DeprecatedAttribute
  */
 class SeeClass {}
+
+/**
+ * @arg fnodeA {Node|Fnode}
+ */
+function union(fnodeA) {
+}

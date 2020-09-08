@@ -256,7 +256,7 @@ class Analyzer:
             types = [self._type_name(t) for t in type['elements']]
             name = '[' + ', '.join(types) + ']'
         elif type_of_type == 'union':
-            name = ' | '.join(self._type_name(t) for t in type['types'])
+            name = '|'.join(self._type_name(t) for t in type['types'])
         elif type_of_type == 'intersection':
             name = ' & '.join(self._type_name(t) for t in type['types'])
         elif type_of_type == 'typeOperator':

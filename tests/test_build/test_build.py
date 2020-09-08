@@ -320,6 +320,19 @@ class Tests(SphinxBuildTestCase):
             '   Returns:\n'
             '      **rtype_** -- >>Dorf_<<\n')
 
+    def test_union_types(self):
+        """Make sure union types render into RST non-wonkily.
+
+        The field was rendering into text as this before::
+
+            * **| Fnode fnodeA** (*Node*) --
+
+        I don't know what RST was thinking, but it got sane again when we
+        switched from " | " as the union separator back to "|".
+
+        """
+        assert '* **fnodeA** (*Node|Fnode*) --' in self._file_contents('union')
+
 
 DESCRIPTION = """
 
@@ -332,8 +345,8 @@ FIELDS = u"""
       * **node** (*Node*) -- Something of a single type
 
    Throws:
-      **PartyError | FartyError** -- Something with multiple types and
-      a line that wraps
+      **PartyError|FartyError** -- Something with multiple types and a
+      line that wraps
 
    Returns:
       **Number** -- What a thing
