@@ -1,5 +1,7 @@
 /**
- * Class doc.
+ * This is a long class that should be unwrapped. Once day, I was walking down
+ * the street, and a large, green, polka-dotted grand piano fell from the 23rd
+ * floor of an apartment building.
  *
  * @example Example in class
  */

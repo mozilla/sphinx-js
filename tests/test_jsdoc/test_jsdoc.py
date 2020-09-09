@@ -74,8 +74,8 @@ class ClassTests(JsDocTestCase):
         assert cls.name == 'Foo'
         assert cls.path == Pathname(['./', 'class.', 'Foo'])
         assert cls.filename == 'class.js'
-        assert cls.description == 'Class doc.'
-        assert cls.line == 13  # Not ideal, as it refers to the constructor, but we'll allow it
+        assert cls.description == 'This is a long class that should be unwrapped. Once day, I was walking down the street, and a large, green, polka-dotted grand piano fell from the 23rd floor of an apartment building.'
+        assert cls.line == 15  # Not ideal, as it refers to the constructor, but we'll allow it
         assert cls.examples == ['Example in constructor']  # We ignore examples and other fields from the class doclet so far. This could change someday.
 
         # Members:

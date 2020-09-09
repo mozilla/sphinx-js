@@ -113,7 +113,7 @@ class Analyzer:
             member = doclet_as_whatever(member_doclet, member_full_path)
             members.append(member)
         return Class(
-            description=doclet.get('classdesc', ''),
+            description=unwrapped(doclet.get('classdesc', '')),
             supers=[],  # Could implement for JS later.
             exported_from=None,  # Could implement for JS later.
             is_abstract=False,
@@ -128,7 +128,7 @@ class Analyzer:
     @staticmethod
     def _doclet_as_function(doclet, full_path):
         return Function(
-            description=unwrapped_description(doclet),
+            description=unwrapped(description(doclet)),
             exported_from=None,
             is_abstract=False,
             is_optional=False,
@@ -142,7 +142,7 @@ class Analyzer:
     @staticmethod
     def _doclet_as_attribute(doclet, full_path):
         return Attribute(
-            description=unwrapped_description(doclet),
+            description=unwrapped(description(doclet)),
             exported_from=None,
             is_abstract=False,
             is_optional=False,
@@ -249,8 +249,13 @@ def format_default_according_to_type_hints(value, declared_types, first_type_is_
             return dumps(value)
 
 
-def unwrapped_description(obj):
-    return sub(r'[ \t]*[\r\n]+[ \t]*', ' ', obj.get('description', ''))  # TODO: Don't unwrap unless totally unindented. Maybe this would let us support OLs and ULs in param descriptions.
+def unwrapped(text):
+    """Return the text with line wrapping removed."""
+    return sub(r'[ \t]*[\r\n]+[ \t]*', ' ', text)  # TODO: Don't unwrap unless totally unindented. Maybe this would let us support OLs and ULs in param descriptions.
+
+
+def description(obj):
+    return obj.get('description', '')
 
 
 def get_type(props):
@@ -289,7 +294,7 @@ def properties_to_ir(properties):
                       # because we never use them for anything:
                       path=Pathname([]),
                       filename='',
-                      description=unwrapped_description(p),
+                      description=unwrapped(description(p)),
                       line=0,
                       deprecated=False,
                       examples=[],
@@ -347,7 +352,7 @@ def params_to_ir(doclet):
                 first_type_is_string(p.get('type', {}))))
         ret.append(Param(
             name=p['name'],
-            description=p.get('description', ''),
+            description=unwrapped(description(p)),
             has_default=default is not NO_DEFAULT,
             default=formatted_default,
             is_variadic=p.get('variable', False),
@@ -364,11 +369,11 @@ def params_to_ir(doclet):
 def exceptions_to_ir(exceptions):
     """Turn jsdoc's JSON-formatted exceptions into a list of Exceptions."""
     return [Exc(type=get_type(e),
-                description=unwrapped_description(e))
+                description=unwrapped(description(e)))
             for e in exceptions]
 
 
 def returns_to_ir(returns):
     return [Return(type=get_type(r),
-                   description=unwrapped_description(r))
+                   description=unwrapped(description(r)))
             for r in returns]
