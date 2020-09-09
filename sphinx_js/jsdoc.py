@@ -9,7 +9,6 @@ from collections import defaultdict
 from errno import ENOENT
 from json import load, dumps
 from os.path import join, normpath, relpath, splitext, sep
-from re import sub
 import subprocess
 from tempfile import TemporaryFile
 
@@ -249,11 +248,6 @@ def format_default_according_to_type_hints(value, declared_types, first_type_is_
             return dumps(value)
 
 
-def unwrapped(text):
-    """Return the text with line wrapping removed."""
-    return sub(r'[ \t]*[\r\n]+[ \t]*', ' ', text)  # TODO: Don't unwrap unless totally unindented. Maybe this would let us support OLs and ULs in param descriptions.
-
-
 def description(obj):
     return obj.get('description', '')
 
@@ -352,7 +346,7 @@ def params_to_ir(doclet):
                 first_type_is_string(p.get('type', {}))))
         ret.append(Param(
             name=p['name'],
-            description=unwrapped(description(p)),
+            description=description(p),
             has_default=default is not NO_DEFAULT,
             default=formatted_default,
             is_variadic=p.get('variable', False),
@@ -369,11 +363,11 @@ def params_to_ir(doclet):
 def exceptions_to_ir(exceptions):
     """Turn jsdoc's JSON-formatted exceptions into a list of Exceptions."""
     return [Exc(type=get_type(e),
-                description=unwrapped(description(e)))
+                description=description(e))
             for e in exceptions]
 
 
 def returns_to_ir(returns):
     return [Return(type=get_type(r),
-                   description=unwrapped(description(r)))
+                   description=description(r))
             for r in returns]

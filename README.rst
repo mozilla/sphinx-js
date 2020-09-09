@@ -359,6 +359,7 @@ Version History
     * Remove the "exported from" module links from classes and interfaces. Functions never had them. Let's see if we miss them.
     * Pathnames for TypeScript objects no longer spuriously use ``~`` after the filename path segment; now they use ``.`` as in JS.
     * More generally, TS pathnames are now just like JS ones. There is no more ``external:`` prefix in front of filenames or ``module:`` in front of namespace names.
+    * TS analyzer no longer cares with the current working directory is.
   * No longer show args in the arg list that are utterly uninformative, lacking both description and type info.
   * Class attributes are now listed before methods unless manally ordered with ``:members:``.
 

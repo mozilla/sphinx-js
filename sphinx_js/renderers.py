@@ -1,3 +1,5 @@
+from re import sub
+
 from docutils.parsers.rst import Parser as RstParser
 from docutils.statemachine import StringList
 from docutils.utils import new_document
@@ -153,7 +155,14 @@ class JsRenderer(object):
                 result = callback(instance)
                 if result:
                     heads, tail = result
-                    yield [rst.escape(h) for h in heads], tail
+                    # If there are line breaks in the tail, the RST parser will
+                    # end the field list prematurely.
+                    #
+                    # TODO: Instead, indent multi-line tails juuuust right, and
+                    # we can enjoy block-level constructs within tails:
+                    # https://docutils.sourceforge.io/docs/ref/rst/
+                    # restructuredtext.html#field-lists.
+                    yield [rst.escape(h) for h in heads], unwrapped(tail)
 
 
 class AutoFunctionRenderer(JsRenderer):
@@ -306,6 +315,11 @@ class AutoAttributeRenderer(JsRenderer):
             examples=obj.examples,
             type=obj.type,
             content='\n'.join(self._content))
+
+
+def unwrapped(text):
+    """Return the text with line wrapping removed."""
+    return sub(r'[ \t]*[\r\n]+[ \t]*', ' ', text)
 
 
 def _return_formatter(return_):

@@ -333,6 +333,31 @@ class Tests(SphinxBuildTestCase):
         """
         assert '* **fnodeA** (*Node|Fnode*) --' in self._file_contents('union')
 
+    def test_field_list_unwrapping(self):
+        """Ensure the tails of field lists have line breaks and leading
+        whitespace removed.
+
+        Otherwise, the RST parser decides the field list is over, leading to
+        mangled markup.
+
+        """
+        self._file_contents_eq(
+            'unwrapped',
+            'longDescriptions(a, b)\n'
+            '\n'
+            '   Once upon a time, there was a large bear named Sid. Sid wore green\n'
+            '   pants with blue stripes and pink polka dots.\n'
+            '\n'
+            # Also assert that line breaks in the description are preserved:
+            '   * List!\n'
+            '\n'
+            '   Arguments:\n'
+            '      * **a** -- A is the first letter of the Roman alphabet. It is\n'
+            '        used in such illustrious words as aardvark and artichoke.\n'
+            '\n'
+            '      * **b** -- Next param, which should be part of the same field\n'
+            '        list\n')
+
 
 DESCRIPTION = """
 

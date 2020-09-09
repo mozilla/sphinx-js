@@ -96,6 +96,9 @@ class Param:
     """A parameter of either a function or (in the case of TS, which has
     classes parametrized by type) a class."""
     name: str
+    #: The description text (like all other description fields in the IR)
+    #: retains any line breaks and subsequent indentation whitespace that were
+    #: in the source code.
     description: ReStructuredText = ''
     has_default: bool = False
     is_variadic: bool = False

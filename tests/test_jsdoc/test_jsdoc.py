@@ -36,6 +36,7 @@ class FunctionTests(JsDocTestCase):
             name='foo',
             path=Pathname(['./', 'function.', 'foo']),
             filename='function.js',
+            # Line breaks and indentation should be preserved:
             description=(
                 'Determine any of type, note, score, and element using a callback. This\n'
                 'overrides any previous call.\n'
@@ -44,12 +45,8 @@ class FunctionTests(JsDocTestCase):
                 '\n'
                 '* An optional :term:`subscore`\n'
                 '* A type (required on ``dom(...)`` rules, defaulting to the input one on\n'
-                '  ``type(...)`` rules)\n'
-                '* Optional notes\n'
-                '* An element, defaulting to the input one. Overriding the default\n'
-                '  enables a callback to walk around the tree and say things about nodes\n'
-                '  other than the input one.'),
-            line=21,
+                '  ``type(...)`` rules)'),
+            line=17,
             deprecated=False,
             examples=[],
             see_alsos=[],
@@ -74,7 +71,8 @@ class FunctionTests(JsDocTestCase):
                             description='ExplosionError It went boom.')],
             returns=[
                 Return(type='Number',
-                       description='How many things there are')])  # Test text unwrapping.
+                       # Line breaks and indentation should be preserved:
+                       description='How many things\n    there are')])
 
 
 class ClassTests(JsDocTestCase):

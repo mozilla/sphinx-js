@@ -221,3 +221,16 @@ class SeeClass {}
  */
 function union(fnodeA) {
 }
+
+/**
+ * Once upon a time, there was a large bear named Sid. Sid wore green pants
+ * with blue stripes and pink polka dots.
+ *
+ * * List!
+ *
+ * @param a A is the first letter of the Roman alphabet. It is used in such
+ *     illustrious words as aardvark and artichoke.
+ * @param b Next param, which should be part of the same field list
+ */
+function longDescriptions(a, b) {
+}

@@ -12,7 +12,7 @@ from tests.testing import dict_where, NO_MATCH, TypeDocAnalyzerTestCase, TypeDoc
 class IndexByIdTests(TestCase):
     def test_top_level_function(self):
         """Make sure nodes get indexed."""
-        # A simple TypeDoc JSON dump of a soruce file with a single, top-level
+        # A simple TypeDoc JSON dump of a source file with a single, top-level
         # function with no params or return value:
         json = loads(r"""{
           "id": 0,
