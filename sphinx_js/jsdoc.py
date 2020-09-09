@@ -113,7 +113,7 @@ class Analyzer:
             member = doclet_as_whatever(member_doclet, member_full_path)
             members.append(member)
         return Class(
-            description=unwrapped(doclet.get('classdesc', '')),
+            description=doclet.get('classdesc', ''),
             supers=[],  # Could implement for JS later.
             exported_from=None,  # Could implement for JS later.
             is_abstract=False,
@@ -128,7 +128,7 @@ class Analyzer:
     @staticmethod
     def _doclet_as_function(doclet, full_path):
         return Function(
-            description=unwrapped(description(doclet)),
+            description=description(doclet),
             exported_from=None,
             is_abstract=False,
             is_optional=False,
@@ -142,7 +142,7 @@ class Analyzer:
     @staticmethod
     def _doclet_as_attribute(doclet, full_path):
         return Attribute(
-            description=unwrapped(description(doclet)),
+            description=description(doclet),
             exported_from=None,
             is_abstract=False,
             is_optional=False,
@@ -294,7 +294,7 @@ def properties_to_ir(properties):
                       # because we never use them for anything:
                       path=Pathname([]),
                       filename='',
-                      description=unwrapped(description(p)),
+                      description=description(p),
                       line=0,
                       deprecated=False,
                       examples=[],

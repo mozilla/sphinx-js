@@ -36,8 +36,20 @@ class FunctionTests(JsDocTestCase):
             name='foo',
             path=Pathname(['./', 'function.', 'foo']),
             filename='function.js',
-            description='Function foo.',
-            line=10,
+            description=(
+                'Determine any of type, note, score, and element using a callback. This\n'
+                'overrides any previous call.\n'
+                '\n'
+                'The callback should return...\n'
+                '\n'
+                '* An optional :term:`subscore`\n'
+                '* A type (required on ``dom(...)`` rules, defaulting to the input one on\n'
+                '  ``type(...)`` rules)\n'
+                '* Optional notes\n'
+                '* An element, defaulting to the input one. Overriding the default\n'
+                '  enables a callback to walk around the tree and say things about nodes\n'
+                '  other than the input one.'),
+            line=21,
             deprecated=False,
             examples=[],
             see_alsos=[],
@@ -74,7 +86,7 @@ class ClassTests(JsDocTestCase):
         assert cls.name == 'Foo'
         assert cls.path == Pathname(['./', 'class.', 'Foo'])
         assert cls.filename == 'class.js'
-        assert cls.description == 'This is a long class that should be unwrapped. Once day, I was walking down the street, and a large, green, polka-dotted grand piano fell from the 23rd floor of an apartment building.'
+        assert cls.description == 'This is a long description that should not be unwrapped. Once day, I was\nwalking down the street, and a large, green, polka-dotted grand piano fell\nfrom the 23rd floor of an apartment building.'
         assert cls.line == 15  # Not ideal, as it refers to the constructor, but we'll allow it
         assert cls.examples == ['Example in constructor']  # We ignore examples and other fields from the class doclet so far. This could change someday.
 
