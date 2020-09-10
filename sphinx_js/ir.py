@@ -7,10 +7,10 @@ surprising, and occasionally changing.
 
 This IR is not intended to be a lossless representation of either jsdoc's or
 typedoc's output. Nor is it meant to generalize to other uses like static
-analysis. Ideally, it exists to provide the minimum information necessary to
-render our Sphinx templates about JS and TS entities. Any expansion or
-generalization of the IR should be driven by needs of those templates and the
-(minimal) logic around them. The complexity of doing otherwise has no payback.
+analysis. Ideally, it provides the minimum information necessary to render our
+Sphinx templates about JS and TS entities. Any expansion or generalization of
+the IR should be driven by needs of those templates and the (minimal) logic
+around them. The complexity of doing otherwise has no payback.
 
 I was conflicted about introducing an additional representation, since a
 multiplicity of representations incurs conversion complexity costs at a

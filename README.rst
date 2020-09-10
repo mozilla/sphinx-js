@@ -22,7 +22,7 @@ Setup
 
         npm install -g typedoc
 
-   We work with JSDoc 3.6.3 and quite possibly other versions. TypeDoc 0.15.0 is known to work.
+   JSDoc 3.6.3 and TypeDoc 0.15.0 are known to work.
 
 2. Install sphinx-js, which will pull in Sphinx itself as a dependency::
 
@@ -64,16 +64,16 @@ Setup
 5. If you want to document TypeScript, add ``js_language = 'typescript'`` to conf.py as well.
 6. If your JS source code is anywhere but at the root of your project, add ``js_source_path = '../somewhere/else'`` on a line by itself in conf.py. The root of your JS source tree should be where that setting points, relative to the conf.py file. (The default, ``../``, works well when there is a ``docs`` folder at the root of your project and your source code lives directly inside the root.)
 7. If you have special JSDoc or TypeDoc configuration, add ``jsdoc_config_path = '../conf.json'`` (for example) to conf.py as well.
-8. If you're documenting only JS/TS and no other languages, you can set your "primary domain" to JS in conf.py::
+8. If you're documenting only JS or TS and no other languages (like C), you can set your "primary domain" to JS in conf.py::
 
         primary_domain = 'js'
 
-   Then you can omit all the "js:" prefixes in the directives below.
+   (The domain is ``js`` even if you're writing TypeScript.) Then you can omit all the "js:" prefixes in the directives below.
 
 Use
 ===
 
-In short, write a folder full of reStructuredText files, use the following directives to pull in your JSDoc documentation, then tell Sphinx to render it all by running ``make html`` in your docs directory. If you have never used Sphinx or written reStructuredText before, here is `where we left off in its tutorial <http://www.sphinx-doc.org/en/stable/tutorial.html#defining-document-structure>`_. For a quick start, just add things to index.rst for now.
+In short, write a folder full of reStructuredText files, use the following directives to pull in your JSDoc documentation, then tell Sphinx to render it all by running ``make html`` in your docs directory. If you have never used Sphinx or written reStructuredText before, here is `where we left off in its tutorial <http://www.sphinx-doc.org/en/stable/tutorial.html#defining-document-structure>`_. For a quick start, just add things to index.rst until you prove things are working.
 
 autofunction
 ------------
@@ -360,6 +360,7 @@ Version History
     * Pathnames for TypeScript objects no longer spuriously use ``~`` after the filename path segment; now they use ``.`` as in JS.
     * More generally, TS pathnames are now just like JS ones. There is no more ``external:`` prefix in front of filenames or ``module:`` in front of namespace names.
     * TS analyzer no longer cares with the current working directory is.
+    * Tests now assert only what they care about rather than being brittle to the point of prohibiting any change.
   * No longer show args in the arg list that are utterly uninformative, lacking both description and type info.
   * Class attributes are now listed before methods unless manally ordered with ``:members:``.
 
