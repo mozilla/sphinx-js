@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import pytest
 
 from sphinx_js.suffix_tree import SuffixAmbiguous, SuffixNotFound, SuffixTree

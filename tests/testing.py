@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from io import open
 from os.path import dirname, join
 from shutil import rmtree

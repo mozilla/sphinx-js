@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from sphinx_js.parsers import PathVisitor, path_and_formal_params
 
 
