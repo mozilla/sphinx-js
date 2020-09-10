@@ -2,7 +2,7 @@ from tests.testing import SphinxBuildTestCase
 
 
 class TextBuilderTests(SphinxBuildTestCase):
-    """Tests which require our one big Sphinx tree to be built (as text)"""
+    """Tests which require our big TS Sphinx tree to be built (as text)"""
 
     def test_autoclass_constructor(self):
         """Make sure class constructor comes before methods."""

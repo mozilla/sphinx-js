@@ -2,9 +2,13 @@ from tests.testing import SphinxBuildTestCase
 
 
 class Tests(SphinxBuildTestCase):
-    """Tests which require our one big Sphinx tree to be built.
+    """Tests which require our big JS Sphinx tree to be built.
 
     Yes, it's too coupled.
+
+    Many of these are renderer tests, but some indirectly test JS analysis.
+    These latter are left over from when JS was the only supported language and
+    had its assumptions coded into the renderers.
 
     """
     def test_autofunction_minimal(self):
