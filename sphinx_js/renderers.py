@@ -19,7 +19,7 @@ class JsRenderer(object):
     Provides an inversion-of-control framework for rendering and bridges us
     from the hidden, closed-over JsDirective subclasses to top-level classes
     that can see and use each other. Handles parsing of a single, all-consuming
-    argument that consists of a JS entity reference and an optional formal
+    argument that consists of a JS/TS entity reference and an optional formal
     parameter list.
 
     """

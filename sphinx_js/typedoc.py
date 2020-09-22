@@ -87,8 +87,8 @@ class Analyzer:
 
         In TS, a constructor may have multiple (overloaded) type signatures but
         only one implementation. (Same with functions.) So there's at most 1
-        constructor to return. Return None for the constructor if it is inherited
-        or implied rather than explicitly present in the class.
+        constructor to return. Return None for the constructor if it is
+        inherited or implied rather than explicitly present in the class.
 
         :arg cls: A TypeDoc node of the class to take apart
         :return: A tuple of (constructor Function, list of other members)
@@ -136,8 +136,8 @@ class Analyzer:
         ir = None
         kind = node.get('kindString')
         if kind == 'External module':
-            # We shouldn't need these until we implement automodule. But what of
-            # js:mod in the templates?
+            # We shouldn't need these until we implement automodule. But what
+            # of js:mod in the templates?
             pass
         elif kind == 'Module':
             # Does anybody even use TS's old internal modules anymore?
@@ -170,21 +170,21 @@ class Analyzer:
                 # There's no signature to speak of for a getter: only a return type.
                 type = get_signature[0]['type']
             else:
-                # ES6 says setters have exactly 1 param. I'm not sure if they can
-                # have multiple signatures, though.
+                # ES6 says setters have exactly 1 param. I'm not sure if they
+                # can have multiple signatures, though.
                 type = node['setSignature'][0]['parameters'][0]['type']
             ir = Attribute(
                 type=self._type_name(type),
                 **member_properties(node),
                 **self._top_level_properties(node))
         elif kind in ['Function', 'Constructor', 'Method']:
-            # There's really nothing in these; all the interesting bits are in the
-            # contained 'Call signature' keys. We support only the first signature
-            # at the moment, because to do otherwise would create multiple
-            # identical pathnames to the same function, which would cause the
-            # suffix tree to raise an exception while being built. An eventual
-            # solution might be to store the signatures in a one-to-many attr of
-            # Functions.
+            # There's really nothing in these; all the interesting bits are in
+            # the contained 'Call signature' keys. We support only the first
+            # signature at the moment, because to do otherwise would create
+            # multiple identical pathnames to the same function, which would
+            # cause the suffix tree to raise an exception while being built. An
+            # eventual solution might be to store the signatures in a one-to-
+            # many attr of Functions.
             sigs = node.get('signatures')
             first_sig = sigs[0]  # Should always have at least one
             first_sig['sources'] = node['sources']
@@ -289,8 +289,8 @@ class Analyzer:
             description=make_description(param.get('comment', {})),
             has_default=has_default,
             is_variadic=param.get('flags', {}).get('isRest', False),
-            # For now, we just pass a single string in as the type rather than a
-            # list of types to be unioned by the renderer. There's really no
+            # For now, we just pass a single string in as the type rather than
+            # a list of types to be unioned by the renderer. There's really no
             # disadvantage.
             type=self._type_name(param.get('type', {})),
             default=param['defaultValue'] if has_default else NO_DEFAULT)
@@ -298,8 +298,8 @@ class Analyzer:
     def _make_returns(self, signature) -> List[Return]:
         """Return the Returns a function signature can have.
 
-        Because, in TypeDoc, each signature can have only 1 @return tag, we return
-        a list of either 0 or 1 item.
+        Because, in TypeDoc, each signature can have only 1 @return tag, we
+        return a list of either 0 or 1 item.
 
         """
         type = signature.get('type')
@@ -386,7 +386,7 @@ def short_name(node):
 
 
 # Optimization: Could memoize this for probably a decent perf gain: every child
-# of an object redoes th work for all its parents.
+# of an object redoes the work for all its parents.
 def make_path_segments(node, base_dir, child_was_static=None):
     """Return the full, unambiguous list of path segments that points to an
     entity described by a TypeDoc JSON node.

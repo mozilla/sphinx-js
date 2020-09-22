@@ -14,7 +14,7 @@ from .renderers import AutoFunctionRenderer, AutoClassRenderer, AutoAttributeRen
 
 
 class JsDirective(Directive):
-    """Abstract directive which knows how to pull things out of JSDoc output"""
+    """Abstract directive which knows how to pull things out of our IR"""
 
     has_content = True
     required_arguments = 1
