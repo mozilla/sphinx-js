@@ -44,7 +44,14 @@ class Analyzer:
 
         :arg as_type: Ignored
 
-        Well, we can't scan through the raw TypeDoc output at runtime, because it's just a linear list of files, each containing a linear list of nodes. They're not indexed at all. And since we need to index by suffix, we need to traverse all the way down, eagerly. Also, we will keep the flattening, because we need it to resolve the IDs of references. (Some of the references are potentially important in the future: that's how TypeDoc points to superclass definitions of methods inherited by subclasses.
+        We can't scan through the raw TypeDoc output at runtime like the JSDoc
+        analyzer does, because it's just a linear list of files, each
+        containing a nested tree of nodes. They're not indexed at all. And
+        since we need to index by suffix, we need to traverse all the way down,
+        eagerly. Also, we will keep the flattening, because we need it to
+        resolve the IDs of references. (Some of the references are potentially
+        important in the future: that's how TypeDoc points to superclass
+        definitions of methods inherited by subclasses.)
 
         """
         return self._objects_by_path.get(path_suffix)
@@ -164,7 +171,7 @@ class Analyzer:
                 type=self._type_name(node.get('type')),
                 **member_properties(node),
                 **self._top_level_properties(node))
-        elif kind == 'Accessor':  # NEXT: Write renderers.
+        elif kind == 'Accessor':
             get_signature = node.get('getSignature')
             if get_signature:
                 # There's no signature to speak of for a getter: only a return type.

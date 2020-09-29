@@ -68,7 +68,7 @@ class JsRenderer(object):
             obj = self._app._sphinxjs_analyzer.get_object(
                 self._partial_path, self._renderer_type)
         except SuffixNotFound as exc:
-            raise SphinxError('No JSDoc documentation was found for object "%s" or any path ending with that.'
+            raise SphinxError('No documentation was found for object "%s" or any path ending with that.'
                               % ''.join(exc.segments))
         except SuffixAmbiguous as exc:
             raise SphinxError('More than one object matches the path suffix "%s". Candidate paths have these segments in front: %s'
