@@ -8,5 +8,6 @@ master_doc = 'index'
 author = u'Erik Rose'
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
-jsdoc_config_path = '../tsconfig.json'
+jsdoc_config_path = '../typedoc.json'
+jsdoc_tsconfig_path = '../tsconfig.json'
 js_language = 'typescript'

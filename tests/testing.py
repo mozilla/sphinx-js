@@ -35,7 +35,7 @@ class SphinxBuildTestCase(ThisDirTestCase):
         cls.docs_dir = join(cls.this_dir(), 'source', 'docs')
         # -v for better tracebacks:
         if sphinx_main([cls.docs_dir, '-b', cls.builder, '-v', '-E', join(cls.docs_dir, '_build')]):
-                raise RuntimeError('Sphinx build exploded.')
+            raise RuntimeError('Sphinx build exploded.')
 
     @classmethod
     def teardown_class(cls):
@@ -75,6 +75,7 @@ class TypeDocTestCase(ThisDirTestCase):
         cls.json = typedoc_output([join(cls._source_dir, file)
                                    for file in cls.files],
                                   cls._source_dir,
+                                  None,
                                   'tsconfig.json')
         index_by_id({}, cls.json)
 

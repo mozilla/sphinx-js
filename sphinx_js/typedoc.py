@@ -36,7 +36,8 @@ class Analyzer:
     def from_disk(cls, abs_source_paths, app, base_dir):
         json = typedoc_output(abs_source_paths,
                               app.confdir,
-                              app.config.jsdoc_config_path)
+                              getattr(app.config, 'jsdoc_config_path', None),
+                              getattr(app.config, 'jsdoc_tsconfig_path', None))
         return cls(json, base_dir)
 
     def get_object(self, path_suffix, as_type=None):
@@ -311,12 +312,15 @@ class Analyzer:
             description=signature.get('comment', {}).get('returns', '').strip())]
 
 
-def typedoc_output(abs_source_paths, sphinx_conf_dir, config_path):
+def typedoc_output(abs_source_paths, sphinx_conf_dir, config_path, tsconfig_path=None):
     """Return the loaded JSON output of the TypeDoc command run over the given
     paths."""
     command = Command('typedoc')
     if config_path:
-        command.add('--tsconfig', normpath(join(sphinx_conf_dir, config_path)))
+        command.add('--options', normpath(join(sphinx_conf_dir, config_path)))
+
+    if tsconfig_path:
+        command.add('--tsconfig', normpath(join(sphinx_conf_dir, tsconfig_path)))
 
     with NamedTemporaryFile(mode='w+b') as temp:
         command.add('--json', temp.name, *abs_source_paths)

@@ -306,7 +306,10 @@ Configuration Reference
   A list of directories to scan (non-recursively) for JS or TS source files, relative to Sphinx's conf.py file. Can be a string instead if there is only one. If there is more than one, ``root_for_relative_js_paths`` must be specified as well. Defaults to '../'.
 
 ``jsdoc_config_path``
-  A conf.py-relative path to a JSDoc config file, which is useful if you want to specify your own JSDoc options, like recursion and custom filename matching. If using TypeDoc, you can also point to a ``tsconfig.json`` file.
+  A conf.py-relative path to a JSDoc config file, which is useful if you want to specify your own JSDoc options, like recursion and custom filename matching. If using TypeDoc, you can also point to a ``typedoc.json`` file.
+
+``jsdoc_tsconfig_path``
+  If using TypeDoc, specify the path of ``tsconfig.json`` file
 
 ``root_for_relative_js_paths``
   Relative JS entity paths are resolved relative to this path. Defaults to ``js_source_path`` if it is only one item.
