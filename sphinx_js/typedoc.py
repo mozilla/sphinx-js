@@ -57,7 +57,7 @@ class Analyzer:
             if not node or node['id'] == 0:
                 # We went all the way up but didn't find a containing module.
                 return
-            elif node.get('kindString') == 'External module':
+            elif node.get('kindString') in ['External module', 'Module']:
                 # Found one!
                 return Pathname(make_path_segments(node, self._base_dir))
 
@@ -221,7 +221,7 @@ class Analyzer:
         """
         types = []
         for type in node.get(kind, []):
-            if type['type'] == 'reference':
+            if type['type'] == 'reference' and 'id' in type:
                 pathname = Pathname(make_path_segments(self._index[type['id']],
                                                        self._base_dir))
                 types.append(pathname)
@@ -420,7 +420,7 @@ def make_path_segments(node, base_dir, child_was_static=None):
 
     # Handle the cases here that are handled in _convert_node(), plus any that
     # are encountered on other nodes on the way up to the root.
-    if kind in ['Variable', 'Property', 'Accessor', 'Interface', 'Module']:
+    if kind in ['Variable', 'Property', 'Accessor', 'Interface', 'Namespace']:
         # We emit a segment for a Method's child Call Signature but skip the
         # Method itself. They 2 nodes have the same names, but, by taking the
         # child, we fortuitously end up without a trailing delimiter on our
@@ -436,7 +436,7 @@ def make_path_segments(node, base_dir, child_was_static=None):
         segments = [node['name']]
         if child_was_static is False:
             delimiter = '#'
-    elif kind == 'External module':
+    elif kind in ['External module', 'Module']:
         # 'name' contains folder names if multiple folders are passed into
         # TypeDoc. It's also got excess quotes. So we ignore it and take
         # 'originalName', which has a nice, absolute path.
