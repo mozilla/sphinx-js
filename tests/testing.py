@@ -66,7 +66,7 @@ class JsDocTestCase(ThisDirTestCase):
 
 
 class TypeDocTestCase(ThisDirTestCase):
-    """Base class for tests which analyze a file using TypeDoc"""
+    """Base class for tests which imbibe TypeDoc's output"""
 
     @classmethod
     def setup_class(cls):
