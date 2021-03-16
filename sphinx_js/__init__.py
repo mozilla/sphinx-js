@@ -44,9 +44,9 @@ def analyze(app):
     away its results in a language-specific Analyzer."""
     # Normalize config values:
     source_paths = [app.config.js_source_path] if isinstance(app.config.js_source_path, str) else app.config.js_source_path
-    abs_source_paths = [normpath(join(app.confdir, path)) for path in source_paths]
+    abs_source_paths = [normpath(join(app.srcdir, path)) for path in source_paths]
     root_for_relative_paths = root_or_fallback(
-        normpath(join(app.confdir, app.config.root_for_relative_js_paths)) if app.config.root_for_relative_js_paths else None,
+        normpath(join(app.srcdir, app.config.root_for_relative_js_paths)) if app.config.root_for_relative_js_paths else None,
         abs_source_paths)
 
     # Pick analyzer:
