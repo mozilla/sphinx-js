@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='sphinx-js',
-    version='3.1.1',
+    version='3.1.2',
     description='Support for using Sphinx on JSDoc-documented JS code',
     long_description=open('README.rst', 'r', encoding='utf8').read(),
     long_description_content_type="text/x-rst",
@@ -14,7 +14,7 @@ setup(
     packages=find_packages(exclude=['ez_setup']),
     url='https://github.com/mozilla/sphinx-js',
     include_package_data=True,
-    install_requires=['docutils', 'Jinja2>2.0,<3.0', 'parsimonious>=0.7.0,<0.8.0', 'Sphinx>=3.0.0'],
+    install_requires=['Jinja2>2.0,<3.0', 'parsimonious>=0.7.0,<0.8.0', 'Sphinx>=3.0.0'],
     python_requires='>=3.7',
     classifiers=[
         'Intended Audience :: Developers',

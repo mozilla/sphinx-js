@@ -1,6 +1,6 @@
-pytest==5.4.3
-recommonmark==0.6.0
+pytest==6.2.3
+recommonmark==0.7.1
 # Sphinx's plain-text renderer changes behavior slightly
 # with regard to how it emits class names and em dashes from
 # time to time:
-Sphinx==3.1.1
+Sphinx==3.5.4

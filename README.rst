@@ -327,7 +327,7 @@ A good example using most of sphinx-js's functionality is the Fathom documentati
 
 Then put the version of sphinx-js you want in ``docs/requirements.txt``. For example... ::
 
-    sphinx-js==3.1.1
+    sphinx-js==3.1.2
 
 Or, if you prefer, the Fathom repo carries a `Travis CI configuration <https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/.travis.yml#L41>`_ and a `deployment script <https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/tooling/travis-deploy-docs>`_ for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them.
 
@@ -347,6 +347,9 @@ Run the tests using tox, which will also install JSDoc and TypeDoc at pinned ver
 
 Version History
 ===============
+
+3.1.2
+  * Remove our declared dependency on ``docutils`` to work around the way pip's greedy dependency resolver reacts to the latest version of Sphinx. pip fails when pip-installing sphinx-js because pip sees our "any version of docutils" declaration first (which resolves greedily to the latest version, 0.17) but later encounters Sphinx's apparently new ``<0.17`` constraint and gives up. We can revert this when pip's ``--use-feature=2020-resolver`` becomes the default.
 
 3.1.1
   * Rewrite large parts of the suffix tree that powers path lookup. This fixes several crashers.
