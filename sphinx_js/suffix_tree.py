@@ -90,8 +90,8 @@ class SuffixTree(object):
             raise SuffixAmbiguous(segments, list(tree['subtree'].keys()))
 
         # Otherwise, return the found value. There must always be a value here
-        # because add() always eventually adds a value after a chain of
-        # subtrees. If there were multiple subrees from here, we would have
+        # because add() always eventually adds (or finds) a value after a chain
+        # of subtrees. If there were multiple subtrees from here, we would have
         # raised SuffixAmbiguous above. If there were a single one, we would
         # have followed it. So, since subtrees always eventually terminate in a
         # value, we must be at one now.
