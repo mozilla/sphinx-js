@@ -334,8 +334,7 @@ Or, if you prefer, the Fathom repo carries a `Travis CI configuration <https://g
 Caveats
 =======
 
-* We don't understand the inline JSDoc constructs like ``{@link foo}``; you have to use Sphinx-style equivalents for now, like ``:js:func:`foo``` (or simply ``:func:`foo``` if you have set ``primary_domain = 'js'`` in conf.py.
-* So far, we understand and convert the JSDoc block tags ``@param``, ``@returns``, ``@throws``, ``@example`` (without the optional ``<caption>``), ``@deprecated``, ``@see``, and their synonyms. Other ones will go *poof* into the ether.
+* So far, we understand and convert the JSDoc block tags ``@param``, ``@returns``, ``@throws``, ``@example`` (without the optional ``<caption>``), ``@deprecated``, ``@see``, @see {@link} and their synonyms. Other ones will go *poof* into the ether.
 
 Tests
 =====

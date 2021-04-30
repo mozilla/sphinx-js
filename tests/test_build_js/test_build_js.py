@@ -119,6 +119,14 @@ class Tests(SphinxBuildTestCase):
             '     * "deprecatedFunction"\n\n'
             '     * "DeprecatedAttribute"\n')
 
+    def test_autofunction_see_link(self):
+        """Make sure @see {@link} tags work with autofunction."""
+        self._file_contents_eq(
+            'autofunction_see_link',
+            'seeLinkFunction()\n\n'
+            '   See also:\n\n'
+            '     * https://github.com/mozilla/sphinx-js\n')
+
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
         comment."""
@@ -257,6 +265,14 @@ class Tests(SphinxBuildTestCase):
             '     * "deprecatedFunction"\n\n'
             '     * "DeprecatedAttribute"\n')
 
+    def test_autoclass_see_link(self):
+        """Make sure @see {@link} tags work with autoclass."""
+        self._file_contents_eq(
+            'autoclass_see_link',
+            'class SeeLinkClass()\n\n'
+            '   See also:\n\n'
+            '     * https://github.com/mozilla/sphinx-js\n')
+
     def test_autoattribute(self):
         """Make sure ``autoattribute`` works."""
         self._file_contents_eq(
@@ -293,6 +309,14 @@ class Tests(SphinxBuildTestCase):
             '     * "DeprecatedClass"\n\n'
             '     * "deprecatedFunction"\n\n'
             '     * "DeprecatedAttribute"\n')
+
+    def test_autoattribute_see_link(self):
+        """Make sure @see {@link} tags work with autoattribute."""
+        self._file_contents_eq(
+            'autoattribute_see_link',
+            'SeeLinkAttribute\n\n'
+            '   See also:\n\n'
+            '     * https://github.com/mozilla/sphinx-js\n')
 
     def test_getter_setter(self):
         """Make sure ES6-style getters and setters can be documented."""
