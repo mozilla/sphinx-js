@@ -164,6 +164,19 @@ class JsRenderer(object):
                     # restructuredtext.html#field-lists.
                     yield [rst.escape(h) for h in heads], unwrapped(tail)
 
+    def _prepare_see_alsos(self, see_alsos):
+        map_see_alsos = {"internal": [], "external": []}
+        for ref in see_alsos:
+            # prepare links like {@link http://...}
+            # split on @link tag, slice to drop the curly brackets,
+            # strip to remove whitespaces
+            if "@link" in ref:
+                reference = ''.join(ref.split("@link"))[1:-1].strip()
+                map_see_alsos["external"].append(reference)
+            else:
+                map_see_alsos["internal"].append(ref)
+        return map_see_alsos
+
 
 class AutoFunctionRenderer(JsRenderer):
     _template = 'function.rst'
@@ -178,7 +191,7 @@ class AutoFunctionRenderer(JsRenderer):
             examples=obj.examples,
             deprecated=obj.deprecated,
             is_optional=obj.is_optional,
-            see_also=obj.see_alsos,
+            see_also=self._prepare_see_alsos(obj.see_alsos),
             content='\n'.join(self._content))
 
 
@@ -220,7 +233,7 @@ class AutoClassRenderer(JsRenderer):
             fields=self._fields(constructor),
             examples=constructor.examples,
             deprecated=constructor.deprecated,
-            see_also=constructor.see_alsos,
+            see_also=self._prepare_see_alsos(constructor.see_alsos),
             exported_from=obj.exported_from,
             class_comment=obj.description,
             is_abstract=isinstance(obj, Class) and obj.is_abstract,
@@ -311,7 +324,7 @@ class AutoAttributeRenderer(JsRenderer):
             description=obj.description,
             deprecated=obj.deprecated,
             is_optional=obj.is_optional,
-            see_also=obj.see_alsos,
+            see_also=self._prepare_see_alsos(obj.see_alsos),
             examples=obj.examples,
             type=obj.type,
             content='\n'.join(self._content))
