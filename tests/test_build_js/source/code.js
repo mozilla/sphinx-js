@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Return the ratio of the inline text length of the links in an element to
  * the inline text length of the entire element.
@@ -233,4 +234,15 @@ function union(fnodeA) {
  * @param b Next param, which should be part of the same field list
  */
 function longDescriptions(a, b) {
+}
+
+/**
+ * Class doc.
+ */
+class SimpleClass {
+
+    /**
+     * Static.
+     */
+    static noUseOfThis() {}
 }
