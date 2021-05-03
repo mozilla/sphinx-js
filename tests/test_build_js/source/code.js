@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Return the ratio of the inline text length of the links in an element to
  * the inline text length of the entire element.
@@ -234,3 +235,98 @@ function union(fnodeA) {
  */
 function longDescriptions(a, b) {
 }
+
+/**
+ * Namespace doc.
+ * @namespace
+ */
+ var ContainingNamespace = {
+    /**
+     * A var.
+     */
+    someVar : "containing some text.",
+
+    /**
+     * Another.
+     */
+    anotherMethod : function() {
+    },
+
+    /**
+     * More.
+     */
+    yetAnotherMethod : function() {
+    },
+}
+
+// We won't add any new members to this namespace, because it would break some tests.
+/** Closed namespace. */
+var ClosedNamespace = {
+    /**
+     * Public thing.
+     */
+    publical: function() {},
+
+    /**
+     * Public thing 2.
+     */
+    publical2: function() {},
+
+    /**
+     * Public thing 3.
+     */
+    publical3: function() {},
+}
+
+/**
+ * Non-alphabetical namespace.
+ * @namespace
+ */
+var NonAlphabeticalNamespace = {
+    /** Fun z. */
+    z: function() {},
+
+    /** Fun a. */
+    a: function() {},
+}
+
+/**
+ * This doesn't emit a paramnames key in meta.code.
+ * @namespace
+ */
+const NoParamnamesNamespace = {};
+
+/**
+ * JSDoc example tag for namespace
+ *
+ * @example
+ * // This is the example.
+ * ExampleNamespace.version;
+ *
+ * @namespace
+ */
+var ExampleNamespace = {
+    /**
+     * Namespace version.
+     */
+    version : "1.0"
+}
+
+/**
+ * @deprecated
+ * @namespace
+ */
+var DeprecatedNamespace = {}
+/**
+ * @deprecated don't use anymore
+ * @namespace
+ */
+var DeprecatedExplanatoryNamespace = {}
+
+/**
+ * @see DeprecatedNamespace
+ * @see deprecatedFunction
+ * @see DeprecatedAttribute
+ * @namespace
+ */
+var SeeNamespace = {}

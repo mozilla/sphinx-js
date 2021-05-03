@@ -257,6 +257,124 @@ class Tests(SphinxBuildTestCase):
             '     * "deprecatedFunction"\n\n'
             '     * "DeprecatedAttribute"\n')
 
+
+    def test_autonamespace(self):
+        """Make sure namespaces show their namespace comment."""
+        contents = self._file_contents('autonamespace')
+        assert 'Namespace doc.' in contents
+
+    def test_autonamespace_members(self):
+        """Make sure namespaces list their members if ``:members:`` is specified.
+
+        Make sure it shows both functions and attributes and shows getters and
+        setters as if they are attributes. Make sure it doesn't show private
+        members.
+        """
+        self._file_contents_eq(
+            'autonamespace_members',
+            'namespace ContainingNamespace()\n\n'
+            '   Namespace doc.\n'
+            '\n'
+            '   ContainingNamespace.someVar\n'
+            '\n'
+            '      A var.\n'
+            '\n'
+            '   ContainingNamespace.anotherMethod()\n'
+            '\n'
+            '      Another.\n'
+            '\n'
+            '   ContainingNamespace.yetAnotherMethod()\n'
+            '\n'
+            '      More.\n')
+
+    def test_autonamespace_members_list(self):
+        """Make sure including a list of names after ``members`` limits it to
+        those names and follows the order you specify."""
+        self._file_contents_eq(
+            'autonamespace_members_list',
+            'namespace ClosedNamespace()\n\n   Closed namespace.\n\n   ClosedNamespace.publical3()\n\n      Public thing 3.\n\n   ClosedNamespace.publical()\n\n      Public thing.\n')
+
+    def test_autonamespace_members_list_star(self):
+        """Make sure including ``*`` in a list of names after
+        ``members`` includes the rest of the names in the normal order
+        at that point."""
+        self._file_contents_eq(
+            'autonamespace_members_list_star',
+            'namespace ContainingNamespace()\n'
+            '\n'
+            '   Namespace doc.\n'
+            '\n'
+            '   ContainingNamespace.someVar\n'
+            '\n'
+            '      A var.\n'
+            '\n'
+            '   ContainingNamespace.anotherMethod()\n'
+            '\n'
+            '      Another.\n'
+            '\n'
+            '   ContainingNamespace.yetAnotherMethod()\n'
+            '\n'
+            '      More.\n')
+
+    def test_autonamespace_alphabetical(self):
+        """Make sure members sort alphabetically when not otherwise specified."""
+        self._file_contents_eq(
+            'autonamespace_alphabetical',
+            'namespace NonAlphabeticalNamespace()\n\n   Non-alphabetical namespace.\n\n   NonAlphabeticalNamespace.a()\n\n      Fun a.\n\n   NonAlphabeticalNamespace.z()\n\n      Fun z.\n')
+
+    def test_autonamespace_exclude_members(self):
+        """Make sure ``exclude-members`` option actually excludes listed
+        members."""
+        contents = self._file_contents('autonamespace_exclude_members')
+        assert 'publical()' in contents
+        assert 'publical2' not in contents
+        assert 'publical3' not in contents
+
+    def test_autonamespace_example(self):
+        """Make sure @example tags can be documented with autonamespace."""
+        self._file_contents_eq(
+            'autonamespace_example',
+            'namespace ExampleNamespace()\n\n'
+            '   JSDoc example tag for namespace\n\n'
+            '   **Examples:**\n\n'
+            '      // This is the example.\n'
+            '      ExampleNamespace.version;\n')
+
+    def test_autonamespace_deprecated(self):
+        """Make sure @deprecated tags can be documented with autonamespace."""
+        self._file_contents_eq(
+            'autonamespace_deprecated',
+            'namespace DeprecatedNamespace()\n\n'
+            '   Note:\n\n'
+            '     Deprecated.\n\n'
+            'namespace DeprecatedExplanatoryNamespace()\n\n'
+            '   Note:\n\n'
+            '     Deprecated: don\'t use anymore\n')
+
+    def test_autonamespace_see(self):
+        """Make sure @see tags work with autonamespace."""
+        self._file_contents_eq(
+            'autonamespace_see',
+            'namespace SeeNamespace()\n\n'
+            '   See also:\n\n'
+            '     * "DeprecatedNamespace"\n\n'
+            '     * "deprecatedFunction"\n\n'
+            '     * "DeprecatedAttribute"\n')
+
+    def test_autonamespace_no_paramnames(self):
+        """Make sure we don't have KeyErrors on naked, memberless objects
+        labeled as namespace:.
+        """
+        self._file_contents_eq(
+            'autonamespace_no_paramnames',
+            'Make sure we don\'t have KeyErrors on naked, memberless objects labeled'
+            '\n'
+            'as namespace:\n'
+            '\n'
+            'namespace NoParamnamesNamespace()\n'
+            '\n'
+            '   This doesn\'t emit a paramnames key in meta.code.\n')
+
     def test_autoattribute(self):
         """Make sure ``autoattribute`` works."""
         self._file_contents_eq(
