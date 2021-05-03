@@ -167,6 +167,9 @@ class JsRenderer(object):
     def _prepare_see_alsos(self, see_alsos):
         map_see_alsos = {"internal": [], "external": []}
         for ref in see_alsos:
+            # skip empty @see
+            if ref is None:
+                continue
             # prepare links like {@link http://...}
             # split on @link tag, slice to drop the curly brackets,
             # strip to remove whitespaces
