@@ -52,7 +52,7 @@ def auto_class_directive_bound_to_app(app):
         option_spec = JsDirective.option_spec.copy()
         option_spec.update({
             'members': lambda members: ([m.strip() for m in members.split(',')]
-                                        if members else []),
+                                        if members else None),
             'exclude-members': _members_to_exclude,
             'private-members': flag})
 

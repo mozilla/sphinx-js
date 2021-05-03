@@ -1,4 +1,6 @@
-from tests.testing import SphinxBuildTestCase
+from tests.testing import (SphinxBuildTestCase,
+                            SphinxBuildDefaultsAllTestCase,
+                            SphinxBuildDefaultsMembersTestCase)
 
 
 class Tests(SphinxBuildTestCase):
@@ -360,6 +362,74 @@ class Tests(SphinxBuildTestCase):
             '\n'
             '      * **b** -- Next param, which should be part of the same field\n'
             '        list\n')
+
+
+class TestAllDefaultValues(SphinxBuildDefaultsAllTestCase):
+    """Test some feature with default options specified.
+    """
+
+    def test_autoclass_members_list(self):
+        """Make sure a class lists all of its members if default options ``members``
+        equals to true including the private member ``secret()`` and excluding
+        ``anotherMethod``."""
+        self._file_contents_eq(
+            'autoclass',
+            'class ContainingClass(ho)\n'
+            '\n'
+            '   Class doc.\n'
+            '\n'
+            '   Constructor doc.\n'
+            '\n'
+            '   Arguments:\n'
+            '      * **ho** -- A thing\n'
+            '\n'
+            '   ContainingClass.bar\n'
+            '\n'
+            '      Setting this also frobs the frobnicator.\n'
+            '\n'
+            '   ContainingClass.someVar\n'
+            '\n'
+            '      A var\n'
+            '\n'
+            '   ContainingClass.anotherMethod()\n'
+            '\n'
+            '      Another.\n'
+            '\n'
+            '   ContainingClass.secret()\n'
+            '\n'
+            '      Private thing.\n'
+            '\n'
+            '   ContainingClass.someMethod(hi)\n'
+            '\n'
+            '      Here.\n'
+            '\n'
+            '   ContainingClass.yetAnotherMethod()\n'
+            '\n'
+            '      More.\n')
+
+class TestMembersDefaultValue(SphinxBuildDefaultsMembersTestCase):
+    """Test some feature with default options specified.
+    """
+
+    def test_autoclass_some_members_list(self):
+        """Make sure class ClosedClass lists all of its members."""
+        self._file_contents_eq(
+            'autoclass_members_list',
+            'class ClosedClass()\n'
+            '\n'
+            '   Closed class.\n'
+            '\n'
+            '   ClosedClass.publical3()\n'
+            '\n'
+            '      Public thing 3.\n'
+            '\n'
+            '   ClosedClass.publical()\n'
+            '\n'
+            '      Public thing.\n'
+            '\n'
+            '   ClosedClass.publical2()\n'
+            '\n'
+            '      Public thing 2.\n')
 
 
 DESCRIPTION = """

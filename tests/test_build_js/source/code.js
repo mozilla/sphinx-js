@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Return the ratio of the inline text length of the links in an element to
  * the inline text length of the entire element.

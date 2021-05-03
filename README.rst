@@ -314,6 +314,12 @@ Configuration Reference
 ``jsdoc_cache``
   Path to a file where JSDoc output will be cached. If omitted, JSDoc will be run every time Sphinx is. If you have a large number of source files, it may help to configure this value. But be careful: the cache is not automatically flushed if your source code changes; you must delete it manually.
 
+``js_autodoc_default_options``
+  A dictionary containing default autodoc options. Options are ``members`` and ``private-members``. Both are set to ``False`` by default. If the ``members`` is set to ``True``, the option tells each autoclass directive to include all members
+  without explicitly specifying it on every autoclass directive. This can also be a string of comma-seperated names which should be included on every autoclass directive by default. If omitted or set to ``False``, this options is ignored.
+  Set ``private-members`` to ``True``, if you'd like to display private members by default.
+
+
 Example
 =======
 

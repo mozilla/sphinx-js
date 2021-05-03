@@ -164,6 +164,26 @@ class JsRenderer(object):
                     # restructuredtext.html#field-lists.
                     yield [rst.escape(h) for h in heads], unwrapped(tail)
 
+    def _default_options(self):
+        options = ['members', 'private-members']
+        extendable_options = ['members']
+        options_active = self._options
+        config_default_options = self._app.config['js_autodoc_default_options']
+        for name in options:
+            if name in config_default_options:
+                if name in options_active:
+                    # take value from options if present and not None and extend it
+                    # with js_autodoc_default_options if necessary
+                    if isinstance(config_default_options[name], str) and isinstance(options_active[name], list):
+                        if name in extendable_options:
+                            options_active[name] += [val.strip() for val in config_default_options[name].split(',')]
+                else:
+                    # typ check default option
+                    # set to default if option is True or None else ignore option
+                    val = config_default_options[name]
+                    if val in [True, None, '1']:
+                        options_active[name] = None
+
 
 class AutoFunctionRenderer(JsRenderer):
     _template = 'function.rst'
@@ -185,6 +205,10 @@ class AutoFunctionRenderer(JsRenderer):
 class AutoClassRenderer(JsRenderer):
     _template = 'class.rst'
     _renderer_type = 'class'
+
+    def __init__(self, directive, app, arguments=None, content=None, options=None):
+        super().__init__(directive, app, arguments=arguments, content=content, options=options)
+        self._default_options()
 
     def _template_vars(self, name, obj):
         # TODO: At the moment, we pull most fields (params, returns,

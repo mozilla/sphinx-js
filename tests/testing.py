@@ -51,6 +51,47 @@ class SphinxBuildTestCase(ThisDirTestCase):
         assert self._file_contents(filename) == contents
 
 
+class SphinxBuildDefaultsAllTestCase(SphinxBuildTestCase):
+    """Base class for tests which require a Sphinx tree to be build and then
+    deleted afterwards. The Difference between this and its base class is
+    that we pass some configuration values to conf.py.
+    """
+    @classmethod
+    def setup_class(cls):
+        """Run Sphinx against the dir adjacent to the testcase."""
+        cls.docs_dir = join(cls.this_dir(), 'source', 'docs')
+        # -v for better tracebacks:
+        if sphinx_main([cls.docs_dir,
+                        '-b',
+                        cls.builder,
+                        '-v',
+                        '-E',
+                        '-Djs_autodoc_default_options.members=1',
+                        '-Djs_autodoc_default_options.private-members=1',
+                        join(cls.docs_dir, '_build')]):
+            raise RuntimeError('Sphinx build exploded.')
+
+
+class SphinxBuildDefaultsMembersTestCase(SphinxBuildTestCase):
+    """Base class for tests which require a Sphinx tree to be build and then
+    deleted afterwards. The Difference between this and its base class is
+    that we pass some configuration values to conf.py.
+    """
+    @classmethod
+    def setup_class(cls):
+        """Run Sphinx against the dir adjacent to the testcase."""
+        cls.docs_dir = join(cls.this_dir(), 'source', 'docs')
+        # -v for better tracebacks:
+        if sphinx_main([cls.docs_dir,
+                        '-b',
+                        cls.builder,
+                        '-v',
+                        '-E',
+                        '-Djs_autodoc_default_options.members=publical2',
+                        join(cls.docs_dir, '_build')]):
+            raise RuntimeError('Sphinx build exploded.')
+
+
 class JsDocTestCase(ThisDirTestCase):
     """Base class for tests which analyze a file using JSDoc"""
 
