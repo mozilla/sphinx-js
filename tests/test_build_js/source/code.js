@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * Return the ratio of the inline text length of the links in an element to
  * the inline text length of the entire element.
@@ -215,6 +216,21 @@ const SeeAttribute = null;
  * @see DeprecatedAttribute
  */
 class SeeClass {}
+
+/**
+ * @see {@link https://github.com/mozilla/sphinx-js}
+ */
+function seeLinkFunction() {}
+
+/**
+ * @see {@link https://github.com/mozilla/sphinx-js}
+ */
+const SeeLinkAttribute = null;
+
+/**
+ * @see {@link https://github.com/mozilla/sphinx-js}
+ */
+class SeeLinkClass {}
 
 /**
  * @arg fnodeA {Node|Fnode}
