@@ -334,7 +334,7 @@ Or, if you prefer, the Fathom repo carries a `Travis CI configuration <https://g
 Caveats
 =======
 
-* So far, we understand and convert the JSDoc block tags ``@param``, ``@returns``, ``@throws``, ``@example`` (without the optional ``<caption>``), ``@deprecated``, ``@see``, @see {@link} and their synonyms. Other ones will go *poof* into the ether.
+* So far, we understand and convert the JSDoc block tags ``@param``, ``@returns``, ``@throws``, ``@example`` (without the optional ``<caption>``), ``@deprecated``, ``@see``, ``@see {@link}`` and their synonyms. Other ones will go *poof* into the ether.
 
 Tests
 =====
