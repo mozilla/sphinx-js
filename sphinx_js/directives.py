@@ -9,7 +9,6 @@ can access each other and collaborate.
 """
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst.directives import flag
-
 from sphinx.domains.javascript import JSCallable
 
 from .renderers import (AutoFunctionRenderer,
