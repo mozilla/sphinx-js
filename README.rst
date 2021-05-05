@@ -216,6 +216,38 @@ Finally, if you want full control, pull your class members in one at a time by e
        allowing you to intersperse long prose passages and examples that you
        don't want in your code.
 
+autonamespace
+-------------
+
+Similar to ``js::autoclass`` we provide a ``js:autonamespace`` directive which documents a namespace with its namespace comment. It shares all the features of ``js:autofunction`` and even takes the same ``:short-name:`` flag. The easiest way to use it is to invoke its ``:members:`` option, which automatically documents all its public methods and attributes::
+
+    .. js:autonamespace:: SomeNamespace
+       :members:
+
+You can add private members by saying... ::
+
+    .. js:autonamespace:: SomeNamespace
+       :members:
+       :private-members:
+
+Privacy is determined by JSDoc ``@private`` tag.
+
+Exclude certain members by name with ``:exclude-members:``::
+
+    .. js:autonamespace:: SomeNamespace
+       :members:
+       :exclude-members: Foo, bar, baz
+
+Or explicitly list the members you want. We will respect your ordering. ::
+
+    .. js:autonamespace:: SomeNamespace
+       :members: Qux, qum
+
+When explicitly listing members, you can include ``*`` to include all unmentioned members. This is useful to have control over ordering of some elements, without having to include an exhaustive list. ::
+
+    .. js:autonamespace:: SomeNamespace
+       :members: importMethod, *, uncommonlyUsedMethod
+
 autoattribute
 -------------
 
