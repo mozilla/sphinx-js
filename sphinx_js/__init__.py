@@ -34,7 +34,6 @@ def setup(app):
     app.add_config_value('js_language', 'javascript', 'env')
     app.add_config_value('js_source_path', '../', 'env')
     app.add_config_value('jsdoc_config_path', None, 'env')
-    # app.add_config_value('jsdoc_cache', None, 'env')
 
     # We could use a callable as the "default" param here, but then we would
     # have had to duplicate or build framework around the logic that promotes

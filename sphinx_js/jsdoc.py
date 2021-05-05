@@ -157,7 +157,7 @@ def is_private(doclet):
 
 
 def is_static(obj):
-    return obj.get('scope', '') == 'static'
+    return obj.get('scope') == 'static'
 
 
 def full_path_segments(d, base_dir, longname_field='longname'):
