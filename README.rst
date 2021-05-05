@@ -248,6 +248,16 @@ When explicitly listing members, you can include ``*`` to include all unmentione
     .. js:autonamespace:: SomeNamespace
        :members: importMethod, *, uncommonlyUsedMethod
 
+Finally, if you want full control, pull your namespace members in one at a time by embedding ``js:autofunction`` or ``js:autoattribute``::
+
+    .. js:autonamespace:: SomeNamespace
+
+       .. js:autofunction:: SomeNamespace.someMethod
+
+       Additional content can go here and appears below the in-code comments,
+       allowing you to intersperse long prose passages and examples that you
+       don't want in your code.
+
 autoattribute
 -------------
 
