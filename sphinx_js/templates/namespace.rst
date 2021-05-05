@@ -1,6 +1,6 @@
 {% import 'common.rst' as common %}
 
-.. js:namespace:: {{ name }}{{ params }}
+.. js:namespace:: {{ name }}
 
    {{ common.deprecated(deprecated)|indent(3) }}
 
