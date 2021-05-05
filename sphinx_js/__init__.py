@@ -40,7 +40,7 @@ def setup(app):
     # to a specific domain. When using the app.add_object_type() method it is not
     # possible to reference namespace objects 'cause sphinx adds the object to
     # the 'std' domain a not the 'js' domain.
-    JavaScriptDomain.object_types.setdefault('namespace', ObjType(_('namespace'),  'ns'))
+    JavaScriptDomain.object_types.setdefault('namespace', ObjType(_('namespace'), 'ns'))
 
     app.add_directive_to_domain('js',
                                 'autoattribute',
