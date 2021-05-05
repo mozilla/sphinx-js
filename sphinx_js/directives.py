@@ -111,7 +111,7 @@ def _members_to_exclude(arg):
     return set(a.strip() for a in (arg or '').split(','))
 
 
-class JSCustomConstructor(JSCallable):
+class JSNamespace(JSCallable):
     """Like a callable but with a different prefix."""
     display_prefix = 'namespace '
     allow_nesting = True

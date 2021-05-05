@@ -9,7 +9,7 @@ from .directives import (auto_class_directive_bound_to_app,
                          auto_namespace_directive_bound_to_app,
                          auto_function_directive_bound_to_app,
                          auto_attribute_directive_bound_to_app,
-                         JSCustomConstructor)
+                         JSNamespace)
 from .jsdoc import Analyzer as JsAnalyzer
 from .typedoc import Analyzer as TsAnalyzer
 
@@ -33,7 +33,7 @@ def setup(app):
                                 auto_namespace_directive_bound_to_app(app))
     app.add_directive_to_domain('js',
                                 'namespace',
-                                JSCustomConstructor)
+                                JSNamespace)
     app.add_role_to_domain('js', 'ns', JSXRefRole(fix_parens=True))
 
     # NOTE: I couldn't find a recommended/denoted way to add a new object type
