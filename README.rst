@@ -260,7 +260,7 @@ Finally, if you want full control, pull your namespace members in one at a time 
 
 To reference a namespace from anywhere in your documentation, you can use the ``js:ns`` role
 
-    :js:ns:`SomeNamespace`
+    ``:js:ns:`SomeNamespace```
 
 autoattribute
 -------------
