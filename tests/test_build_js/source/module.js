@@ -8,9 +8,9 @@
  */
 
 /**
- * SimpleClass.
+ * StandardClass.
  */
-class SimpleClass {}
+class StandardClass {}
 
 /**
  * simpleFunction.
