@@ -91,6 +91,7 @@ def auto_module_directive_bound_to_app(app):
                                         if members else None),
             'exclude-members': _members_to_exclude,
             'private-members': flag})
+
         def run(self):
             return AutoModuleRenderer.from_directive(self, app).rst_nodes()
 

@@ -65,12 +65,12 @@ class Analyzer:
         for d in doclets:
             of = d.get('memberof')
             if of:
-                segments = full_path_segments(d, base_dir, longname_field='memberof')
-                self._doclets_by_class[tuple(segments)].append(d)
-                self._doclets_by_module[tuple(segments)].append(d)
-            else:
-                segments = full_path_segments(d, base_dir, longname_field='longname')
-                self._doclets_by_module[tuple(segments)].append(d)
+                if 'module' in of:
+                    segments = full_path_segments(d, base_dir, longname_field='memberof')
+                    self._doclets_by_module[tuple(segments)].append(d)
+                else:
+                    segments = full_path_segments(d, base_dir, longname_field='memberof')
+                    self._doclets_by_class[tuple(segments)].append(d)
 
     @classmethod
     def from_disk(cls, abs_source_paths, app, base_dir):

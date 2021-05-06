@@ -236,5 +236,4 @@ class Module(TopLevel):
     authors: List[str]
     version: str
     license_information: str
-    # functions: Optional[List[Function]]
     members: Optional[List[Union[Class, Function]]]

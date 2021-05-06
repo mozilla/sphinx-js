@@ -45,7 +45,6 @@ class JsRenderer(object):
             prefix = 'module'
             self._partial_path[0] = '{}:{}'.format(prefix, self._partial_path[0])
 
-
     @classmethod
     def from_directive(cls, directive, app):
         """Return one of these whose state is all derived from a directive.
@@ -301,8 +300,7 @@ class AutoModuleRenderer(JsRenderer):
             members=self._members_of(obj,
                                      include=self._options['members'],
                                      exclude=self._options.get('exclude-members', set()))
-                        if 'members' in self._options else '',
-        )
+                    if 'members' in self._options else '')
 
     def _members_of(self, obj, include, exclude):
         """Return RST describing the members of a given module.
