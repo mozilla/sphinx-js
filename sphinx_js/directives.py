@@ -9,8 +9,11 @@ can access each other and collaborate.
 """
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst.directives import flag
+from sphinx.domains.javascript import JSCallable
 
-from .renderers import AutoFunctionRenderer, AutoClassRenderer, AutoAttributeRenderer
+from .renderers import (AutoFunctionRenderer,
+                        AutoClassRenderer,
+                        AutoAttributeRenderer)
 
 
 class JsDirective(Directive):
@@ -83,3 +86,8 @@ def _members_to_exclude(arg):
 
     """
     return set(a.strip() for a in (arg or '').split(','))
+
+
+class JSStaticFunction(JSCallable):
+    """Like a callable but with a different prefix."""
+    display_prefix = 'static '

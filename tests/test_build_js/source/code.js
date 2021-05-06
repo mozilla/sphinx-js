@@ -234,3 +234,14 @@ function union(fnodeA) {
  */
 function longDescriptions(a, b) {
 }
+
+/**
+ * Class doc.
+ */
+class SimpleClass {
+
+    /**
+     * Static.
+     */
+    static noUseOfThis() {}
+}
