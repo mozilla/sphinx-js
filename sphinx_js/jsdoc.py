@@ -64,8 +64,8 @@ class Analyzer:
         self._doclets_by_module = defaultdict(lambda: [])
         for d in doclets:
             of = d.get('memberof')
-            if of:
-                if 'module' in of:
+            if of:  # speed optimization
+                if 'module' in of and '~' not in of:
                     segments = full_path_segments(d, base_dir, longname_field='memberof')
                     self._doclets_by_module[tuple(segments)].append(d)
                 else:
