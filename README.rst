@@ -258,6 +258,10 @@ Finally, if you want full control, pull your namespace members in one at a time 
        allowing you to intersperse long prose passages and examples that you
        don't want in your code.
 
+To reference a namespace from anywhere in your documentation, you can use the ``js:ns`` role
+
+    :js:ns:`SomeNamespace`
+
 autoattribute
 -------------
 
