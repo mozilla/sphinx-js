@@ -7,11 +7,11 @@
  *    that wraps
  * @returns {Number} What a thing
  */
-function linkDensity(node) {
-    const length = node.flavors.get('paragraphish').inlineLength;
-    const lengthWithoutLinks = inlineTextLength(node.element,
-                                                element => element.tagName !== 'A');
-    return (length - lengthWithoutLinks) / length;
+function linkDensity( node ) {
+    const length             = node.flavors.get( 'paragraphish' ).inlineLength;
+    const lengthWithoutLinks = inlineTextLength( node.element,
+        element => element.tagName !== 'A' );
+    return ( length - lengthWithoutLinks ) / length;
 }
 
 /**
@@ -23,7 +23,7 @@ class ContainingClass {
      *
      * @arg ho A thing
      */
-    constructor(ho) {
+    constructor( ho ) {
         /**
          * A var
          */
@@ -34,17 +34,18 @@ class ContainingClass {
      * Here.
      * @protected
      */
-    someMethod(hi) {
+    someMethod( hi ) {
     }
 
     /**
      * Setting this also frobs the frobnicator.
      */
     get bar() {
-      return this._bar;
+        return this._bar;
     }
-    set bar(baz) {
-      this._bar = _bar;
+
+    set bar( baz ) {
+        this._bar = _bar;
     }
 
     /**
@@ -148,7 +149,7 @@ const ExampleAttribute = null;
  * @param {string} p2.foo
  * @param {string} p2.bar
  */
-function destructuredParams(p1, {foo, bar}) {}
+function destructuredParams( p1, { foo, bar } ) {}
 
 /**
  * @param a_ Snorf
@@ -165,7 +166,7 @@ function injection() {}
  * @param [num=5]
  * @param [nil=null]
  */
-function defaultsDocumentedInDoclet(func, str, strNum, strBool, num, nil) {}
+function defaultsDocumentedInDoclet( func, str, strNum, strBool, num, nil ) {}
 
 /**
  * @param [num]
@@ -173,14 +174,14 @@ function defaultsDocumentedInDoclet(func, str, strNum, strBool, num, nil) {}
  * @param [bool]
  * @param [nil]
  */
-function defaultsDocumentedInCode(num=5, str="true", bool=true, nil=null) {}
+function defaultsDocumentedInCode( num = 5, str = "true", bool = true, nil = null ) {}
 
 /**
  * Variadic parameter
  * @param a
  * @param args
  */
-function variadicParameter(a, ...args) {}
+function variadicParameter( a, ...args ) {}
 
 /** @deprecated */
 function deprecatedFunction() {}
@@ -219,7 +220,7 @@ class SeeClass {}
 /**
  * @arg fnodeA {Node|Fnode}
  */
-function union(fnodeA) {
+function union( fnodeA ) {
 }
 
 /**
@@ -232,5 +233,5 @@ function union(fnodeA) {
  *     illustrious words as aardvark and artichoke.
  * @param b Next param, which should be part of the same field list
  */
-function longDescriptions(a, b) {
+function longDescriptions( a, b ) {
 }

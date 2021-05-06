@@ -1,0 +1,5 @@
+/**
+ * Empty module.
+ *
+ * @module EmptyModule
+ */

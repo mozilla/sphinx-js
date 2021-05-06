@@ -39,6 +39,13 @@ class JsRenderer(object):
         self._content = content or StringList()
         self._options = options or {}
 
+        # Prefix partial path if we use automodule directive.
+        # Only add prefix if we must not deal with long pathnames like ./some/dir/file..
+        if len(self._partial_path) == 1 and 'automodule' in directive.name:
+            prefix = 'module'
+            self._partial_path[0] = '{}:{}'.format(prefix, self._partial_path[0])
+
+
     @classmethod
     def from_directive(cls, directive, app):
         """Return one of these whose state is all derived from a directive.
@@ -253,49 +260,8 @@ class AutoClassRenderer(JsRenderer):
                 obj,
                 use_short_name=False)
 
-        def members_to_include(include):
-            """Return the members that should be included (before excludes and
-            access specifiers are taken into account).
-
-            This will either be the ones explicitly listed after the
-            ``:members:`` option, in that order; all members of the class; or
-            listed members with remaining ones inserted at the placeholder "*".
-
-            """
-            def sort_attributes_first_then_by_path(obj):
-                """Return a sort key for IR objects."""
-                return isinstance(obj, Function), obj.path.segments
-
-            members = obj.members
-            if not include:
-                # Specifying none means listing all.
-                return sorted(members, key=sort_attributes_first_then_by_path)
-            included_set = set(include)
-
-            # If the special name * is included in the list, include all other
-            # members, in sorted order.
-            if '*' in included_set:
-                star_index = include.index('*')
-                sorted_not_included_members = sorted(
-                    (m for m in members if m.name not in included_set),
-                    key=sort_attributes_first_then_by_path
-                )
-                not_included = [m.name for m in sorted_not_included_members]
-                include = include[:star_index] + not_included + include[star_index + 1:]
-                included_set.update(not_included)
-
-            # Even if there are 2 members with the same short name (e.g. a
-            # static member and an instance one), keep them both. This
-            # prefiltering step should make the below sort less horrible, even
-            # though I'm calling index().
-            included_members = [m for m in members if m.name in included_set]
-            # sort()'s stability should keep same-named members in the order
-            # JSDoc spits them out in.
-            included_members.sort(key=lambda m: include.index(m.name))
-            return included_members
-
         return '\n\n'.join(
-            rst_for(member) for member in members_to_include(include)
+            rst_for(member) for member in _members_to_include(obj, include)
             if (not member.is_private
                 or (member.is_private and should_include_private))
             and member.name not in exclude)
@@ -315,6 +281,53 @@ class AutoAttributeRenderer(JsRenderer):
             examples=obj.examples,
             type=obj.type,
             content='\n'.join(self._content))
+
+
+class AutoModuleRenderer(JsRenderer):
+    _template = 'module.rst'
+    _renderer_type = 'module'
+
+    def _template_vars(self, name, obj):
+        return dict(
+            name=obj.name,
+            authors=obj.authors,
+            version=obj.version,
+            license_information=obj.license_information,
+            description=obj.description,
+            deprecated=obj.deprecated,
+            see_also=obj.see_alsos,
+            examples=obj.examples,
+            content='\n'.join(self._content),
+            members=self._members_of(obj,
+                                     include=self._options['members'],
+                                     exclude=self._options.get('exclude-members', set()))
+                        if 'members' in self._options else '',
+        )
+
+    def _members_of(self, obj, include, exclude):
+        """Return RST describing the members of a given module.
+
+        :arg obj Module: The module we're documenting
+        :arg include: List of names of members to include. If empty, include
+            all.
+        :arg exclude: Set of names of members to exclude
+        """
+        def rst_for(obj):
+            if isinstance(obj, Class):
+                renderer = AutoClassRenderer
+            else:
+                renderer = AutoFunctionRenderer
+            return renderer(self._directive,
+                            self._app,
+                            arguments=['dummy'],
+                            options=self._options).rst(
+                [obj.name],
+                obj,
+                use_short_name=False)
+
+        return '\n\n'.join(
+            rst_for(member) for member in _members_to_include(obj, include)
+            if member.name not in exclude)
 
 
 def unwrapped(text):
@@ -358,3 +371,44 @@ def _exception_formatter(exception):
         heads.append(exception.type)
     tail = exception.description
     return heads, tail
+
+def _members_to_include(obj, include):
+    """Return the members that should be included (before excludes and
+    access specifiers are taken into account).
+
+    This will either be the ones explicitly listed after the
+    ``:members:`` option, in that order; all members of the class; or
+    listed members with remaining ones inserted at the placeholder "*".
+
+    """
+    def sort_attributes_first_then_by_path(obj):
+        """Return a sort key for IR objects."""
+        return isinstance(obj, Function), obj.path.segments
+
+    members = obj.members
+    if not include:
+        # Specifying none means listing all.
+        return sorted(members, key=sort_attributes_first_then_by_path)
+    included_set = set(include)
+
+    # If the special name * is included in the list, include all other
+    # members, in sorted order.
+    if '*' in included_set:
+        star_index = include.index('*')
+        sorted_not_included_members = sorted(
+            (m for m in members if m.name not in included_set),
+            key=sort_attributes_first_then_by_path
+        )
+        not_included = [m.name for m in sorted_not_included_members]
+        include = include[:star_index] + not_included + include[star_index + 1:]
+        included_set.update(not_included)
+
+    # Even if there are 2 members with the same short name (e.g. a
+    # static member and an instance one), keep them both. This
+    # prefiltering step should make the below sort less horrible, even
+    # though I'm calling index().
+    included_members = [m for m in members if m.name in included_set]
+    # sort()'s stability should keep same-named members in the order
+    # JSDoc spits them out in.
+    included_members.sort(key=lambda m: include.index(m.name))
+    return included_members

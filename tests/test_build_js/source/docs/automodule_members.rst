@@ -1,0 +1,2 @@
+.. js:automodule:: TestModule
+    :members:
