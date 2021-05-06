@@ -119,12 +119,6 @@ class Tests(SphinxBuildTestCase):
             '     * "deprecatedFunction"\n\n'
             '     * "DeprecatedAttribute"\n')
 
-    def test_staticfunction(self):
-        """Make sure the staticfunction directive works."""
-        self._file_contents_eq(
-            'staticfunction',
-            'static staticFunction()\n')
-
     def test_autofunction_static(self):
         """Make sure the static function gets its prefix ``static``."""
         self._file_contents_eq(
