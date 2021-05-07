@@ -216,6 +216,55 @@ Finally, if you want full control, pull your class members in one at a time by e
        allowing you to intersperse long prose passages and examples that you
        don't want in your code.
 
+automodule
+----------
+
+To document all of your code that belongs to a single module at once, use the ``js:automodule`` directive.
+Start by adding your module documentation on top of your file::
+
+    /**
+    * Module comment goes here.
+    *
+    * @module MyModule
+    */
+
+Provide some extra information with the JSDoc tags ``@author``, ``@version`` or ``@license``::
+
+    /**
+    * Module comment goes here.
+    *
+    * @module   YourModule
+    * @author   your name
+    * @version  0.1.0
+    * @license  MIT
+    */
+
+Use the ``@author`` tag multiple times, if you need::
+
+    /**
+    * Module comment goes here.
+    *
+    * @module   MyModule
+    * @author   company name
+    * @author   name
+    */
+
+Document all of your classes, function or whatever as shown above and use the ``js:automodule`` directive to generate the api. Invoke it with the ``:members:`` option, which automatically includes all members that belongs to the specified module ::
+
+    .. js:automodule:: MyModule
+        :members:
+
+This will even include all class members (if they exist) as well! Include private members by saying ::
+
+    .. js:automodule:: MyModule
+        :private-members:
+
+You can easily control what needs to be included or excluded in the module with the ``:members:`` and ``:exclude-members:`` option ... ::
+
+    .. js:automodule:: MyModule
+        :members: MyClass, memberOfMyClass
+        :exclude-members: Foo, bar, baz, AnotherClass, memberOfAnotherClass
+
 autoattribute
 -------------
 
