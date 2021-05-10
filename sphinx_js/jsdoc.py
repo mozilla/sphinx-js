@@ -116,10 +116,10 @@ class Analyzer:
             # Typedefs should still fit into function-shaped holes:
             if (kind == 'class'):
                 doclet_as_whatever = self._doclet_as_class
-            elif (kind == 'function'):
+            elif (kind == 'function' or kind == 'typedef'):
                 doclet_as_whatever = self._doclet_as_function
             else:
-                continue    # ignore everything else at module level
+                doclet_as_whatever = self._doclet_as_attribute
             member = doclet_as_whatever(member_doclet, member_full_path)
             members.append(member)
         return Module(

@@ -40,6 +40,6 @@ class StandardClass {
 function simpleFunction() {}
 
 /**
- * someAttribute.
+ * globalConstant.
  */
-const someAttribute = null;
+const globalConstant = null;
