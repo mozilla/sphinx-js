@@ -115,3 +115,7 @@ class JSNamespace(JSCallable):
     """Like a callable but with a different prefix."""
     display_prefix = 'namespace '
     allow_nesting = True
+
+class JSStaticFunction(JSCallable):
+    """Like a callable but with a different prefix."""
+    display_prefix = 'static '

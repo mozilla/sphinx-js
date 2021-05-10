@@ -178,6 +178,7 @@ class AutoFunctionRenderer(JsRenderer):
             examples=obj.examples,
             deprecated=obj.deprecated,
             is_optional=obj.is_optional,
+            is_static=obj.is_static,
             see_also=obj.see_alsos,
             content='\n'.join(self._content))
 

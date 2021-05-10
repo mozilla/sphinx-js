@@ -235,11 +235,22 @@ function union(fnodeA) {
 function longDescriptions(a, b) {
 }
 
+/*
+ * Class doc.
+ */
+class SimpleClass {
+
+    /**
+     * Static.
+     */
+    static noUseOfThis() {}
+}
+
 /**
  * Namespace doc.
  * @namespace
  */
- var ContainingNamespace = {
+var ContainingNamespace = {
     /**
      * A var.
      */
