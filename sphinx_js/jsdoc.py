@@ -15,7 +15,7 @@ from tempfile import TemporaryFile
 from sphinx.errors import SphinxError
 
 from .analyzer_utils import cache_to_file, Command, is_explicitly_rooted
-from .ir import Attribute, Class, Exc, Function, NO_DEFAULT, Param, Pathname, Return
+from .ir import Attribute, Class, Exc, Function, Namespace, NO_DEFAULT, Param, Pathname, Return
 from .parsers import path_and_formal_params, PathVisitor
 from .suffix_tree import SuffixTree
 
@@ -60,11 +60,14 @@ class Analyzer:
         # if you don't have same-named inner functions or inner variables that
         # are documented, you shouldn't have trouble.
         self._doclets_by_class = defaultdict(lambda: [])
+        self._doclets_by_namespace = defaultdict(lambda: [])
         for d in doclets:
             of = d.get('memberof')
             if of:  # speed optimization
                 segments = full_path_segments(d, base_dir, longname_field='memberof')
+                # append members to class and namespace
                 self._doclets_by_class[tuple(segments)].append(d)
+                self._doclets_by_namespace[tuple(segments)].append(d)
 
     @classmethod
     def from_disk(cls, abs_source_paths, app, base_dir):
@@ -94,6 +97,7 @@ class Analyzer:
             doclet_as_whatever = {
                 'function': self._doclet_as_function,
                 'class': self._doclet_as_class,
+                'namespace': self._doclet_as_namespace,
                 'attribute': self._doclet_as_attribute}[as_type]
         except KeyError:
             raise NotImplementedError('Unknown autodoc directive: auto%s' % as_type)
@@ -122,6 +126,22 @@ class Analyzer:
             # the fields are about the default constructor:
             constructor=self._doclet_as_function(doclet, full_path),
             members=members,
+            **top_level_properties(doclet, full_path))
+
+    def _doclet_as_namespace(self, doclet, full_path):
+        # This is an instance method so it can get at the base dir.
+        members = []
+        for member_doclet in self._doclets_by_namespace[tuple(full_path)]:
+            kind = member_doclet.get('kind')
+            member_full_path = full_path_segments(member_doclet, self._base_dir)
+            # Typedefs should still fit into function-shaped holes:
+            doclet_as_whatever = self._doclet_as_function if (kind == 'function' or kind == 'typedef') else self._doclet_as_attribute
+            member = doclet_as_whatever(member_doclet, member_full_path)
+            members.append(member)
+        return Namespace(
+            description=doclet.get('description', ''),
+            members=members,
+            exported_from=None,
             **top_level_properties(doclet, full_path))
 
     @staticmethod

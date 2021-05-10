@@ -1,0 +1,2 @@
+.. js:autonamespace:: NonAlphabeticalNamespace
+   :members:
