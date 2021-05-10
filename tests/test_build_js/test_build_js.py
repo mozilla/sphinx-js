@@ -320,10 +320,81 @@ class Tests(SphinxBuildTestCase):
             '\n'
             '**License:** MIT\n'
             '\n'
-            'class TestModule.StandardClass()\n\n'
-            '   StandardClass.\n'
+            'class TestModule.StandardClass()\n'
+            '\n'
+            '   StandardClass doc.\n'
+            '\n'
+            '   Constructor doc.\n'
+            '\n'
+            '   StandardClass.aMember()\n'
+            '\n'
+            '      aMember.\n'
+            '\n'
+            '   StandardClass.zMember()\n'
+            '\n'
+            '      zMember.\n'
             '\n'
             'TestModule.simpleFunction()\n\n'
+            '   simpleFunction.\n')
+
+    def test_automodule_members_list(self):
+        """Make sure automodule shows only the given members."""
+        self._file_contents_eq(
+            'automodule_members_list',
+            'For test purpose only.\n'
+            '\n'
+            '**Author(s):** xsjad0\n'
+            '\n'
+            '**Version:** 1.0\n'
+            '\n'
+            '**License:** MIT\n'
+            '\n'
+            'class TestModule.StandardClass()\n'
+            '\n'
+            '   StandardClass doc.\n'
+            '\n'
+            '   Constructor doc.\n'
+            '\n'
+            '   StandardClass.aMember()\n'
+            '\n'
+            '      aMember.\n'
+            '\n'
+            'TestModule.simpleFunction()\n'
+            '\n'
+            '   simpleFunction.\n')
+
+    def test_automodule_private_members(self):
+        """Make sure automodule shows members and private members."""
+        self._file_contents_eq(
+            'automodule_private_members',
+            'For test purpose only.\n'
+            '\n'
+            '**Author(s):** xsjad0\n'
+            '\n'
+            '**Version:** 1.0\n'
+            '\n'
+            '**License:** MIT\n'
+            '\n'
+            'class TestModule.StandardClass()\n'
+            '\n'
+            '   StandardClass doc.\n'
+            '\n'
+            '   Constructor doc.\n'
+            '\n'
+            '   StandardClass.aMember()\n'
+            '\n'
+            '      aMember.\n'
+            '\n'
+            '   StandardClass.xMember()\n'
+            '\n'
+            '      xMember. (private)\n'
+            '\n'
+            '   StandardClass.zMember()\n'
+            '\n'
+            '      zMember.\n'
+            '\n'
+            'TestModule.simpleFunction()\n'
+            '\n'
             '   simpleFunction.\n')
 
     def test_automodule_empty(self):

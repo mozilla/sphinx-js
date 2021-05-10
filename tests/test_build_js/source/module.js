@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * For test purpose only.
  *
@@ -8,9 +9,30 @@
  */
 
 /**
- * StandardClass.
+ * StandardClass doc.
  */
-class StandardClass {}
+class StandardClass {
+    /**
+     * Constructor doc.
+     */
+    constructor() {}
+
+    /**
+     * aMember.
+     */
+    aMember() {}
+
+    /**
+     * zMember.
+     */
+    zMember() {}
+
+    /**
+     * xMember. (private)
+     * @private
+     */
+    xMember() {}
+}
 
 /**
  * simpleFunction.
