@@ -1,4 +1,3 @@
-/* eslint-disable */
 /**
  * For test purpose only.
  *
