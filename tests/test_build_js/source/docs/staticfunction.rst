@@ -1,0 +1,1 @@
+.. js:staticfunction:: staticFunction
