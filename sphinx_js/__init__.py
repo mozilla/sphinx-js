@@ -5,7 +5,7 @@ from sphinx.errors import SphinxError
 from .directives import (auto_class_directive_bound_to_app,
                          auto_function_directive_bound_to_app,
                          auto_attribute_directive_bound_to_app,
-                         auto_module_directive_bound_to_app)
+                         auto_module_directive_bound_to_app,
                          JSStaticFunction)
 from .jsdoc import Analyzer as JsAnalyzer
 from .typedoc import Analyzer as TsAnalyzer
