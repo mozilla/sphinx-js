@@ -282,18 +282,19 @@ class Tests(SphinxBuildTestCase):
         """
         self._file_contents_eq(
             'autonamespace_members',
-            'namespace ContainingNamespace()\n\n'
+            'namespace ContainingNamespace()\n'
+            '\n'
             '   Namespace doc.\n'
             '\n'
             '   ContainingNamespace.someVar\n'
             '\n'
             '      A var.\n'
             '\n'
-            '   ContainingNamespace.anotherMethod()\n'
+            '   static ContainingNamespace.anotherMethod()\n'
             '\n'
             '      Another.\n'
             '\n'
-            '   ContainingNamespace.yetAnotherMethod()\n'
+            '   static ContainingNamespace.yetAnotherMethod()\n'
             '\n'
             '      More.\n')
 
@@ -302,7 +303,17 @@ class Tests(SphinxBuildTestCase):
         those names and follows the order you specify."""
         self._file_contents_eq(
             'autonamespace_members_list',
-            'namespace ClosedNamespace()\n\n   Closed namespace.\n\n   ClosedNamespace.publical3()\n\n      Public thing 3.\n\n   ClosedNamespace.publical()\n\n      Public thing.\n')
+            'namespace ClosedNamespace()\n'
+            '\n'
+            '   Closed namespace.\n'
+            '\n'
+            '   static ClosedNamespace.publical3()\n'
+            '\n'
+            '      Public thing 3.\n'
+            '\n'
+            '   static ClosedNamespace.publical()\n'
+            '\n'
+            '      Public thing.\n')
 
     def test_autonamespace_members_list_star(self):
         """Make sure including ``*`` in a list of names after
@@ -318,11 +329,11 @@ class Tests(SphinxBuildTestCase):
             '\n'
             '      A var.\n'
             '\n'
-            '   ContainingNamespace.anotherMethod()\n'
+            '   static ContainingNamespace.anotherMethod()\n'
             '\n'
             '      Another.\n'
             '\n'
-            '   ContainingNamespace.yetAnotherMethod()\n'
+            '   static ContainingNamespace.yetAnotherMethod()\n'
             '\n'
             '      More.\n')
 
@@ -330,7 +341,17 @@ class Tests(SphinxBuildTestCase):
         """Make sure members sort alphabetically when not otherwise specified."""
         self._file_contents_eq(
             'autonamespace_alphabetical',
-            'namespace NonAlphabeticalNamespace()\n\n   Non-alphabetical namespace.\n\n   NonAlphabeticalNamespace.a()\n\n      Fun a.\n\n   NonAlphabeticalNamespace.z()\n\n      Fun z.\n')
+            'namespace NonAlphabeticalNamespace()\n'
+            '\n'
+            '   Non-alphabetical namespace.\n'
+            '\n'
+            '   static NonAlphabeticalNamespace.a()\n'
+            '\n'
+            '      Fun a.\n'
+            '\n'
+            '   static NonAlphabeticalNamespace.z()\n'
+            '\n'
+            '      Fun z.\n')
 
     def test_autonamespace_exclude_members(self):
         """Make sure ``exclude-members`` option actually excludes listed
