@@ -397,6 +397,32 @@ class Tests(SphinxBuildTestCase):
             '\n'
             '   simpleFunction.\n')
 
+    def test_automodule_exclude_members(self):
+        """Make sure automodule shows only members that are not excluded."""
+        self._file_contents_eq(
+            'automodule_exclude_members',
+            'For test purpose only.\n'
+            '\n'
+            '**Author(s):** xsjad0\n'
+            '\n'
+            '**Version:** 1.0\n'
+            '\n'
+            '**License:** MIT\n'
+            '\n'
+            'class TestModule.StandardClass()\n'
+            '\n'
+            '   StandardClass doc.\n'
+            '\n'
+            '   Constructor doc.\n'
+            '\n'
+            '   StandardClass.aMember()\n'
+            '\n'
+            '      aMember.\n'
+            '\n'
+            'TestModule.simpleFunction()\n'
+            '\n'
+            '   simpleFunction.\n')
+
     def test_automodule_empty(self):
         """Make sure automodule works without specifying author, license and
         version information."""
