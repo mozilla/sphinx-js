@@ -131,7 +131,7 @@ class Analyzer:
             exported_from=None,
             is_abstract=False,
             is_optional=False,
-            is_static=False,
+            is_static=is_static(doclet),
             is_private=is_private(doclet),
             exceptions=exceptions_to_ir(doclet.get('exceptions', [])),
             returns=returns_to_ir(doclet.get('returns', [])),
@@ -154,6 +154,10 @@ class Analyzer:
 
 def is_private(doclet):
     return doclet.get('access') == 'private'
+
+
+def is_static(doclet):
+    return doclet.get('scope') == 'static'
 
 
 def full_path_segments(d, base_dir, longname_field='longname'):

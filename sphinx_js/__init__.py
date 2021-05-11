@@ -4,10 +4,10 @@ from sphinx.errors import SphinxError
 
 from .directives import (auto_class_directive_bound_to_app,
                          auto_function_directive_bound_to_app,
-                         auto_attribute_directive_bound_to_app)
+                         auto_attribute_directive_bound_to_app,
+                         JSStaticFunction)
 from .jsdoc import Analyzer as JsAnalyzer
 from .typedoc import Analyzer as TsAnalyzer
-
 
 def setup(app):
     # I believe this is the best place to run jsdoc. I was tempted to use
@@ -17,6 +17,9 @@ def setup(app):
 
     app.connect('env-before-read-docs', read_all_docs)
 
+    app.add_directive_to_domain('js',
+                                'staticfunction',
+                                JSStaticFunction)
     app.add_directive_to_domain('js',
                                 'autofunction',
                                 auto_function_directive_bound_to_app(app))

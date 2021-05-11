@@ -121,6 +121,17 @@ class Tests(SphinxBuildTestCase):
             '     * "deprecatedFunction"\n\n'
             '     * "DeprecatedAttribute"\n')
 
+    def test_autofunction_static(self):
+        """Make sure the static function gets its prefix ``static``."""
+        self._file_contents_eq(
+            'autofunction_static',
+            'class SimpleClass()\n\n'
+            '   Class doc.\n'
+            '\n'
+            '   static SimpleClass.noUseOfThis()\n'
+            '\n'
+            '      Static.\n')
+
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor
         comment."""
