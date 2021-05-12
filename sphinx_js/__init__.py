@@ -1,6 +1,9 @@
 from os.path import join, normpath
 
+from sphinx.domains.javascript import JavaScriptDomain
+from sphinx.domains import ObjType
 from sphinx.errors import SphinxError
+from sphinx.locale import _
 
 from .directives import (auto_class_directive_bound_to_app,
                          auto_function_directive_bound_to_app,
@@ -30,6 +33,12 @@ def setup(app):
                                 'autoattribute',
                                 auto_attribute_directive_bound_to_app(app))
     # TODO: We could add a js:module with app.add_directive_to_domain().
+
+    # NOTE: I couldn't find a recommended/denoted way to add a new object type
+    # to a specific domain. When using the app.add_object_type() method it is not
+    # possible to reference namespace objects 'cause sphinx adds the object to
+    # the 'std' domain a not the 'js' domain.
+    JavaScriptDomain.object_types.setdefault('staticfunction', ObjType(_('static function'), 'func'))
 
     app.add_config_value('js_language', 'javascript', 'env')
     app.add_config_value('js_source_path', '../', 'env')
