@@ -194,7 +194,7 @@ class Analyzer:
             # many attr of Functions.
             sigs = node.get('signatures')
             first_sig = sigs[0]  # Should always have at least one
-            first_sig['sources'] = node['sources']
+            first_sig['sources'] = node.get('sources', node['__parent']['sources'])
             return self._convert_node(first_sig)
         elif kind in ['Call signature', 'Constructor signature']:
             # This is the real meat of a function, method, or constructor.
@@ -228,7 +228,7 @@ class Analyzer:
         """
         types = []
         for type in node.get(kind, []):
-            if type['type'] == 'reference':
+            if type['type'] == 'reference' and type.get('id'):
                 pathname = Pathname(make_path_segments(self._index[type['id']],
                                                        self._base_dir))
                 types.append(pathname)
