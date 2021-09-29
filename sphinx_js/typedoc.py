@@ -123,7 +123,7 @@ class Analyzer:
             todo.extend(more_todo)
         return done
 
-    def _convert_node(self, node) -> Tuple[TopLevel, List[dict]]:
+    def _convert_node(self, node) -> Tuple[Union[TopLevel, None], List[dict]]:
         """Convert a node of TypeScript JSON output to an IR object.
 
         :return: A tuple: (the IR object, a list of other nodes found within
@@ -134,11 +134,16 @@ class Analyzer:
         """
         if node.get('inheritedFrom'):
             return None, []
-        if node.get('sources'):
+
+        try:
+            sources = node.get('sources', node['__parent']['sources'])
+        except (KeyError, TypeError):
+            sources = None
+        if sources:
             # Ignore nodes with a reference to absolute paths (like /usr/lib)
-            source = node.get('sources')[0]
-            if source.get('fileName', '.')[0] == '/':
+            if sources[0].get('fileName', '.')[0] == '/':
                 return None, []
+            node['sources'] = sources
 
         ir = None
         kind = node.get('kindString')
@@ -194,7 +199,7 @@ class Analyzer:
             # many attr of Functions.
             sigs = node.get('signatures')
             first_sig = sigs[0]  # Should always have at least one
-            first_sig['sources'] = node.get('sources', node['__parent']['sources'])
+            first_sig['sources'] = sources
             return self._convert_node(first_sig)
         elif kind in ['Call signature', 'Constructor signature']:
             # This is the real meat of a function, method, or constructor.
