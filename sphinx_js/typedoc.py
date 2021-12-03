@@ -194,7 +194,15 @@ class Analyzer:
             # many attr of Functions.
             sigs = node.get('signatures')
             first_sig = sigs[0]  # Should always have at least one
-            first_sig['sources'] = node['sources']
+            def rec_helper(node):
+                if "sources" in node["__parent"]:
+                    return node["__parent"]["sources"]
+                else:
+                    rec_helper(node["__parent"])
+            if "sources" in node:
+                first_sig['sources'] = node['sources']
+            else:
+                first_sig['sources'] = rec_helper(node)
             return self._convert_node(first_sig)
         elif kind in ['Call signature', 'Constructor signature']:
             # This is the real meat of a function, method, or constructor.
