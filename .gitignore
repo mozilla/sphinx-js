@@ -19,3 +19,5 @@ sphinx_js.egg-info/
 .vscode
 .DS_Store
 venv
+# Pyenv
+.python-version

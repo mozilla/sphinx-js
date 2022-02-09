@@ -198,7 +198,7 @@ class Analyzer:
                 if "sources" in node["__parent"]:
                     return node["__parent"]["sources"]
                 else:
-                    rec_helper(node["__parent"])
+                    return rec_helper(node["__parent"])
             if "sources" in node:
                 first_sig['sources'] = node['sources']
             else:
@@ -252,8 +252,12 @@ class Analyzer:
         type_of_type = type.get('type')
 
         if type_of_type == 'reference' and type.get('id'):
-            node = self._index[type['id']]
-            name = node['name']
+            try:
+                node = self._index[type['id']]
+                name = node['name']
+            except KeyError:
+                # Try to get the name directly from the type, in one last attempt.
+                name = type['name']
         elif type_of_type == 'unknown':
             if re.match(r'-?\d*(\.\d+)?', type['name']):  # It's a number.
                 # TypeDoc apparently sticks numeric constants' values into the
@@ -283,10 +287,15 @@ class Analyzer:
             if constraint is not None:
                 name += ' extends ' + self._type_name(constraint)
                 # e.g. K += extends + keyof T
+        elif type_of_type == 'literal':
+            if type['value'] is None:
+                name = 'null'
+            else:
+                name = repr(type['value'])
         elif type_of_type == 'reflection':
             name = '<TODO: reflection>'
-            # test_generic_member() (currently skipped) tests this.
         else:
+            # test_generic_member() (currently skipped) tests this.
             name = '<TODO: other type>'
 
         type_args = type.get('typeArguments')
@@ -336,6 +345,8 @@ def typedoc_output(abs_source_paths, sphinx_conf_dir, config_path):
     with NamedTemporaryFile(mode='w+b') as temp:
         command.add('--json', temp.name, *abs_source_paths)
         try:
+            from pprint import pprint
+            pprint(command.make())
             subprocess.call(command.make())
         except OSError as exc:
             if exc.errno == ENOENT:
