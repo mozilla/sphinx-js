@@ -340,8 +340,6 @@ def typedoc_output(abs_source_paths, sphinx_conf_dir, config_path):
     with NamedTemporaryFile(mode='w+b') as temp:
         command.add('--json', temp.name, *abs_source_paths)
         try:
-            from pprint import pprint
-            pprint(command.make())
             subprocess.call(command.make())
         except OSError as exc:
             if exc.errno == ENOENT:
