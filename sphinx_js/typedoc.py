@@ -195,8 +195,8 @@ class Analyzer:
             sigs = node.get('signatures')
             first_sig = sigs[0]  # Should always have at least one
             parent = node
-            while 'sources' not in node and '__parent' in node:
-                parent = node['__parent']
+            while 'sources' not in parent and '__parent' in parent:
+                parent = parent['__parent']
             first_sig['sources'] = parent['sources']
             return self._convert_node(first_sig)
         elif kind in ['Call signature', 'Constructor signature']:
