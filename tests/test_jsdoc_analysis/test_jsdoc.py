@@ -86,7 +86,7 @@ class ClassTests(JsDocTestCase):
         assert cls.filename == 'class.js'
         assert cls.description == 'This is a long description that should not be unwrapped. Once day, I was\nwalking down the street, and a large, green, polka-dotted grand piano fell\nfrom the 23rd floor of an apartment building.'
         assert cls.line == 8
-        assert cls.examples == ['Example in constructor']  # We ignore examples and other fields from the class doclet so far. This could change someday.
+        assert cls.examples == ['Example in class']  # We ignore examples and other fields from the class doclet so far. This could change someday.
 
         # Members:
         getter, private_method = cls.members  # default constructor not included here
