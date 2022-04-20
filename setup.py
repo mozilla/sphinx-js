@@ -14,7 +14,7 @@ setup(
     packages=find_packages(exclude=['ez_setup']),
     url='https://github.com/mozilla/sphinx-js',
     include_package_data=True,
-    install_requires=['Jinja2>3.0,<4.0', 'parsimonious>=0.9.0,<0.10.0', 'Sphinx>=4.0.0,<5.0.0'],
+    install_requires=['Jinja2==3.1.1', 'parsimonious==0.9.0', 'Sphinx==4.5.0'],
     python_requires='>=3.7',
     classifiers=[
         'Intended Audience :: Developers',
