@@ -243,5 +243,5 @@ class SimpleClass {
     /**
      * Static.
      */
-    static noUseOfThis() {}
+    static aStaticClassFunction() {}
 }

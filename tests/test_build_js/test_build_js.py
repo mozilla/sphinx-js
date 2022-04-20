@@ -131,7 +131,7 @@ class Tests(SphinxBuildTestCase):
             'class SimpleClass()\n\n'
             '   Class doc.\n'
             '\n'
-            '   static SimpleClass.noUseOfThis()\n'
+            '   static SimpleClass.aStaticClassFunction()\n'
             '\n'
             '      Static.\n')
 
