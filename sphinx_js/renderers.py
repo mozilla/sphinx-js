@@ -57,6 +57,35 @@ class JsRenderer(object):
                    content=directive.content,
                    options=directive.options)
 
+    def get_object(self):
+        """Return the IR object rendered by this renderer.
+
+        """
+        try:
+            obj = self._app._sphinxjs_analyzer.get_object(
+                self._partial_path, self._renderer_type)
+            return obj
+        except SuffixNotFound as exc:
+            raise SphinxError('No documentation was found for object "%s" or any path ending with that.'
+                              % ''.join(exc.segments))
+        except SuffixAmbiguous as exc:
+            raise SphinxError('More than one object matches the path suffix "%s". Candidate paths have these segments in front: %s'
+                              % (''.join(exc.segments), exc.next_possible_keys))
+
+    def dependencies(self):
+        """Return a set of path(s) to the file(s) that the IR object
+        rendered by this renderer is from.  Each path is absolute or
+        relative to `root_for_relative_js_paths`.
+
+        """
+        try:
+            obj = self.get_object()
+            if obj.deppath:
+                return set([obj.deppath])
+        except SphinxError:
+            pass
+        return set([])
+
     def rst_nodes(self):
         """Render into RST nodes a thing shaped like a function, having a name
         and arguments.
@@ -64,32 +93,22 @@ class JsRenderer(object):
         Fill in args, docstrings, and info fields from stored JSDoc output.
 
         """
-        try:
-            obj = self._app._sphinxjs_analyzer.get_object(
-                self._partial_path, self._renderer_type)
-        except SuffixNotFound as exc:
-            raise SphinxError('No documentation was found for object "%s" or any path ending with that.'
-                              % ''.join(exc.segments))
-        except SuffixAmbiguous as exc:
-            raise SphinxError('More than one object matches the path suffix "%s". Candidate paths have these segments in front: %s'
-                              % (''.join(exc.segments), exc.next_possible_keys))
-        else:
-            rst = self.rst(self._partial_path,
-                           obj,
-                           use_short_name='short-name' in self._options)
+        obj = self.get_object()
+        rst = self.rst(self._partial_path,
+                       obj,
+                       use_short_name='short-name' in self._options)
 
-            # Parse the RST into docutils nodes with a fresh doc, and return
-            # them.
-            #
-            # Not sure if passing the settings from the "real" doc is the right
-            # thing to do here:
-            doc = new_document('%s:%s(%s)' % (obj.filename,
-                                              obj.path,
-                                              obj.line),
-                               settings=self._directive.state.document.settings)
-            RstParser().parse(rst, doc)
-            return doc.children
-        return []
+        # Parse the RST into docutils nodes with a fresh doc, and return
+        # them.
+        #
+        # Not sure if passing the settings from the "real" doc is the right
+        # thing to do here:
+        doc = new_document('%s:%s(%s)' % (obj.filename,
+                                          obj.path,
+                                          obj.line),
+                           settings=self._directive.state.document.settings)
+        RstParser().parse(rst, doc)
+        return doc.children
 
     def rst(self, partial_path, obj, use_short_name=False):
         """Return rendered RST about an entity with the given name and IR
@@ -199,6 +218,7 @@ class AutoClassRenderer(JsRenderer):
                 name='',
                 path=Pathname([]),
                 filename='',
+                deppath=None,
                 description='',
                 line=0,
                 deprecated=False,

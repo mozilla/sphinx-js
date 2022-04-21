@@ -15,8 +15,6 @@ def setup(app):
     # is RSTs.
     app.connect('builder-inited', analyze)
 
-    app.connect('env-before-read-docs', read_all_docs)
-
     app.add_directive_to_domain('js',
                                 'staticfunction',
                                 JSStaticFunction)
@@ -82,14 +80,3 @@ def root_or_fallback(root_for_relative_paths, abs_source_paths):
             raise SphinxError('Since more than one js_source_path is specified in conf.py, root_for_relative_js_paths must also be specified. This allows paths beginning with ./ or ../ to be unambiguous.')
         else:
             return abs_source_paths[0]
-
-
-def read_all_docs(app, env, doc_names):
-    """Add all found docs to the to-be-read list, because we have no way of
-    telling which ones reference JS code that might have changed.
-
-    Otherwise, builds go stale until you touch the stale RSTs or do a ``make
-    clean``.
-
-    """
-    doc_names[:] = env.found_docs

@@ -160,6 +160,9 @@ class TopLevel:
     path: Pathname
     #: The basename of the file the object is from, e.g. "foo.js"
     filename: str
+    #: The path to the dependency, i.e., the file the object is from.
+    #: Either absolute or relative to the root_for_relative_js_paths.
+    deppath: Optional[str]
     #: The human-readable description of the entity or '' if absent
     description: ReStructuredText
     #: Line number where the object (exluding any prefixing comment) begins
