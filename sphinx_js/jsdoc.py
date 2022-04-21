@@ -122,10 +122,9 @@ class Analyzer:
             # the fields are about the default constructor:
             constructor=self._doclet_as_function(doclet, full_path),
             members=members,
-            **top_level_properties(doclet, full_path))
+            **top_level_properties(doclet, full_path, self._base_dir))
 
-    @staticmethod
-    def _doclet_as_function(doclet, full_path):
+    def _doclet_as_function(self, doclet, full_path):
         return Function(
             description=description(doclet),
             exported_from=None,
@@ -136,10 +135,9 @@ class Analyzer:
             exceptions=exceptions_to_ir(doclet.get('exceptions', [])),
             returns=returns_to_ir(doclet.get('returns', [])),
             params=params_to_ir(doclet),
-            **top_level_properties(doclet, full_path))
+            **top_level_properties(doclet, full_path, self._base_dir))
 
-    @staticmethod
-    def _doclet_as_attribute(doclet, full_path):
+    def _doclet_as_attribute(self, doclet, full_path):
         return Attribute(
             description=description(doclet),
             exported_from=None,
@@ -148,7 +146,7 @@ class Analyzer:
             is_static=False,
             is_private=is_private(doclet),
             type=get_type(doclet),
-            **top_level_properties(doclet, full_path)
+            **top_level_properties(doclet, full_path, self._base_dir)
         )
 
 
@@ -264,7 +262,7 @@ def get_type(props):
     return '|'.join(names) if names else None
 
 
-def top_level_properties(doclet, full_path):
+def top_level_properties(doclet, full_path, base_dir):
     """Extract information common to complex entities, and return it as a dict.
 
     Specifically, pull out the information needed to parametrize TopLevel's
@@ -275,6 +273,7 @@ def top_level_properties(doclet, full_path):
         name=doclet['name'],
         path=Pathname(full_path),
         filename=doclet['meta']['filename'],
+        deppath=relpath(join(doclet['meta']['path'], doclet['meta']['filename']), base_dir),
         # description's source varies depending on whether the doclet is a
         #    class, so it gets filled out elsewhere.
         line=doclet['meta']['lineno'],
@@ -292,6 +291,7 @@ def properties_to_ir(properties):
                       # because we never use them for anything:
                       path=Pathname([]),
                       filename='',
+                      deppath='',
                       description=description(p),
                       line=0,
                       deprecated=False,

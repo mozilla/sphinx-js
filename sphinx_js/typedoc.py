@@ -68,6 +68,25 @@ class Analyzer:
                 # Found one!
                 return Pathname(make_path_segments(node, self._base_dir))
 
+    def _containing_deppath(self, node) -> Optional[Pathname]:
+        """Return the path pointing to the module containing the given node.
+        The path is absolute or relative to `root_for_relative_js_paths`.
+        Raises ValueError if one isn't found.
+
+        """
+        while True:
+            node = node.get('__parent')
+            if not node or node['id'] == 0:
+                # We went all the way up but didn't find a containing module.
+                raise ValueError('Could not find deppath')
+            elif node.get('kindString') == 'External module':
+                # Found one!
+                deppath = node.get('originalName')
+                if deppath:
+                    return relpath(deppath, self._base_dir)
+                else:
+                    raise ValueError('Could not find deppath')
+
     def _top_level_properties(self, node):
         source = node.get('sources')[0]
         if node.get('flags', {}).get('isExported', False):
@@ -78,6 +97,7 @@ class Analyzer:
             name=short_name(node),
             path=Pathname(make_path_segments(node, self._base_dir)),
             filename=basename(source['fileName']),
+            deppath=self._containing_deppath(node),
             description=make_description(node.get('comment', {})),
             line=source['line'],
 

@@ -36,6 +36,7 @@ class FunctionTests(JsDocTestCase):
             name='foo',
             path=Pathname(['./', 'function.', 'foo']),
             filename='function.js',
+            deppath='function.js',
             # Line breaks and indentation should be preserved:
             description=(
                 'Determine any of type, note, score, and element using a callback. This\n'

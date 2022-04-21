@@ -7,6 +7,8 @@ JSDoc output, via closure. The renderer classes, able to be top-level classes,
 can access each other and collaborate.
 
 """
+from os.path import join, relpath
+
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst.directives import flag
 from sphinx.domains.javascript import JSCallable
@@ -29,6 +31,17 @@ class JsDirective(Directive):
     }
 
 
+def note_dependencies(app, dependencies):
+    """Note dependencies of current document."""
+    for fn in dependencies:
+        # Dependencies in the IR are relative to `root_for_relative_paths`, itself
+        # relative to the configuration directory.
+        abs = join(app._sphinxjs_analyzer._base_dir, fn)
+        # Sphinx dependencies are relative to the source directory.
+        rel = relpath(abs, app.srcdir)
+        app.env.note_dependency(rel)
+
+
 def auto_function_directive_bound_to_app(app):
     class AutoFunctionDirective(JsDirective):
         """js:autofunction directive, which spits out a js:function directive
@@ -38,7 +51,9 @@ def auto_function_directive_bound_to_app(app):
 
         """
         def run(self):
-            return AutoFunctionRenderer.from_directive(self, app).rst_nodes()
+            renderer = AutoFunctionRenderer.from_directive(self, app)
+            note_dependencies(app, renderer.dependencies())
+            return renderer.rst_nodes()
 
     return AutoFunctionDirective
 
@@ -60,7 +75,9 @@ def auto_class_directive_bound_to_app(app):
             'private-members': flag})
 
         def run(self):
-            return AutoClassRenderer.from_directive(self, app).rst_nodes()
+            renderer = AutoClassRenderer.from_directive(self, app)
+            note_dependencies(app, renderer.dependencies())
+            return renderer.rst_nodes()
 
     return AutoClassDirective
 
@@ -73,7 +90,9 @@ def auto_attribute_directive_bound_to_app(app):
 
         """
         def run(self):
-            return AutoAttributeRenderer.from_directive(self, app).rst_nodes()
+            renderer = AutoAttributeRenderer.from_directive(self, app)
+            note_dependencies(app, renderer.dependencies())
+            return renderer.rst_nodes()
 
     return AutoAttributeDirective
 
