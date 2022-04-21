@@ -4,3 +4,6 @@ recommonmark==0.7.1
 # with regard to how it emits class names and em dashes from
 # time to time:
 Sphinx==3.5.4
+markupsafe==2.0.1
+Jinja2>2.0,<3.0
+
