@@ -3,4 +3,4 @@ recommonmark==0.7.1
 # Sphinx's plain-text renderer changes behavior slightly
 # with regard to how it emits class names and em dashes from
 # time to time:
-Sphinx==3.5.4
+Sphinx==4.1.0
