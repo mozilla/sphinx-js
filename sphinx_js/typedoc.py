@@ -4,10 +4,11 @@ from codecs import getreader
 from errno import ENOENT
 from json import load
 from os.path import basename, join, normpath, relpath, sep, splitext
+from platform import node
 import re
 import subprocess
 from tempfile import NamedTemporaryFile
-from typing import List, Optional, Tuple, Union
+from typing import Iterator, List, Optional, Tuple, Union
 
 from sphinx.errors import SphinxError
 
@@ -56,17 +57,23 @@ class Analyzer:
         """
         return self._objects_by_path.get(path_suffix)
 
-    def _containing_module(self, node) -> Optional[Pathname]:
-        """Return the Pathname pointing to the module containing the given
-        node, None if one isn't found."""
+    def _parent_nodes(self, node) -> Iterator[node]:
+        """Return an iterator of parent nodes"""
         while True:
             node = node.get('__parent')
             if not node or node['id'] == 0:
                 # We went all the way up but didn't find a containing module.
-                return
+                yield StopIteration
             elif node.get('kindString') == 'External module':
                 # Found one!
-                return Pathname(make_path_segments(node, self._base_dir))
+                yield node
+
+    def _containing_module(self, node) -> Optional[Pathname]:
+        """Return the Pathname pointing to the module containing the given
+        node, None if one isn't found."""
+        for node in self._parent_nodes(node):
+            return Pathname(make_path_segments(node, self._base_dir))
+        return None
 
     def _containing_deppath(self, node) -> Optional[Pathname]:
         """Return the path pointing to the module containing the given node.
@@ -74,18 +81,13 @@ class Analyzer:
         Raises ValueError if one isn't found.
 
         """
-        while True:
-            node = node.get('__parent')
-            if not node or node['id'] == 0:
-                # We went all the way up but didn't find a containing module.
+        for node in self._parent_nodes(node):
+            deppath = node.get('originalName')
+            if deppath:
+                return relpath(deppath, self._base_dir)
+            else:
                 raise ValueError('Could not find deppath')
-            elif node.get('kindString') == 'External module':
-                # Found one!
-                deppath = node.get('originalName')
-                if deppath:
-                    return relpath(deppath, self._base_dir)
-                else:
-                    raise ValueError('Could not find deppath')
+        raise ValueError('Could not find deppath')
 
     def _top_level_properties(self, node):
         source = node.get('sources')[0]
