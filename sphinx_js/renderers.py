@@ -5,12 +5,15 @@ from docutils.statemachine import StringList
 from docutils.utils import new_document
 from jinja2 import Environment, PackageLoader
 from sphinx.errors import SphinxError
-from sphinx.util import rst
+from sphinx.util import logging, rst
 
 from .analyzer_utils import dotted_path
 from .ir import Class, Function, Interface, Pathname
 from .parsers import PathVisitor
 from .suffix_tree import SuffixAmbiguous, SuffixNotFound
+
+
+logger = logging.getLogger(__name__)
 
 
 class JsRenderer(object):
@@ -82,8 +85,8 @@ class JsRenderer(object):
             obj = self.get_object()
             if obj.deppath:
                 return set([obj.deppath])
-        except SphinxError:
-            pass
+        except SphinxError as exc:
+            logger.exception('Exception while retrieving paths for IR object "%s"' % (''.join(exc.segments)))
         return set([])
 
     def rst_nodes(self):
