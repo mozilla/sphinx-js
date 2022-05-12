@@ -32,7 +32,11 @@ class JsDirective(Directive):
 
 
 def note_dependencies(app, dependencies):
-    """Note dependencies of current document."""
+    """Note dependencies of current document.
+
+    :arg app: Sphinx application object
+    :arg dependencies: iterable of filename strings relative to root_for_relative_paths
+    """
     for fn in dependencies:
         # Dependencies in the IR are relative to `root_for_relative_paths`, itself
         # relative to the configuration directory.
