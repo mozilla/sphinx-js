@@ -106,7 +106,7 @@ optional parameters::
 
     .. js:autofunction:: someFunction(foo, bar[, baz])
 
-Parameter properties and destructuring parameters also work fine, using `standard JSDoc syntax <http://usejsdoc.org/tags-param.html#parameters-with-properties>`_::
+Parameter properties and destructuring parameters also work fine, using `standard JSDoc syntax <https://jsdoc.app/tags-param.html#parameters-with-properties>`_::
 
     /**
      * Export an image from the given canvas and save it to the disk.
@@ -170,9 +170,9 @@ You can even add additional content. If you do, it will appear just below any ex
     .. js:autofunction:: someClass#someFunction
        :short-name:
 
-``autofunction`` can also be used on callbacks defined with the `@callback tag <http://usejsdoc.org/tags-callback.html>`_.
+``autofunction`` can also be used on callbacks defined with the `@callback tag <https://jsdoc.app/tags-callback.html>`_.
 
-There is experimental support for abusing ``autofunction`` to document `@typedef tags <http://usejsdoc.org/tags-typedef.html>`_ as well, though the result will be styled as a function, and ``@property`` tags will fall misleadingly under an "Arguments" heading. Still, it's better than nothing until we can do it properly.
+There is experimental support for abusing ``autofunction`` to document `@typedef tags <https://jsdoc.app/tags-typedef.html>`_ as well, though the result will be styled as a function, and ``@property`` tags will fall misleadingly under an "Arguments" heading. Still, it's better than nothing until we can do it properly.
 
 autoclass
 ---------
@@ -260,7 +260,7 @@ If you have same-named objects in different files, use pathnames to disambiguate
 
     .. js:autofunction:: ./some/dir/some/file.SomeClass#someInstanceMethod.staticMethod~innerMember
 
-You may recognize the separators ``#.~`` from `JSDoc namepaths <http://usejsdoc.org/about-namepaths.html>`_; they work the same here.
+You may recognize the separators ``#.~`` from `JSDoc namepaths <https://jsdoc.app/about-namepaths.html>`_; they work the same here.
 
 For conciseness, you can use any unique suffix, as long as it consists of complete path segments. These would all be equivalent to the above, assuming they are unique within your source tree::
 
