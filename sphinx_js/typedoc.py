@@ -63,7 +63,7 @@ class Analyzer:
             node = node.get('__parent')
             if not node or node['id'] == 0:
                 # We went all the way up but didn't find a containing module.
-                yield StopIteration
+                return
             elif node.get('kindString') == 'External module':
                 # Found one!
                 yield node
