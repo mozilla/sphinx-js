@@ -86,7 +86,7 @@ class JsRenderer(object):
             if obj.deppath:
                 return set([obj.deppath])
         except SphinxError as exc:
-            logger.exception('Exception while retrieving paths for IR object "%s"' % (''.join(exc.segments)))
+            logger.exception('Exception while retrieving paths for IR object: %s' % exc)
         return set([])
 
     def rst_nodes(self):
