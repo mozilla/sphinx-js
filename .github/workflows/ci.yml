@@ -8,9 +8,11 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  test:
 
     runs-on: ubuntu-latest
+
+    continue-on-error: true
 
     strategy:
       matrix:
