@@ -73,7 +73,7 @@ Setup
 Use
 ===
 
-In short, write a folder full of reStructuredText files, use the following directives to pull in your JSDoc documentation, then tell Sphinx to render it all by running ``make html`` in your docs directory. If you have never used Sphinx or written reStructuredText before, here is `where we left off in its tutorial <http://www.sphinx-doc.org/en/stable/tutorial.html#defining-document-structure>`_. For a quick start, just add things to index.rst until you prove things are working.
+In short, in a Sphinx project, use the following directives to pull in your JSDoc documentation, then tell Sphinx to render it all by running ``make html`` in your docs directory. If you have never used Sphinx or written reStructuredText before, here is `where we left off in its tutorial <http://www.sphinx-doc.org/en/stable/tutorial.html#defining-document-structure>`_. For a quick start, just add things to index.rst until you prove things are working.
 
 autofunction
 ------------
