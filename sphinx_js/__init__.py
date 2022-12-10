@@ -92,9 +92,9 @@ def setup(app):
                                 auto_attribute_directive_bound_to_app(app))
     # TODO: We could add a js:module with app.add_directive_to_domain().
 
-    app.add_config_value('js_language', 'javascript', 'env')
-    app.add_config_value('js_source_path', '../', 'env')
-    app.add_config_value('jsdoc_config_path', None, 'env')
+    app.add_config_value('js_language', default='javascript', rebuild='env')
+    app.add_config_value('js_source_path', default=['../'], rebuild='env', types=[str, list])
+    app.add_config_value('jsdoc_config_path', default=None, rebuild='env')
 
     # We could use a callable as the "default" param here, but then we would
     # have had to duplicate or build framework around the logic that promotes
