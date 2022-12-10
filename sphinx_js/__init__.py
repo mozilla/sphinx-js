@@ -1,3 +1,4 @@
+from functools import lru_cache
 from os.path import join, normpath
 
 from sphinx.errors import SphinxError
@@ -8,6 +9,68 @@ from .directives import (auto_class_directive_bound_to_app,
                          JSStaticFunction)
 from .jsdoc import Analyzer as JsAnalyzer
 from .typedoc import Analyzer as TsAnalyzer
+
+
+# Cache this to guarantee it only runs once.
+@lru_cache(maxsize=None)
+def fix_js_make_xref():
+    """Monkeypatch to fix sphinx.domains.javascript TypedField and GroupedField
+
+    Fixes https://github.com/sphinx-doc/sphinx/issues/11021
+
+    """
+    from docutils import nodes
+
+    from sphinx.domains import javascript
+    from sphinx.locale import _
+
+    class JSXrefMixin:
+        def make_xref(
+            self,
+            rolename,
+            domain,
+            target,
+            innernode=nodes.emphasis,
+            contnode=None,
+            env=None,
+            inliner=None,
+            location=None,
+        ):
+            # Set inliner to None just like the PythonXrefMixin does so the
+            # xref doesn't get rendered as a function.
+            return super().make_xref(
+                rolename, domain, target,
+                innernode, contnode,
+                env, inliner=None, location=None)
+
+    class JSTypedField(JSXrefMixin, javascript.TypedField):
+        pass
+
+    class JSGroupedField(JSXrefMixin, javascript.GroupedField):
+        pass
+
+    # Replace javascript module
+    javascript.TypedField = JSTypedField
+    javascript.GroupedField = JSGroupedField
+
+    # Fix the one place TypedField and GroupedField are used in the javascript
+    # module
+    javascript.JSCallable.doc_field_types = [
+        JSTypedField(
+            'arguments', label=_('Arguments'),
+            names=('argument', 'arg', 'parameter', 'param'),
+            typerolename='func', typenames=('paramtype', 'type')
+        ),
+        JSGroupedField(
+            'errors', label=_('Throws'), rolename='func',
+            names=('throws', ),
+            can_collapse=True
+        ),
+    ] + javascript.JSCallable.doc_field_types[2:]
+
+
+fix_js_make_xref()
+
 
 def setup(app):
     # I believe this is the best place to run jsdoc. I was tempted to use
