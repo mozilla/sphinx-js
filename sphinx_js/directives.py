@@ -11,6 +11,7 @@ from os.path import join, relpath
 
 from docutils.parsers.rst import Directive
 from docutils.parsers.rst.directives import flag
+from sphinx import addnodes
 from sphinx.domains.javascript import JSCallable
 
 from .renderers import (AutoFunctionRenderer,
@@ -113,4 +114,6 @@ def _members_to_exclude(arg):
 
 class JSStaticFunction(JSCallable):
     """Like a callable but with a different prefix."""
-    display_prefix = 'static '
+    def get_display_prefix(self):
+        return [addnodes.desc_sig_keyword('static', 'static'),
+                addnodes.desc_sig_space()]
