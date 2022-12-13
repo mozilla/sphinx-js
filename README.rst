@@ -348,13 +348,21 @@ Run the tests using tox, which will also install JSDoc and TypeDoc at pinned ver
 Version History
 ===============
 
-3.1.2
+3.2.0: (December 13th, 2022)
+  * Add "static" in front of static methods.
+  * Pin Jinja2 and markupsafe versions. (#190)
+  * Track dependencies; do not read all documents. This improves speed of incremental updates. (#194)
+  * Support Python 3.10 and 3.11. (#186)
+  * Support Sphinx >= 4.1.0. (#209)
+  * Fix types warning for ``js_source_path`` configuration item. (#182)
+
+3.1.2: (April 15th, 2021)
   * Remove our declared dependency on ``docutils`` to work around the way pip's greedy dependency resolver reacts to the latest version of Sphinx. pip fails when pip-installing sphinx-js because pip sees our "any version of docutils" declaration first (which resolves greedily to the latest version, 0.17) but later encounters Sphinx's apparently new ``<0.17`` constraint and gives up. We can revert this when pip's ``--use-feature=2020-resolver`` becomes the default.
 
-3.1.1
+3.1.1: (March 23rd, 2021)
   * Rewrite large parts of the suffix tree that powers path lookup. This fixes several crashers.
 
-3.1
+3.1: (September 10th, 2020)
   * Re-architect language analysis. There is now a well-documented intermediate representation between JSDoc- and TypeDoc-emitted JSON and the renderers. This should make it much faster to merge PRs.
   * Rewrite much of the TypeScript analysis engine so it feeds into the new IR.
 
@@ -370,16 +378,16 @@ Version History
   * No longer show args in the arg list that are utterly uninformative, lacking both description and type info.
   * Class attributes are now listed before methods unless manally ordered with ``:members:``.
 
-3.0.1
+3.0.1: (August 10th, 2020)
   * Don't crash when encountering a ``../`` prefix on an object path. This can happen behind the scenes when ``root_for_relative_js_paths`` is set inward of the JS code.
 
-3.0
+3.0: (July 14th, 2020)
   * Make compatible with Sphinx 3, which requires Python 3.
   * Drop support for Python 2.
   * Make sphinx-js not care what the current working directory is, except for the TypeScript analyzer, which needs further work.
   * Properly RST-escape return types.
 
-2.8
+2.8: (September 16th, 2019)
   * Display generic TypeScript types properly. Make fields come before methods. (Paul Grau)
   * Combine constructor and class documentation at the top TypeScript classes. (Sebastian Weigand)
   * Switch to pytest as the testrunner. (Sebastian Weigand)
@@ -388,54 +396,54 @@ Version History
   * Fix parsing breakage that began in typedoc 0.14.0. (Paul Grau)
   * Fix a data-intake crash with TypeScript. (Cristiano Santos)
 
-2.7.1
+2.7.1: (November 16th, 2018)
   * Fix a crash that would happen sometimes with UTF-8 on Windows. #67.
   * Always use conf.py's dir for JSDoc's working dir. #78. (Thomas Khyn)
 
-2.7
+2.7: (August 2nd, 2018))
   * Add experimental TypeScript support. (Wim Yedema)
 
-2.6
+2.6: (July 26th, 2018)
   * Add support for ``@deprecated`` and ``@see``. (David Li)
   * Notice and document JS variadic params nicely. (David Li)
   * Add linter to codebase.
 
-2.5
+2.5: (April 20th, 2018)
   * Use documented ``@params`` to help fill out the formal param list for a
     function. This keeps us from missing params that use destructuring. (flozz)
   * Improve error reporting when JSDoc is missing.
   * Add extracted default values to generated formal param lists. (flozz and erikrose)
 
-2.4
+2.4: (March 21, 2018)
   * Support the ``@example`` tag. (lidavidm)
   * Work under Windows. Before, we could hardly find any documentation. (flozz)
   * Properly unwrap multiple-line JSDoc tags, even if they have Windows line endings. (Wim Yedema)
   * Drop support for Python 3.3, since Sphinx has also done so.
   * Fix build-time crash when using recommonmark (for Markdown support) under Sphinx >=1.7.1. (jamrizzi)
 
-2.3.1
+2.3.1: (January 11th, 2018)
   * Find the ``jsdoc`` command on Windows, where it has a different name. Then
     patch up process communication so it doesn't hang.
 
-2.3
+2.3: (November 1st, 2017)
   * Add the ability to say "*" within the ``autoclass :members:`` option, meaning "and all the members that I didn't explicitly list".
 
-2.2
+2.2: (October 10th, 2017)
   * Add ``autofunction`` support for ``@callback`` tags. (krassowski)
   * Add experimental ``autofunction`` support for ``@typedef`` tags. (krassowski)
   * Add a nice error message for when JSDoc can't find any JS files.
   * Pin six more tightly so ``python_2_unicode_compatible`` is sure to be around.
 
-2.1
+2.1: (August 30th, 2017)
   * Allow multiple folders in ``js_source_path``. This is useful for gradually migrating large projects, one folder at a time, to JSDoc. Introduce ``root_for_relative_js_paths`` to keep relative paths unambiguous in the face of multiple source paths.
   * Aggregate PathTaken errors, and report them all at once. This means you don't have to run JSDoc repeatedly while cleaning up large projects.
   * Fix a bytes-vs-strings issue that crashed on versions of Python 3 before 3.6. (jhkennedy)
   * Tolerate JS files that have filename extensions other than ".js". Before, when combined with custom JSDoc configuration that ingested such files, incorrect object pathnames were generated, which led to spurious "No JSDoc documentation was found for object ..." errors.
 
-2.0.1
+2.0.1: (July 13th, 2017)
   * Fix spurious syntax errors while loading large JSDoc output by writing it to a temp file first. (jhkennedy)
 
-2.0
+2.0: (May 4th, 2017)
   * Deal with ambiguous object paths. Symbols with identical JSDoc longnames (such as two top-level things called "foo" in different files) will no longer have one shadow the other. Introduce an unambiguous path convention for referring to objects. Add a real parser to parse them rather than the dirty tricks we were using before. Backward compatibility breaks a little, because ambiguous references are now a fatal error, rather than quietly referring to the last definition JSDoc happened to encounter.
   * Index everything into a suffix tree so you can use any unique path suffix to refer to an object.
   * Other fallout of having a real parser:
@@ -446,34 +454,34 @@ Version History
   * Fix KeyError when trying to gather the constructor params of a plain old
     object labeled as a ``@class``.
 
-1.5.2
+1.5.2: (March 22th, 2017)
   * Fix crasher while warning that a specified longname isn't found.
 
-1.5.1
+1.5.1: (March 20th, 2017)
   * Sort ``:members:`` alphabetically when an order is not explicitly specified.
 
-1.5
+1.5: (March 17th, 2017)
   * Add ``:members:`` option to ``autoclass``.
   * Add ``:private-members:`` and ``:exclude-members:`` options to go with it.
   * Significantly refactor to allow directive classes to talk to each other.
 
-1.4
+1.4: (March 10th, 2017)
   * Add ``jsdoc_config_path`` option.
 
-1.3.1
+1.3.1: (March 6th, 2017)
   * Tolerate @args and other info field lines that are wrapped in the source code.
   * Cite the file and line of the source comment in Sphinx-emitted warnings and errors.
 
-1.3
+1.3: (February 21st, 2017)
   * Add ``autoattribute`` directive.
 
-1.2
+1.2: (February 14th, 2017)
   * Always do full rebuilds; don't leave pages stale when JS code has changed but the RSTs have not.
   * Make Python-3-compatible.
   * Add basic ``autoclass`` directive.
 
-1.1
+1.1: (February 13th, 2017)
   * Add ``:short-name:`` option.
 
-1.0
+1.0: (February 7th, 2017)
   * Initial release, with just ``js:autofunction``
