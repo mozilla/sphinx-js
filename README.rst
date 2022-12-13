@@ -356,6 +356,8 @@ Version History
   * Support Sphinx >= 4.1.0. (#209)
   * Fix types warning for ``js_source_path`` configuration item. (#182)
 
+  Thank you Stefan 'hr' Berder, David Huggins-Daines, Nick Alexander, mariusschenzle, Erik Rose, lonnen, and Will Kahn-Greene!
+
 3.1.2: (April 15th, 2021)
   * Remove our declared dependency on ``docutils`` to work around the way pip's greedy dependency resolver reacts to the latest version of Sphinx. pip fails when pip-installing sphinx-js because pip sees our "any version of docutils" declaration first (which resolves greedily to the latest version, 0.17) but later encounters Sphinx's apparently new ``<0.17`` constraint and gives up. We can revert this when pip's ``--use-feature=2020-resolver`` becomes the default.
 
