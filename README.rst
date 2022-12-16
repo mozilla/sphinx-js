@@ -348,6 +348,12 @@ Run the tests using tox, which will also install JSDoc and TypeDoc at pinned ver
 Version History
 ===============
 
+3.2.1: (December 16th, 2022)
+  * Fix xrefs to static functions. (#178)
+  * Add support for jsdoc 4.0.0. (#215)
+
+  Thank you to xsjad0 and Will Kahn-Greene!
+
 3.2.0: (December 13th, 2022)
   * Add "static" in front of static methods.
   * Pin Jinja2 and markupsafe versions. (#190)
