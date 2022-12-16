@@ -86,8 +86,16 @@ class ClassTests(JsDocTestCase):
         assert cls.path == Pathname(['./', 'class.', 'Foo'])
         assert cls.filename == 'class.js'
         assert cls.description == 'This is a long description that should not be unwrapped. Once day, I was\nwalking down the street, and a large, green, polka-dotted grand piano fell\nfrom the 23rd floor of an apartment building.'
-        assert cls.line == 15  # Not ideal, as it refers to the constructor, but we'll allow it
-        assert cls.examples == ['Example in constructor']  # We ignore examples and other fields from the class doclet so far. This could change someday.
+        # Not ideal, as it refers to the constructor, but we'll allow it
+        assert cls.line in (
+            8,  # jsdoc 4.0.0
+            15,  # jsdoc 3.6.3
+        )
+        # We ignore examples and other fields from the class doclet so far. This could change someday.
+        assert cls.examples in (
+            ['Example in class'],  # jsdoc, 4.0.0
+            ['Example in constructor'],  # jsdoc 3.6.3
+        )
 
         # Members:
         getter, private_method = cls.members  # default constructor not included here
@@ -108,7 +116,10 @@ class ClassTests(JsDocTestCase):
         assert constructor.path == Pathname(['./', 'class.', 'Foo'])  # Same path as class. This might differ in different languages.
         assert constructor.filename == 'class.js'
         assert constructor.description == 'Constructor doc.'
-        assert constructor.examples == ['Example in constructor']
+        assert constructor.examples in (
+            ['Example in class'],  # jsdoc 4.0.0
+            ['Example in constructor'],  # jsdoc 3.6.3
+        )
         assert constructor.params == [Param(name='ho',
                                             description='A thing',
                                             has_default=False,
