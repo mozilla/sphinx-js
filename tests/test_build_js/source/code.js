@@ -242,6 +242,15 @@ class SimpleClass {
 
     /**
      * Static.
+     *
+     * @see nonStaticMethod
      */
-    static noUseOfThis() {}
+    static staticMethod() {}
+
+    /**
+     * Non-static member.
+     *
+     * @see staticMethod
+     */
+    nonStaticMethod() {}
 }
