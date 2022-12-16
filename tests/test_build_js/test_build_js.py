@@ -126,9 +126,21 @@ class Tests(SphinxBuildTestCase):
             'class SimpleClass()\n\n'
             '   Class doc.\n'
             '\n'
-            '   static SimpleClass.noUseOfThis()\n'
+            '   SimpleClass.nonStaticMethod()\n'
             '\n'
-            '      Static.\n')
+            '      Non-static member.\n'
+            '\n'
+            '      See also:\n'
+            '\n'
+            '        * "staticMethod"\n'
+            '\n'
+            '   static SimpleClass.staticMethod()\n'
+            '\n'
+            '      Static.\n'
+            '\n'
+            '      See also:\n'
+            '\n'
+            '        * "nonStaticMethod"\n')
 
     def test_autoclass(self):
         """Make sure classes show their class comment and constructor

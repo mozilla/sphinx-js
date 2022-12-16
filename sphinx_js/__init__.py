@@ -69,7 +69,42 @@ def fix_js_make_xref():
     ] + javascript.JSCallable.doc_field_types[2:]
 
 
+# Cache this to guarantee it only runs once.
+@lru_cache(maxsize=None)
+def fix_staticfunction_objtype():
+    """Add support for staticfunction objtype
+
+    This adds a new staticfunction objtype to javascript domain class attribute.
+    Can't do this with ``app.add_object_type()`` because that adds it to the
+    std domain.
+
+    This also monkeypatches ``JSObject.get_index_text`` to have the right name
+    for static functions.
+
+    """
+    from sphinx.domains import ObjType
+    from sphinx.domains.javascript import JavaScriptDomain, JSObject
+    from sphinx.locale import _
+
+    if "staticfunction" in JavaScriptDomain.object_types:
+        return
+    JavaScriptDomain.object_types["staticfunction"] = ObjType(_('static function'), 'func')
+
+    orig_get_index_text = JSObject.get_index_text
+
+    def get_index_text(self, objectname, name_obj):
+        name, obj = name_obj
+        if self.objtype == 'staticfunction':
+            if not obj:
+                return _('%s() (built-in static function)') % name
+            return _('%s() (%s static method)') % (name, obj)
+        return orig_get_index_text(self, objectname, name_obj)
+
+    JSObject.get_index_text = get_index_text
+
+
 fix_js_make_xref()
+fix_staticfunction_objtype()
 
 
 def setup(app):
