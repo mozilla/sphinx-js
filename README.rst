@@ -347,6 +347,12 @@ Run the tests using tox, which will also install JSDoc and TypeDoc at pinned ver
 Version History
 ===============
 
+3.2.2: (September 20th, 2023)
+  * Remove Sphinx upper-bound requirement. (#227)
+  * Drop support for Python 3.7. (#228)
+
+  Thank you to Will Kahn-Greene!
+
 3.2.1: (December 16th, 2022)
   * Fix xrefs to static functions. (#178)
   * Add support for jsdoc 4.0.0. (#215)
