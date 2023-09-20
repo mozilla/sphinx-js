@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='sphinx-js',
-    version='3.2.1',
+    version='3.2.2',
     description='Support for using Sphinx on JSDoc-documented JS code',
     long_description=open('README.rst', 'r', encoding='utf8').read(),
     long_description_content_type="text/x-rst",
