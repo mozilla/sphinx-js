@@ -22,14 +22,18 @@ setup(
         # https://github.com/pallets/jinja/issues/1585
         'markupsafe==2.0.1',
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.8',
     classifiers=[
         'Framework :: Sphinx :: Extension',
         'Intended Audience :: Developers',
         'Natural Language :: English',
         'Development Status :: 5 - Production/Stable',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3',
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         'Topic :: Documentation :: Sphinx',
         'Topic :: Software Development :: Documentation'
     ],
