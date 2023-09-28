@@ -344,6 +344,13 @@ Run the tests using tox, which will also install JSDoc and TypeDoc at pinned ver
     pip install tox
     tox
 
+Provenance
+==========
+
+sphinx-js was originally written and maintained by Erik Rose and various
+contributors within and without the Mozilla Corporation and Foundation.
+See ``CONTRIBUTORS`` for details.
+
 Version History
 ===============
 
