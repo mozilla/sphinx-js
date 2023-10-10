@@ -216,7 +216,10 @@ class Analyzer:
             # many attr of Functions.
             sigs = node.get('signatures')
             first_sig = sigs[0]  # Should always have at least one
-            first_sig['sources'] = node['sources']
+            parent = node
+            while 'sources' not in parent and '__parent' in parent:
+                parent = parent['__parent']
+            first_sig['sources'] = parent['sources']
             return self._convert_node(first_sig)
         elif kind in ['Call signature', 'Constructor signature']:
             # This is the real meat of a function, method, or constructor.
@@ -266,8 +269,12 @@ class Analyzer:
         type_of_type = type.get('type')
 
         if type_of_type == 'reference' and type.get('id'):
-            node = self._index[type['id']]
-            name = node['name']
+            try:
+                node = self._index[type['id']]
+                name = node['name']
+            except KeyError:
+                # Try to get the name directly from the type, in one last attempt.
+                name = type['name']
         elif type_of_type == 'unknown':
             if re.match(r'-?\d*(\.\d+)?', type['name']):  # It's a number.
                 # TypeDoc apparently sticks numeric constants' values into the
@@ -297,10 +304,15 @@ class Analyzer:
             if constraint is not None:
                 name += ' extends ' + self._type_name(constraint)
                 # e.g. K += extends + keyof T
+        elif type_of_type == 'literal':
+            if type['value'] is None:
+                name = 'null'
+            else:
+                name = repr(type['value'])
         elif type_of_type == 'reflection':
             name = '<TODO: reflection>'
-            # test_generic_member() (currently skipped) tests this.
         else:
+            # test_generic_member() (currently skipped) tests this.
             name = '<TODO: other type>'
 
         type_args = type.get('typeArguments')
