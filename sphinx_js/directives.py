@@ -14,9 +14,10 @@ from docutils.parsers.rst.directives import flag
 from sphinx import addnodes
 from sphinx.domains.javascript import JSCallable
 
-from .renderers import (AutoFunctionRenderer,
+from .renderers import (AutoAttributeRenderer,
                         AutoClassRenderer,
-                        AutoAttributeRenderer)
+                        AutoFunctionRenderer,
+                        AutoModuleRenderer)
 
 
 class JsDirective(Directive):
@@ -100,6 +101,26 @@ def auto_attribute_directive_bound_to_app(app):
             return renderer.rst_nodes()
 
     return AutoAttributeDirective
+
+
+def auto_module_directive_bound_to_app(app):
+    class AutoModuleDirective(JsDirective):
+        """js:automodule directive, which spits out a js:module directive
+
+        Takes a single argument which is a JS module name.
+
+        """
+        option_spec = JsDirective.option_spec.copy()
+        option_spec.update({
+            'members': lambda members: ([m.strip() for m in members.split(',')]
+                                        if members else None),
+            'exclude-members': _members_to_exclude,
+            'private-members': flag})
+
+        def run(self):
+            return AutoModuleRenderer.from_directive(self, app).rst_nodes()
+
+    return AutoModuleDirective
 
 
 def _members_to_exclude(arg):

@@ -317,6 +317,154 @@ class Tests(SphinxBuildTestCase):
             '     * "deprecatedFunction"\n\n'
             '     * "DeprecatedAttribute"\n')
 
+    def test_automodule(self):
+        """Make sure automodule shows its module comment, author(s), version and
+        license information.
+        """
+        self._file_contents_eq(
+            'automodule',
+            'For test purpose only.\n'
+            '\n'
+            '**Author(s):** xsjad0\n'
+            '\n'
+            '**Version:** 1.0\n'
+            '\n'
+            '**License:** MIT\n')
+
+    def test_automodule_members(self):
+        """Make sure automodule shows all of its information including members."""
+        self._file_contents_eq(
+            'automodule_members',
+            'For test purpose only.\n'
+            '\n'
+            '**Author(s):** xsjad0\n'
+            '\n'
+            '**Version:** 1.0\n'
+            '\n'
+            '**License:** MIT\n'
+            '\n'
+            'class TestModule.StandardClass()\n'
+            '\n'
+            '   StandardClass doc.\n'
+            '\n'
+            '   Constructor doc.\n'
+            '\n'
+            '   StandardClass.aMember()\n'
+            '\n'
+            '      aMember.\n'
+            '\n'
+            '   StandardClass.zMember()\n'
+            '\n'
+            '      zMember.\n'
+            '\n'
+            'TestModule.globalConstant\n'
+            '\n'
+            '   globalConstant.\n'
+            '\n'
+            'TestModule.simpleFunction()\n\n'
+            '   simpleFunction.\n')
+
+    def test_automodule_members_list(self):
+        """Make sure automodule shows only the given members."""
+        self._file_contents_eq(
+            'automodule_members_list',
+            'For test purpose only.\n'
+            '\n'
+            '**Author(s):** xsjad0\n'
+            '\n'
+            '**Version:** 1.0\n'
+            '\n'
+            '**License:** MIT\n'
+            '\n'
+            'class TestModule.StandardClass()\n'
+            '\n'
+            '   StandardClass doc.\n'
+            '\n'
+            '   Constructor doc.\n'
+            '\n'
+            '   StandardClass.aMember()\n'
+            '\n'
+            '      aMember.\n'
+            '\n'
+            'TestModule.simpleFunction()\n'
+            '\n'
+            '   simpleFunction.\n')
+
+    def test_automodule_private_members(self):
+        """Make sure automodule shows members and private members."""
+        self._file_contents_eq(
+            'automodule_private_members',
+            'For test purpose only.\n'
+            '\n'
+            '**Author(s):** xsjad0\n'
+            '\n'
+            '**Version:** 1.0\n'
+            '\n'
+            '**License:** MIT\n'
+            '\n'
+            'class TestModule.StandardClass()\n'
+            '\n'
+            '   StandardClass doc.\n'
+            '\n'
+            '   Constructor doc.\n'
+            '\n'
+            '   StandardClass.aMember()\n'
+            '\n'
+            '      aMember.\n'
+            '\n'
+            '   StandardClass.xMember()\n'
+            '\n'
+            '      xMember. (private)\n'
+            '\n'
+            '   StandardClass.zMember()\n'
+            '\n'
+            '      zMember.\n'
+            '\n'
+            'TestModule.globalConstant\n'
+            '\n'
+            '   globalConstant.\n'
+            '\n'
+            'TestModule.simpleFunction()\n'
+            '\n'
+            '   simpleFunction.\n')
+
+    def test_automodule_exclude_members(self):
+        """Make sure automodule shows only members that are not excluded."""
+        self._file_contents_eq(
+            'automodule_exclude_members',
+            'For test purpose only.\n'
+            '\n'
+            '**Author(s):** xsjad0\n'
+            '\n'
+            '**Version:** 1.0\n'
+            '\n'
+            '**License:** MIT\n'
+            '\n'
+            'class TestModule.StandardClass()\n'
+            '\n'
+            '   StandardClass doc.\n'
+            '\n'
+            '   Constructor doc.\n'
+            '\n'
+            '   StandardClass.aMember()\n'
+            '\n'
+            '      aMember.\n'
+            '\n'
+            'TestModule.globalConstant\n'
+            '\n'
+            '   globalConstant.\n'
+            '\n'
+            'TestModule.simpleFunction()\n'
+            '\n'
+            '   simpleFunction.\n')
+
+    def test_automodule_empty(self):
+        """Make sure automodule works without specifying author, license and
+        version information."""
+        self._file_contents_eq(
+            'automodule_empty',
+            'Empty module.\n')
+
     def test_getter_setter(self):
         """Make sure ES6-style getters and setters can be documented."""
         self._file_contents_eq(
