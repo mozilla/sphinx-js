@@ -4,17 +4,48 @@ from codecs import getreader
 from errno import ENOENT
 from json import load
 from os.path import basename, join, normpath, relpath, sep, splitext
+from pathlib import Path
 from platform import node
 import re
 import subprocess
 from tempfile import NamedTemporaryFile
-from typing import Iterator, List, Optional, Tuple, Union
+from typing import Iterator, List, Optional, Tuple, Union, NamedTuple
 
 from sphinx.errors import SphinxError
 
 from .analyzer_utils import Command, is_explicitly_rooted
 from .ir import Attribute, Class, Function, Interface, NO_DEFAULT, Param, Pathname, Return, TopLevel
 from .suffix_tree import SuffixTree
+
+class ReflectionKind:
+    def __init__(self, kindString, kind):
+        pass
+
+# https://github.com/TypeStrong/typedoc/blob/v0.25.3/src/lib/models/reflections/kind.ts#L7
+class ReflectionKinds(NamedTuple):
+    Project = ReflectionKind("Project", 0x1)
+    Module = ReflectionKind("Module", 0x2)
+    Namespace = ReflectionKind("Namespace", 0x4)
+    Enum = ReflectionKind("Enum", 0x8)
+    EnumMember = ReflectionKind("EnumMember", 0x10)
+    Variable = ReflectionKind("Variable", 0x20)
+    Function = ReflectionKind("Function", 0x40)
+    Class = ReflectionKind("Class", 0x80)
+    Interface = ReflectionKind("Interface", 0x100)
+    Constructor = ReflectionKind("Constructor", 0x200)
+    Property = ReflectionKind("Property", 0x400)
+    Method = ReflectionKind("Method", 0x800)
+    CallSignature = ReflectionKind("CallSignature", 0x1000)
+    IndexSignature = ReflectionKind("IndexSignature", 0x2000)
+    ConstructorSignature = ReflectionKind("ConstructorSignature", 0x4000)
+    Parameter = ReflectionKind("Parameter", 0x8000)
+    TypeLiteral = ReflectionKind("TypeLiteral", 0x10000)
+    TypeParameter = ReflectionKind("TypeParameter", 0x20000)
+    Accessor = ReflectionKind("Accessor", 0x40000)
+    GetSignature = ReflectionKind("GetSignature", 0x80000)
+    SetSignature = ReflectionKind("SetSignature", 0x100000)
+    TypeAlias = ReflectionKind("TypeAlias", 0x200000)
+    Reference = ReflectionKind("Reference", 0x400000)
 
 
 class Analyzer:
@@ -64,7 +95,7 @@ class Analyzer:
             if not node or node['id'] == 0:
                 # We went all the way up but didn't find a containing module.
                 return
-            elif node.get('kindString') == 'External module':
+            elif node.get('kindString') == 'External module' or node.get('kind') == 0x2:
                 # Found one!
                 yield node
 
@@ -81,13 +112,21 @@ class Analyzer:
         Raises ValueError if one isn't found.
 
         """
+        def trySymMap():
+            try:
+                return relpath(str((Path.cwd() / self._index[0]['symbolIdMap'][
+                    str(node['id'])]['sourceFileName']).resolve()
+                ), self._base_dir)
+            except:
+                raise ValueError('Could not find deppath')
+
         for node in self._parent_nodes(node):
             deppath = node.get('originalName')
             if deppath:
                 return relpath(deppath, self._base_dir)
             else:
-                raise ValueError('Could not find deppath')
-        raise ValueError('Could not find deppath')
+                return trySymMap()
+        return trySymMap()
 
     def _top_level_properties(self, node):
         source = node.get('sources')[0]
@@ -128,7 +167,7 @@ class Analyzer:
         for child in cls.get('children', []):
             ir, _ = self._convert_node(child)
             if ir:
-                if (child.get('kindString') == 'Constructor'):
+                if (child.get('kindString') == 'Constructor' or child.get('kind') == 200):
                     # This really, really should happen exactly once per class.
                     constructor = ir
                 else:
@@ -163,21 +202,22 @@ class Analyzer:
                 return None, []
 
         ir = None
-        kind = node.get('kindString')
-        if kind == 'External module':
+        kindString = node.get('kindString')
+        kind = node.get('kind')
+        if kindString == 'External module':
             # We shouldn't need these until we implement automodule. But what
             # of js:mod in the templates?
             pass
-        elif kind == 'Module':
+        elif kindString == 'Module' or kind == 0x2:
             # Does anybody even use TS's old internal modules anymore?
             pass
-        elif kind == 'Interface':
+        elif kindString == 'Interface' or kind == 0x100:
             _, members = self._constructor_and_members(node)
             ir = Interface(
                 members=members,
                 supers=self._related_types(node, kind='extendedTypes'),
                 **self._top_level_properties(node))
-        elif kind == 'Class':
+        elif kindString == 'Class' or kind == 0x80:
             # Every class has a constructor in the JSON, even if it's only
             # inherited.
             constructor, members = self._constructor_and_members(node)
@@ -188,12 +228,12 @@ class Analyzer:
                 is_abstract=node.get('flags', {}).get('isAbstract', False),
                 interfaces=self._related_types(node, kind='implementedTypes'),
                 **self._top_level_properties(node))
-        elif kind in ['Property', 'Variable']:
+        elif kindString in ['Property', 'Variable'] or kind in [0x400, 0x20]:
             ir = Attribute(
                 type=self._type_name(node.get('type')),
                 **member_properties(node),
                 **self._top_level_properties(node))
-        elif kind == 'Accessor':
+        elif kindString == 'Accessor' or kind == 0x40000:
             get_signature = node.get('getSignature')
             if get_signature:
                 # There's no signature to speak of for a getter: only a return type.
@@ -206,7 +246,7 @@ class Analyzer:
                 type=self._type_name(type),
                 **member_properties(node),
                 **self._top_level_properties(node))
-        elif kind in ['Function', 'Constructor', 'Method']:
+        elif kindString in ['Function', 'Constructor', 'Method'] or kind in [0x40, 0x200, 0x800]:
             # There's really nothing in these; all the interesting bits are in
             # the contained 'Call signature' keys. We support only the first
             # signature at the moment, because to do otherwise would create
@@ -216,9 +256,10 @@ class Analyzer:
             # many attr of Functions.
             sigs = node.get('signatures')
             first_sig = sigs[0]  # Should always have at least one
-            first_sig['sources'] = node['sources']
-            return self._convert_node(first_sig)
-        elif kind in ['Call signature', 'Constructor signature']:
+            first_sig['sources'] = node.get('sources')
+            if first_sig['sources']:  # else for Constructor(s) it's not actually defined
+                return self._convert_node(first_sig)
+        elif kindString in ['Call signature', 'Constructor signature'] or kind in [0x1000, 0x4000]:
             # This is the real meat of a function, method, or constructor.
             #
             # Constructors' .name attrs end up being like 'new Foo'. They
@@ -231,7 +272,7 @@ class Analyzer:
                 exceptions=[],
                 # Though perhaps technically true, it looks weird to the user
                 # (and in the template) if constructors have a return value:
-                returns=self._make_returns(node) if kind != 'Constructor signature' else [],
+                returns=self._make_returns(node) if (kindString and kindString != 'Constructor signature') or kind != 0x4000 else [],
                 **member_properties(node['__parent']),
                 **self._top_level_properties(node))
 
@@ -250,7 +291,7 @@ class Analyzer:
         """
         types = []
         for type in node.get(kind, []):
-            if type['type'] == 'reference':
+            if type['type'] == 'reference' and 'id' in type:
                 pathname = Pathname(make_path_segments(self._index[type['id']],
                                                        self._base_dir))
                 types.append(pathname)
@@ -393,7 +434,10 @@ def index_by_id(index, node, parent=None):
 
 def make_description(comment):
     """Construct a single comment string from a fancy object."""
-    ret = '\n\n'.join(text for text in [comment.get('shortText'),
+    if 'summary' in comment:
+        ret = "".join([summary.get('text') for summary in comment['summary']])
+    else:
+        ret = '\n\n'.join(text for text in [comment.get('shortText'),
                                         comment.get('text')]
                       if text)
     return ret.strip()
@@ -409,7 +453,7 @@ def member_properties(node):
 
 
 def short_name(node):
-    if node['kindString'] in ['Module', 'External module']:
+    if node.get('kindString') in ['Module', 'External module'] or node.get('kind') == 0x2:
         return node['name'][1:-1]  # strip quotes
     return node['name']
 
@@ -444,28 +488,29 @@ def make_path_segments(node, base_dir, child_was_static=None):
     parent_segments = (make_path_segments(parent, base_dir, child_was_static=node_is_static)
                        if parent else [])
 
-    kind = node.get('kindString')
+    kindString = node.get('kindString')
+    kind = node.get('kind')
     delimiter = '' if child_was_static is None else '.'
 
     # Handle the cases here that are handled in _convert_node(), plus any that
     # are encountered on other nodes on the way up to the root.
-    if kind in ['Variable', 'Property', 'Accessor', 'Interface', 'Module']:
+    if kindString in ['Variable', 'Property', 'Accessor', 'Interface', 'Module'] or kind in [0x20, 0x400, 0x40000, 0x100, 0x2]:
         # We emit a segment for a Method's child Call Signature but skip the
         # Method itself. They 2 nodes have the same names, but, by taking the
         # child, we fortuitously end up without a trailing delimiter on our
         # last segment.
         segments = [node['name']]
-    elif kind in ['Call signature', 'Constructor signature']:
+    elif kindString in ['Call signature', 'Constructor signature'] or kind in [0x1000, 0x4000]:
         # Similar to above, we skip the parent Constructor and glom onto the
         # Constructor Signature. That gets us no trailing delimiter. However,
         # the signature has name == 'new Foo', so we go up to the parent to get
         # the real name, which is usually (always?) "constructor".
         segments = [parent['name']]
-    elif kind == 'Class':
+    elif kindString == 'Class' or kind == 0x80:
         segments = [node['name']]
         if child_was_static is False:
             delimiter = '#'
-    elif kind == 'External module':
+    elif kindString == 'External module':
         # 'name' contains folder names if multiple folders are passed into
         # TypeDoc. It's also got excess quotes. So we ignore it and take
         # 'originalName', which has a nice, absolute path.

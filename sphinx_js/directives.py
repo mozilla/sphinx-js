@@ -14,7 +14,8 @@ from docutils.parsers.rst.directives import flag
 from sphinx import addnodes
 from sphinx.domains.javascript import JSCallable
 
-from .renderers import (AutoFunctionRenderer,
+from .renderers import (AutoInterfaceRenderer,
+                        AutoFunctionRenderer,
                         AutoClassRenderer,
                         AutoAttributeRenderer)
 
@@ -32,6 +33,26 @@ class JsDirective(Directive):
     }
 
 
+def _members_to_exclude(arg):
+    """Return a set of members to exclude given a comma-delim list them.
+
+    Exclude none if none are passed. This differs from autodocs' behavior,
+    which excludes all. That seemed useless to me.
+
+    """
+    return set(a.strip() for a in (arg or '').split(','))
+
+
+class JsStructDirective(JsDirective):
+    """Abstract directive for interface(s) (typescript) and class(es)"""
+    option_spec = JsDirective.option_spec.copy()
+    option_spec.update({
+        'members': lambda members: ([m.strip() for m in members.split(',')]
+                                    if members else []),
+        'exclude-members': _members_to_exclude,
+        'private-members': flag})
+
+
 def note_dependencies(app, dependencies):
     """Note dependencies of current document.
 
@@ -45,6 +66,22 @@ def note_dependencies(app, dependencies):
         # Sphinx dependencies are relative to the source directory.
         rel = relpath(abs, app.srcdir)
         app.env.note_dependency(rel)
+
+
+def auto_interface_directive_bound_to_app(app):
+    class AutoInterfaceDirective(JsStructDirective):
+        """js:autointerface directive, which spits out a js:data directive
+
+        Takes a single argument which is a JS function name combined with an
+        optional formal property list, all mashed together in a single string.
+
+        """
+        def run(self):
+            renderer = AutoInterfaceRenderer.from_directive(self, app)
+            note_dependencies(app, renderer.dependencies())
+            return renderer.rst_nodes()
+
+    return AutoInterfaceDirective
 
 
 def auto_function_directive_bound_to_app(app):
@@ -64,7 +101,7 @@ def auto_function_directive_bound_to_app(app):
 
 
 def auto_class_directive_bound_to_app(app):
-    class AutoClassDirective(JsDirective):
+    class AutoClassDirective(JsStructDirective):
         """js:autoclass directive, which spits out a js:class directive
 
         Takes a single argument which is a JS class name combined with an
@@ -72,13 +109,6 @@ def auto_class_directive_bound_to_app(app):
         in a single string.
 
         """
-        option_spec = JsDirective.option_spec.copy()
-        option_spec.update({
-            'members': lambda members: ([m.strip() for m in members.split(',')]
-                                        if members else []),
-            'exclude-members': _members_to_exclude,
-            'private-members': flag})
-
         def run(self):
             renderer = AutoClassRenderer.from_directive(self, app)
             note_dependencies(app, renderer.dependencies())
@@ -100,16 +130,6 @@ def auto_attribute_directive_bound_to_app(app):
             return renderer.rst_nodes()
 
     return AutoAttributeDirective
-
-
-def _members_to_exclude(arg):
-    """Return a set of members to exclude given a comma-delim list them.
-
-    Exclude none if none are passed. This differs from autodocs' behavior,
-    which excludes all. That seemed useless to me.
-
-    """
-    return set(a.strip() for a in (arg or '').split(','))
 
 
 class JSStaticFunction(JSCallable):
