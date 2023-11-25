@@ -187,6 +187,78 @@ class JsRenderer(object):
                     yield [rst.escape(h) for h in heads], unwrapped(tail)
 
 
+class JsStructRenderer(JsRenderer):
+    """Abstract renderer for interface(s) (typescript) and class(es).
+    See also: :py:class:`JsRenderer`
+    """
+    def _members_of(self, obj, include, exclude, should_include_private):
+        """Return RST describing the members of a given struct.
+
+        :arg obj Union[Class, Interface]: The class we're documenting
+        :arg include: List of names of members to include. If empty, include
+            all.
+        :arg exclude: Set of names of members to exclude
+        :arg should_include_private: Whether to include private members
+
+        """
+        def rst_for(member):
+            renderer = (AutoFunctionRenderer if isinstance(member, Function)
+                        else AutoAttributeRenderer)
+            # if isinstance(obj, AutoInterfaceRenderer):
+            #     renderer = AutoAttributeRenderer
+            return renderer(self._directive, self._app, arguments=['dummy']).rst(
+                [member.name],
+                member,
+                use_short_name=False)
+
+        def members_to_include(include):
+            """Return the members that should be included (before excludes and
+            access specifiers are taken into account).
+
+            This will either be the ones explicitly listed after the
+            ``:members:`` option, in that order; all members of the class; or
+            listed members with remaining ones inserted at the placeholder "*".
+
+            """
+            def sort_attributes_first_then_by_path(obj):
+                """Return a sort key for IR objects."""
+                return isinstance(obj, Function), obj.path.segments
+
+            members = obj.members
+            if not include:
+                # Specifying none means listing all.
+                return sorted(members, key=sort_attributes_first_then_by_path)
+            included_set = set(include)
+
+            # If the special name * is included in the list, include all other
+            # members, in sorted order.
+            if '*' in included_set:
+                star_index = include.index('*')
+                sorted_not_included_members = sorted(
+                    (m for m in members if m.name not in included_set),
+                    key=sort_attributes_first_then_by_path
+                )
+                not_included = [m.name for m in sorted_not_included_members]
+                include = include[:star_index] + not_included + include[star_index + 1:]
+                included_set.update(not_included)
+
+            # Even if there are 2 members with the same short name (e.g. a
+            # static member and an instance one), keep them both. This
+            # prefiltering step should make the below sort less horrible, even
+            # though I'm calling index().
+            included_members = [m for m in members if m.name in included_set]
+            # sort()'s stability should keep same-named members in the order
+            # JSDoc spits them out in.
+            included_members.sort(key=lambda m: include.index(m.name))
+            return included_members
+
+        return '\n\n'.join(
+            rst_for(member) for member in members_to_include(include)
+            if (not member.is_private
+                or (member.is_private and should_include_private))
+            and member.name not in exclude)
+
+
 class AutoFunctionRenderer(JsRenderer):
     _template = 'function.rst'
     _renderer_type = 'function'
@@ -205,7 +277,27 @@ class AutoFunctionRenderer(JsRenderer):
             content='\n'.join(self._content))
 
 
-class AutoClassRenderer(JsRenderer):
+class AutoInterfaceRenderer(JsStructRenderer):
+    _template = 'interface.rst'
+    _renderer_type = 'interface'
+
+    def _template_vars(self, name, obj):
+        return dict(
+            name=name,
+            fields=self._fields(obj),
+            description=obj.description,
+            examples=obj.examples,
+            deprecated=obj.deprecated,
+            see_also=obj.see_alsos,
+            content='\n'.join(self._content),
+            members=self._members_of(obj,
+                                     include=self._options['members'],
+                                     exclude=self._options.get('exclude-members', set()),
+                                     should_include_private='private-members' in self._options)
+                    if 'members' in self._options else '')
+
+
+class AutoClassRenderer(JsStructRenderer):
     _template = 'class.rst'
     _renderer_type = 'class'
 
@@ -258,71 +350,6 @@ class AutoClassRenderer(JsRenderer):
                                      exclude=self._options.get('exclude-members', set()),
                                      should_include_private='private-members' in self._options)
                     if 'members' in self._options else '')
-
-    def _members_of(self, obj, include, exclude, should_include_private):
-        """Return RST describing the members of a given class.
-
-        :arg obj Class: The class we're documenting
-        :arg include: List of names of members to include. If empty, include
-            all.
-        :arg exclude: Set of names of members to exclude
-        :arg should_include_private: Whether to include private members
-
-        """
-        def rst_for(obj):
-            renderer = (AutoFunctionRenderer if isinstance(obj, Function)
-                        else AutoAttributeRenderer)
-            return renderer(self._directive, self._app, arguments=['dummy']).rst(
-                [obj.name],
-                obj,
-                use_short_name=False)
-
-        def members_to_include(include):
-            """Return the members that should be included (before excludes and
-            access specifiers are taken into account).
-
-            This will either be the ones explicitly listed after the
-            ``:members:`` option, in that order; all members of the class; or
-            listed members with remaining ones inserted at the placeholder "*".
-
-            """
-            def sort_attributes_first_then_by_path(obj):
-                """Return a sort key for IR objects."""
-                return isinstance(obj, Function), obj.path.segments
-
-            members = obj.members
-            if not include:
-                # Specifying none means listing all.
-                return sorted(members, key=sort_attributes_first_then_by_path)
-            included_set = set(include)
-
-            # If the special name * is included in the list, include all other
-            # members, in sorted order.
-            if '*' in included_set:
-                star_index = include.index('*')
-                sorted_not_included_members = sorted(
-                    (m for m in members if m.name not in included_set),
-                    key=sort_attributes_first_then_by_path
-                )
-                not_included = [m.name for m in sorted_not_included_members]
-                include = include[:star_index] + not_included + include[star_index + 1:]
-                included_set.update(not_included)
-
-            # Even if there are 2 members with the same short name (e.g. a
-            # static member and an instance one), keep them both. This
-            # prefiltering step should make the below sort less horrible, even
-            # though I'm calling index().
-            included_members = [m for m in members if m.name in included_set]
-            # sort()'s stability should keep same-named members in the order
-            # JSDoc spits them out in.
-            included_members.sort(key=lambda m: include.index(m.name))
-            return included_members
-
-        return '\n\n'.join(
-            rst_for(member) for member in members_to_include(include)
-            if (not member.is_private
-                or (member.is_private and should_include_private))
-            and member.name not in exclude)
 
 
 class AutoAttributeRenderer(JsRenderer):
