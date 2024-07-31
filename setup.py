@@ -18,7 +18,7 @@ setup(
         'Sphinx>=4.1.0',
         # Pin markupsafe because of
         # https://github.com/pallets/jinja/issues/1585
-        'markupsafe==2.0.1',
+        'markupsafe>=2.0.1',
     ],
     python_requires='>=3.8',
     classifiers=[
