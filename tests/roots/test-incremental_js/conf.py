@@ -5,7 +5,7 @@ extensions = [
 # Minimal stuff needed for Sphinx to work:
 source_suffix = '.rst'
 master_doc = 'index'
-author = u'Nick Alexander'
+author = 'Nick Alexander'
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 js_source_path = ['.', 'inner']
 root_for_relative_js_paths = '.'

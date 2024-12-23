@@ -51,7 +51,7 @@ class Tests(SphinxBuildTestCase):
         """Make sure @typedef uses can be documented with autofunction."""
         self._file_contents_eq(
             'autofunction_typedef',
-            u'TypeDefinition()\n\n   Arguments:\n      * **width** (*Number*) -- width in pixels\n')
+            'TypeDefinition()\n\n   Arguments:\n      * **width** (*Number*) -- width in pixels\n')
 
     def test_autofunction_callback(self):
         """Make sure @callback uses can be documented with autofunction."""
@@ -383,7 +383,7 @@ class Tests(SphinxBuildTestCase):
         """
         self._file_contents_eq(
             'injection',
-            u'injection(a_, b)\n\n'
+            'injection(a_, b)\n\n'
             '   Arguments:\n'
             '      * **a_** -- Snorf\n\n'
             '      * **b** (*type_*) -- >>Borf_<<\n\n'
