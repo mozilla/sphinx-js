@@ -1,4 +1,12 @@
+from sphinx import __version__ as sphinx_version
 from tests.testing import SphinxBuildTestCase
+
+
+SPHINX_VERSION = tuple(int(part) for part in sphinx_version.split('.'))
+
+# NOTE(willkg): This is the version of Sphinx that removes trailing " --" from
+# :params: lines when there is no description.
+SPHINX_7_3_0 = (7, 3, 0)
 
 
 class Tests(SphinxBuildTestCase):
@@ -47,9 +55,22 @@ class Tests(SphinxBuildTestCase):
 
     def test_autofunction_callback(self):
         """Make sure @callback uses can be documented with autofunction."""
-        self._file_contents_eq(
-            'autofunction_callback',
-            u'requestCallback(responseCode)\n\n   Some global callback\n\n   Arguments:\n      * **responseCode** (*number*) --\n')
+        if SPHINX_VERSION < SPHINX_7_3_0:
+            expected_content = (
+                'requestCallback(responseCode)\n\n'
+                '   Some global callback\n\n'
+                '   Arguments:\n'
+                '      * **responseCode** (*number*) --\n'
+            )
+        else:
+            expected_content = (
+                'requestCallback(responseCode)\n\n'
+                '   Some global callback\n\n'
+                '   Arguments:\n'
+                '      * **responseCode** (*number*)\n'
+            )
+
+        self._file_contents_eq('autofunction_callback', expected_content)
 
     def test_autofunction_example(self):
         """Make sure @example tags can be documented with autofunction."""
@@ -64,25 +85,48 @@ class Tests(SphinxBuildTestCase):
     def test_autofunction_destructured_params(self):
         """Make sure that all documented params appears in the function
         definition."""
-        self._file_contents_eq(
-            'autofunction_destructured_params',
-            u'destructuredParams(p1, p2)\n\n'
-            '   Arguments:\n'
-            '      * **p1** (*number*) --\n\n'
-            '      * **p2** (*Object*) --\n\n'
-            '      * **p2.foo** (*string*) --\n\n'
-            '      * **p2.bar** (*string*) --\n')
+        if SPHINX_VERSION < SPHINX_7_3_0:
+            expected_content = (
+                'destructuredParams(p1, p2)\n\n'
+                '   Arguments:\n'
+                '      * **p1** (*number*) --\n\n'
+                '      * **p2** (*Object*) --\n\n'
+                '      * **p2.foo** (*string*) --\n\n'
+                '      * **p2.bar** (*string*) --\n'
+            )
+        else:
+            expected_content = (
+                'destructuredParams(p1, p2)\n\n'
+                '   Arguments:\n'
+                '      * **p1** (*number*)\n\n'
+                '      * **p2** (*Object*)\n\n'
+                '      * **p2.foo** (*string*)\n\n'
+                '      * **p2.bar** (*string*)\n'
+            )
+
+        self._file_contents_eq('autofunction_destructured_params', expected_content)
 
     def test_autofunction_defaults_in_doclet(self):
         """Make sure param default values appear in the function definition,
         when defined in JSDoc."""
-        self._file_contents_eq(
-            'autofunction_defaults_doclet',
-            'defaultsDocumentedInDoclet(func=() => 5, str="a string with \\" quote", strNum="42", strBool="true", num=5, nil=null)\n\n'
-            '   Arguments:\n'
-            '      * **func** (*function*) --\n\n'
-            '      * **strNum** (*string*) --\n\n'
-            '      * **strBool** (*string*) --\n')
+        if SPHINX_VERSION < SPHINX_7_3_0:
+            expected_content = (
+                'defaultsDocumentedInDoclet(func=() => 5, str="a string with \\" quote", strNum="42", strBool="true", num=5, nil=null)\n\n'
+                '   Arguments:\n'
+                '      * **func** (*function*) --\n\n'
+                '      * **strNum** (*string*) --\n\n'
+                '      * **strBool** (*string*) --\n'
+            )
+        else:
+            expected_content = (
+                'defaultsDocumentedInDoclet(func=() => 5, str="a string with \\" quote", strNum="42", strBool="true", num=5, nil=null)\n\n'
+                '   Arguments:\n'
+                '      * **func** (*function*)\n\n'
+                '      * **strNum** (*string*)\n\n'
+                '      * **strBool** (*string*)\n'
+            )
+
+        self._file_contents_eq('autofunction_defaults_doclet', expected_content)
 
     def test_autofunction_defaults_in_code(self):
         """Make sure param default values appear in the function definition,
@@ -357,7 +401,7 @@ class Tests(SphinxBuildTestCase):
         switched from " | " as the union separator back to "|".
 
         """
-        assert '* **fnodeA** (*Node|Fnode*) --' in self._file_contents('union')
+        assert '* **fnodeA** (*Node|Fnode*)' in self._file_contents('union')
 
     def test_field_list_unwrapping(self):
         """Ensure the tails of field lists have line breaks and leading
