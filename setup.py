@@ -1,5 +1,5 @@
 from io import open
-from setuptools import setup, find_packages
+from setuptools import setup
 
 
 setup(
@@ -9,7 +9,7 @@ setup(
     long_description=open('README.rst', 'r', encoding='utf8').read(),
     long_description_content_type="text/x-rst",
     license='MIT',
-    packages=find_packages(exclude=['ez_setup']),
+    packages=["sphinx_js"],
     url='https://github.com/mozilla/sphinx-js',
     include_package_data=True,
     install_requires=[
