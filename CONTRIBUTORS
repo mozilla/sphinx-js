@@ -1,12 +1,11 @@
 sphinx-js was originally written and maintained by Erik Rose and various
 contributors within and without the Mozilla Corporation and Foundation.
 
-It is currently maintained by Hood Chatham.
+It is currently maintained by Will Kahn-Greene.
 
 Maintainer emeritus:
 
 * Erik Rose
-* Will Kahn-Greene
 * Lonnen
 
 Contributors:
@@ -15,6 +14,7 @@ Contributors:
 * David Huggins-Daines
 * David Li
 * Fabien LOISON
+* Hood Chatham
 * Igor Loskutov
 * Jam Risser
 * Jared Dillard
