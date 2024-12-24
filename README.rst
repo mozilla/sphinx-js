@@ -10,10 +10,10 @@ small project in a domain your users are familiar with, JSDoc's alphabetical
 list of routines might suffice. But in a larger project, it is useful to
 intersperse prose with your API docs without having to copy and paste things.
 
-sphinx-js lets you use the industry-leading `Sphinx <http://sphinx-doc.org/>`_
+sphinx-js lets you use the industry-leading `Sphinx <https://sphinx-doc.org/>`__
 documentation tool with JS projects. It provides a handful of directives,
 patterned after the Python-centric `autodoc
-<www.sphinx-doc.org/en/latest/ext/autodoc.html>`_ ones, for pulling
+<https://www.sphinx-doc.org/en/latest/ext/autodoc.html>`__ ones, for pulling
 JSDoc-formatted documentation into reStructuredText pages. And, because you can
 keep using JSDoc in your code, you remain compatible with the rest of your JS
 tooling, like Google's Closure Compiler.
@@ -68,27 +68,39 @@ Setup
          https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-language.
          > Project language [en]:
 
-4. In the generated Sphinx conf.py file, turn on ``sphinx_js`` by adding it to
-   ``extensions``::
+4. In the generated Sphinx ``conf.py`` file, turn on ``sphinx_js`` by adding it
+   to ``extensions``::
 
        extensions = ['sphinx_js']
 
-5. If you want to document TypeScript, add ``js_language = 'typescript'`` to
-   conf.py as well.
-6. If your JS source code is anywhere but at the root of your project, add
-   ``js_source_path = '../somewhere/else'`` on a line by itself in conf.py. The
-   root of your JS source tree should be where that setting points, relative to
-   the conf.py file. (The default, ``../``, works well when there is a ``docs``
-   folder at the root of your project and your source code lives directly
-   inside the root.)
-7. If you have special JSDoc or TypeDoc configuration, add ``jsdoc_config_path
-   = '../conf.json'`` (for example) to conf.py as well.
+5. If you want to document TypeScript, add::
+
+       js_language = 'typescript'
+
+   to ``conf.py`` as well.
+
+6. If your JS source code is anywhere but at the root of your project, add::
+
+       js_source_path = '../somewhere/else'
+
+   on a line by itself in ``conf.py``. The root of your JS source tree should be
+   where that setting points, relative to the ``conf.py`` file.
+
+   The default, ``../``, works well when there is a ``docs`` folder at the root
+   of your project and your source code lives directly inside the root.
+
+7. If you have special JSDoc or TypeDoc configuration, add::
+
+       jsdoc_config_path = '../conf.json'
+
+   to ``conf.py`` as well.
+
 8. If you're documenting only JS or TS and no other languages (like C), you can
-   set your "primary domain" to JS in conf.py::
+   set your "primary domain" to JS in ``conf.py``::
 
        primary_domain = 'js'
 
-   (The domain is ``js`` even if you're writing TypeScript.) Then you can omit
+   The domain is ``js`` even if you're writing TypeScript. Then you can omit
    all the "js:" prefixes in the directives below.
 
 Use
@@ -98,7 +110,7 @@ In short, in a Sphinx project, use the following directives to pull in your
 JSDoc documentation, then tell Sphinx to render it all by running ``make html``
 in your docs directory. If you have never used Sphinx or written
 reStructuredText before, here is `where we left off in its tutorial
-<http://www.sphinx-doc.org/en/stable/tutorial.html#defining-document-structure>`_.
+<https://www.sphinx-doc.org/en/stable/tutorial.html#defining-document-structure>`__.
 For a quick start, just add things to index.rst until you prove things are
 working.
 
@@ -137,7 +149,7 @@ optional parameters::
 
 Parameter properties and destructuring parameters also work fine, using
 `standard JSDoc syntax
-<https://jsdoc.app/tags-param.html#parameters-with-properties>`_::
+<https://jsdoc.app/tags-param.html#parameters-with-properties>`__::
 
     /**
      * Export an image from the given canvas and save it to the disk.
@@ -208,10 +220,10 @@ references must use the short name as well (``:func:`someFunction```)::
        :short-name:
 
 ``autofunction`` can also be used on callbacks defined with the `@callback tag
-<https://jsdoc.app/tags-callback.html>`_.
+<https://jsdoc.app/tags-callback.html>`__.
 
 There is experimental support for abusing ``autofunction`` to document
-`@typedef tags <https://jsdoc.app/tags-typedef.html>`_ as well, though the
+`@typedef tags <https://jsdoc.app/tags-typedef.html>`__ as well, though the
 result will be styled as a function, and ``@property`` tags will fall
 misleadingly under an "Arguments" heading. Still, it's better than nothing
 until we can do it properly.
@@ -315,7 +327,7 @@ disambiguate them. Here's a particularly long example::
     .. js:autofunction:: ./some/dir/some/file.SomeClass#someInstanceMethod.staticMethod~innerMember
 
 You may recognize the separators ``#.~`` from `JSDoc namepaths
-<https://jsdoc.app/about-namepaths.html>`_; they work the same here.
+<https://jsdoc.app/about-namepaths.html>`__; they work the same here.
 
 For conciseness, you can use any unique suffix, as long as it consists of
 complete path segments. These would all be equivalent to the above, assuming
@@ -332,7 +344,7 @@ Things to note:
   ``external:`` or ``module:`` ones.
 * We use simple backslash escaping exclusively rather than switching escaping
   schemes halfway through the path; JSDoc itself `is headed that way as well
-  <https://github.com/jsdoc3/jsdoc/issues/876>`_. The characters that need to
+  <https://github.com/jsdoc3/jsdoc/issues/876>`__. The characters that need to
   be escaped are ``#.~(/``, though you do not need to escape the dots in a
   leading ``./`` or ``../``. A really horrible path might be::
 
@@ -351,8 +363,11 @@ Behind the scenes, sphinx-js will change all separators to dots so that:
 Saving Keystrokes By Setting The Primary Domain
 -----------------------------------------------
 
-To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and
-then say (for example) ``autofunction`` rather than ``js:autofunction``.
+To save some keystrokes, you can set::
+
+    primary_domain = 'js'
+
+in ``conf.py`` and then use ``autofunction`` rather than ``js:autofunction``.
 
 TypeScript: Getting Superclass and Interface Links To Work
 ----------------------------------------------------------
@@ -370,7 +385,8 @@ Configuration Reference
 -----------------------
 
 ``js_language``
-  Use 'javascript' or 'typescript' depending on the language you use. The default is 'javascript'.
+  Use 'javascript' or 'typescript' depending on the language you use. The
+  default is 'javascript'.
 
 ``js_source_path``
   A list of directories to scan (non-recursively) for JS or TS source files,
@@ -398,10 +414,10 @@ Example
 
 A good example using most of sphinx-js's functionality is the Fathom
 documentation. A particularly juicy page is
-https://mozilla.github.io/fathom/ruleset.html. Click the "View page source"
-link to see the raw directives.
+`<https://mozilla.github.io/fathom/ruleset.html>`__. Click the "View page
+source" link to see the raw directives.
 
-`ReadTheDocs <https://readthedocs.org/>`_ is the canonical hosting platform for
+`ReadTheDocs <https://readthedocs.org/>`__ is the canonical hosting platform for
 Sphinx docs and now supports sphinx-js as an opt-in beta. Put this in the
 ``.readthedocs.yml`` file at the root of your repo::
 
@@ -415,9 +431,9 @@ example::
     sphinx-js==3.1.2
 
 Or, if you prefer, the Fathom repo carries a `Travis CI configuration
-<https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/.travis.yml#L41>`_
+<https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/.travis.yml#L41>`__
 and a `deployment script
-<https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/tooling/travis-deploy-docs>`_
+<https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/tooling/travis-deploy-docs>`__
 for building docs with sphinx-js and publishing them to GitHub Pages. Feel free
 to borrow them.
 
