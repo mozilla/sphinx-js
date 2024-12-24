@@ -5,74 +5,102 @@ sphinx-js
 Why
 ===
 
-When you write a JavaScript library, how do you explain it to people? If it's a small project in a domain your users are familiar with, JSDoc's alphabetical list of routines might suffice. But in a larger project, it is useful to intersperse prose with your API docs without having to copy and paste things.
+When you write a JavaScript library, how do you explain it to people? If it's a
+small project in a domain your users are familiar with, JSDoc's alphabetical
+list of routines might suffice. But in a larger project, it is useful to
+intersperse prose with your API docs without having to copy and paste things.
 
-sphinx-js lets you use the industry-leading `Sphinx <http://sphinx-doc.org/>`_ documentation tool with JS projects. It provides a handful of directives, patterned after the Python-centric `autodoc <www.sphinx-doc.org/en/latest/ext/autodoc.html>`_ ones, for pulling JSDoc-formatted documentation into reStructuredText pages. And, because you can keep using JSDoc in your code, you remain compatible with the rest of your JS tooling, like Google's Closure Compiler.
+sphinx-js lets you use the industry-leading `Sphinx <http://sphinx-doc.org/>`_
+documentation tool with JS projects. It provides a handful of directives,
+patterned after the Python-centric `autodoc
+<www.sphinx-doc.org/en/latest/ext/autodoc.html>`_ ones, for pulling
+JSDoc-formatted documentation into reStructuredText pages. And, because you can
+keep using JSDoc in your code, you remain compatible with the rest of your JS
+tooling, like Google's Closure Compiler.
 
-sphinx-js also works with TypeScript, using the TypeDoc tool in place of JSDoc and emitting all the type information you would expect.
+sphinx-js also works with TypeScript, using the TypeDoc tool in place of JSDoc
+and emitting all the type information you would expect.
 
 Setup
 =====
 
-1. Install JSDoc (or TypeDoc if you're writing TypeScript). The tool must be on your ``$PATH``, so you might want to install it globally::
+1. Install JSDoc (or TypeDoc if you're writing TypeScript). The tool must be on
+   your ``$PATH``, so you might want to install it globally::
 
-        npm install -g jsdoc
+       npm install -g jsdoc
 
-   ...or... ::
+   or::
 
-        npm install -g typedoc
+       npm install -g typedoc
 
    JSDoc 3.6.3 and 4.0.0 and TypeDoc 0.15.0 are known to work.
 
 2. Install sphinx-js, which will pull in Sphinx itself as a dependency::
 
-        pip install sphinx-js
+       pip install sphinx-js
 
-3. Make a documentation folder in your project by running ``sphinx-quickstart`` and answering its questions::
+3. Make a documentation folder in your project by running ``sphinx-quickstart``
+   and answering its questions::
 
-        cd my-project
-        sphinx-quickstart
+       cd my-project
+       sphinx-quickstart
 
-          Please enter values for the following settings (just press Enter to
-          accept a default value, if one is given in brackets).
+         Please enter values for the following settings (just press Enter to
+         accept a default value, if one is given in brackets).
 
-          Selected root path: .
+         Selected root path: .
 
-          You have two options for placing the build directory for Sphinx output.
-          Either, you use a directory "_build" within the root path, or you separate
-          "source" and "build" directories within the root path.
-          > Separate source and build directories (y/n) [n]:
+         You have two options for placing the build directory for Sphinx output.
+         Either, you use a directory "_build" within the root path, or you separate
+         "source" and "build" directories within the root path.
+         > Separate source and build directories (y/n) [n]:
 
-          The project name will occur in several places in the built documentation.
-          > Project name: My Project
-          > Author name(s): Fred Fredson
-          > Project release []: 1.0
+         The project name will occur in several places in the built documentation.
+         > Project name: My Project
+         > Author name(s): Fred Fredson
+         > Project release []: 1.0
 
-          If the documents are to be written in a language other than English,
-          you can select a language here by its language code. Sphinx will then
-          translate text that it generates into that language.
+         If the documents are to be written in a language other than English,
+         you can select a language here by its language code. Sphinx will then
+         translate text that it generates into that language.
 
-          For a list of supported codes, see
-          https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-language.
-          > Project language [en]:
+         For a list of supported codes, see
+         https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-language.
+         > Project language [en]:
 
-4. In the generated Sphinx conf.py file, turn on ``sphinx_js`` by adding it to ``extensions``::
+4. In the generated Sphinx conf.py file, turn on ``sphinx_js`` by adding it to
+   ``extensions``::
 
-        extensions = ['sphinx_js']
+       extensions = ['sphinx_js']
 
-5. If you want to document TypeScript, add ``js_language = 'typescript'`` to conf.py as well.
-6. If your JS source code is anywhere but at the root of your project, add ``js_source_path = '../somewhere/else'`` on a line by itself in conf.py. The root of your JS source tree should be where that setting points, relative to the conf.py file. (The default, ``../``, works well when there is a ``docs`` folder at the root of your project and your source code lives directly inside the root.)
-7. If you have special JSDoc or TypeDoc configuration, add ``jsdoc_config_path = '../conf.json'`` (for example) to conf.py as well.
-8. If you're documenting only JS or TS and no other languages (like C), you can set your "primary domain" to JS in conf.py::
+5. If you want to document TypeScript, add ``js_language = 'typescript'`` to
+   conf.py as well.
+6. If your JS source code is anywhere but at the root of your project, add
+   ``js_source_path = '../somewhere/else'`` on a line by itself in conf.py. The
+   root of your JS source tree should be where that setting points, relative to
+   the conf.py file. (The default, ``../``, works well when there is a ``docs``
+   folder at the root of your project and your source code lives directly
+   inside the root.)
+7. If you have special JSDoc or TypeDoc configuration, add ``jsdoc_config_path
+   = '../conf.json'`` (for example) to conf.py as well.
+8. If you're documenting only JS or TS and no other languages (like C), you can
+   set your "primary domain" to JS in conf.py::
 
-        primary_domain = 'js'
+       primary_domain = 'js'
 
-   (The domain is ``js`` even if you're writing TypeScript.) Then you can omit all the "js:" prefixes in the directives below.
+   (The domain is ``js`` even if you're writing TypeScript.) Then you can omit
+   all the "js:" prefixes in the directives below.
 
 Use
 ===
 
-In short, in a Sphinx project, use the following directives to pull in your JSDoc documentation, then tell Sphinx to render it all by running ``make html`` in your docs directory. If you have never used Sphinx or written reStructuredText before, here is `where we left off in its tutorial <http://www.sphinx-doc.org/en/stable/tutorial.html#defining-document-structure>`_. For a quick start, just add things to index.rst until you prove things are working.
+In short, in a Sphinx project, use the following directives to pull in your
+JSDoc documentation, then tell Sphinx to render it all by running ``make html``
+in your docs directory. If you have never used Sphinx or written
+reStructuredText before, here is `where we left off in its tutorial
+<http://www.sphinx-doc.org/en/stable/tutorial.html#defining-document-structure>`_.
+For a quick start, just add things to index.rst until you prove things are
+working.
 
 autofunction
 ------------
@@ -94,18 +122,22 @@ First, document your JS code using standard JSDoc formatting::
         return (length - lengthWithoutLinks) / length;
     }
 
-Then, reference your documentation using sphinx-js directives. Our directives work much like Sphinx's standard autodoc ones. You can specify just a function's name... ::
+Then, reference your documentation using sphinx-js directives. Our directives
+work much like Sphinx's standard autodoc ones. You can specify just a
+function's name::
 
     .. js:autofunction:: someFunction
 
-...and a nicely formatted block of documentation will show up in your docs.
+and a nicely formatted block of documentation will show up in your docs.
 
 You can also throw in your own explicit parameter list, if you want to note
 optional parameters::
 
     .. js:autofunction:: someFunction(foo, bar[, baz])
 
-Parameter properties and destructuring parameters also work fine, using `standard JSDoc syntax <https://jsdoc.app/tags-param.html#parameters-with-properties>`_::
+Parameter properties and destructuring parameters also work fine, using
+`standard JSDoc syntax
+<https://jsdoc.app/tags-param.html#parameters-with-properties>`_::
 
     /**
      * Export an image from the given canvas and save it to the disk.
@@ -120,7 +152,8 @@ Parameter properties and destructuring parameters also work fine, using `standar
         // ...
     }
 
-Extraction of default parameter values works as well. These act as expected, with a few caveats::
+Extraction of default parameter values works as well. These act as expected,
+with a few caveats::
 
     /**
      * You must declare the params, even if you have nothing else to say, so
@@ -151,7 +184,8 @@ Extraction of default parameter values works as well. These act as expected, wit
      */
     function defaultsDocumentedInDoclet(func, strNum, strBool, num, nil) {}
 
-You can even add additional content. If you do, it will appear just below any extracted documentation::
+You can even add additional content. If you do, it will appear just below any
+extracted documentation::
 
     .. js:autofunction:: someFunction
 
@@ -164,30 +198,45 @@ You can even add additional content. If you do, it will appear just below any ex
 
         Enjoy!
 
-``js:autofunction`` has one option, ``:short-name:``, which comes in handy for chained APIs whose implementation details you want to keep out of sight. When you use it on a class method, the containing class won't be mentioned in the docs, the function will appear under its short name in indices, and cross references must use the short name as well (``:func:`someFunction```)::
+``js:autofunction`` has one option, ``:short-name:``, which comes in handy for
+chained APIs whose implementation details you want to keep out of sight. When
+you use it on a class method, the containing class won't be mentioned in the
+docs, the function will appear under its short name in indices, and cross
+references must use the short name as well (``:func:`someFunction```)::
 
     .. js:autofunction:: someClass#someFunction
        :short-name:
 
-``autofunction`` can also be used on callbacks defined with the `@callback tag <https://jsdoc.app/tags-callback.html>`_.
+``autofunction`` can also be used on callbacks defined with the `@callback tag
+<https://jsdoc.app/tags-callback.html>`_.
 
-There is experimental support for abusing ``autofunction`` to document `@typedef tags <https://jsdoc.app/tags-typedef.html>`_ as well, though the result will be styled as a function, and ``@property`` tags will fall misleadingly under an "Arguments" heading. Still, it's better than nothing until we can do it properly.
+There is experimental support for abusing ``autofunction`` to document
+`@typedef tags <https://jsdoc.app/tags-typedef.html>`_ as well, though the
+result will be styled as a function, and ``@property`` tags will fall
+misleadingly under an "Arguments" heading. Still, it's better than nothing
+until we can do it properly.
 
 autoclass
 ---------
 
-We provide a ``js:autoclass`` directive which documents a class with the concatenation of its class comment and its constructor comment. It shares all the features of ``js:autofunction`` and even takes the same ``:short-name:`` flag, which can come in handy for inner classes. The easiest way to use it is to invoke its ``:members:`` option, which automatically documents all your class's public methods and attributes::
+We provide a ``js:autoclass`` directive which documents a class with the
+concatenation of its class comment and its constructor comment. It shares all
+the features of ``js:autofunction`` and even takes the same ``:short-name:``
+flag, which can come in handy for inner classes. The easiest way to use it is
+to invoke its ``:members:`` option, which automatically documents all your
+class's public methods and attributes::
 
     .. js:autoclass:: SomeEs6Class(constructor, args, if, you[, wish])
        :members:
 
-You can add private members by saying... ::
+You can add private members by saying::
 
     .. js:autoclass:: SomeEs6Class
        :members:
        :private-members:
 
-Privacy is determined by JSDoc ``@private`` tags or TypeScript's ``private`` keyword.
+Privacy is determined by JSDoc ``@private`` tags or TypeScript's ``private``
+keyword.
 
 Exclude certain members by name with ``:exclude-members:``::
 
@@ -200,12 +249,15 @@ Or explicitly list the members you want. We will respect your ordering. ::
     .. js:autoclass:: SomeEs6Class
        :members: Qux, qum
 
-When explicitly listing members, you can include ``*`` to include all unmentioned members. This is useful to have control over ordering of some elements, without having to include an exhaustive list. ::
+When explicitly listing members, you can include ``*`` to include all
+unmentioned members. This is useful to have control over ordering of some
+elements, without having to include an exhaustive list. ::
 
     .. js:autoclass:: SomeEs6Class
        :members: importMethod, *, uncommonlyUsedMethod
 
-Finally, if you want full control, pull your class members in one at a time by embedding ``js:autofunction`` or ``js:autoattribute``::
+Finally, if you want full control, pull your class members in one at a time by
+embedding ``js:autofunction`` or ``js:autoattribute``::
 
     .. js:autoclass:: SomeEs6Class
 
@@ -229,13 +281,15 @@ This is useful for documenting public properties::
         }
     }
 
-And then, in the docs... ::
+And then, in the docs::
 
     .. autoclass:: Fnode
 
        .. autoattribute:: Fnode#element
 
-This is also the way to document ES6-style getters and setters, as it omits the trailing ``()`` of a function. The assumed practice is the usual JSDoc one: document only one of your getter/setter pair::
+This is also the way to document ES6-style getters and setters, as it omits the
+trailing ``()`` of a function. The assumed practice is the usual JSDoc one:
+document only one of your getter/setter pair::
 
     class Bing {
         /** The bong of the bing */
@@ -248,20 +302,24 @@ This is also the way to document ES6-style getters and setters, as it omits the 
         }
     }
 
-And then, in the docs... ::
+And then, in the docs::
 
    .. autoattribute:: Bing#bong
 
 Dodging Ambiguity With Pathnames
 --------------------------------
 
-If you have same-named objects in different files, use pathnames to disambiguate them. Here's a particularly long example::
+If you have same-named objects in different files, use pathnames to
+disambiguate them. Here's a particularly long example::
 
     .. js:autofunction:: ./some/dir/some/file.SomeClass#someInstanceMethod.staticMethod~innerMember
 
-You may recognize the separators ``#.~`` from `JSDoc namepaths <https://jsdoc.app/about-namepaths.html>`_; they work the same here.
+You may recognize the separators ``#.~`` from `JSDoc namepaths
+<https://jsdoc.app/about-namepaths.html>`_; they work the same here.
 
-For conciseness, you can use any unique suffix, as long as it consists of complete path segments. These would all be equivalent to the above, assuming they are unique within your source tree::
+For conciseness, you can use any unique suffix, as long as it consists of
+complete path segments. These would all be equivalent to the above, assuming
+they are unique within your source tree::
 
     innerMember
     staticMethod~innerMember
@@ -270,30 +328,43 @@ For conciseness, you can use any unique suffix, as long as it consists of comple
 
 Things to note:
 
-* We use simple file paths rather than JSDoc's ``module:`` prefix or TypeDoc's ``external:`` or ``module:`` ones.
-* We use simple backslash escaping exclusively rather than switching escaping schemes halfway through the path; JSDoc itself `is headed that way as well <https://github.com/jsdoc3/jsdoc/issues/876>`_. The characters that need to be escaped are ``#.~(/``, though you do not need to escape the dots in a leading ``./`` or ``../``. A really horrible path might be... ::
+* We use simple file paths rather than JSDoc's ``module:`` prefix or TypeDoc's
+  ``external:`` or ``module:`` ones.
+* We use simple backslash escaping exclusively rather than switching escaping
+  schemes halfway through the path; JSDoc itself `is headed that way as well
+  <https://github.com/jsdoc3/jsdoc/issues/876>`_. The characters that need to
+  be escaped are ``#.~(/``, though you do not need to escape the dots in a
+  leading ``./`` or ``../``. A really horrible path might be::
 
-    some/path\ with\ spaces/file.topLevelObject#instanceMember.staticMember\(with\(parens
-* Relative paths are relative to the ``js_source_path`` specified in the config. Absolute paths are not allowed.
+      some/path\ with\ spaces/file.topLevelObject#instanceMember.staticMember\(with\(parens
 
-Behind the scenes, sphinx-js will change all separators to dots so that...
+* Relative paths are relative to the ``js_source_path`` specified in the
+  config. Absolute paths are not allowed.
 
-* Sphinx's "shortening" syntax works: ``:func:`~InwardRhs.atMost``` prints as merely ``atMost()``. (For now, you should always use dots rather than other namepath separators: ``#~``.)
+Behind the scenes, sphinx-js will change all separators to dots so that:
+
+* Sphinx's "shortening" syntax works: ``:func:`~InwardRhs.atMost``` prints as
+  merely ``atMost()``. (For now, you should always use dots rather than other
+  namepath separators: ``#~``.)
 * Sphinx indexes more informatively, saying methods belong to their classes.
 
 Saving Keystrokes By Setting The Primary Domain
 -----------------------------------------------
 
-To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and then say (for example) ``autofunction`` rather than ``js:autofunction``.
+To save some keystrokes, you can set ``primary_domain = 'js'`` in conf.py and
+then say (for example) ``autofunction`` rather than ``js:autofunction``.
 
 TypeScript: Getting Superclass and Interface Links To Work
 ----------------------------------------------------------
 
-To have a class link to its superclasses and implemented interfaces, you'll need to document the superclass (or interface) somewhere using ``js:autoclass`` or ``js:class`` and use the class's full (but dotted) path when you do::
+To have a class link to its superclasses and implemented interfaces, you'll
+need to document the superclass (or interface) somewhere using ``js:autoclass``
+or ``js:class`` and use the class's full (but dotted) path when you do::
 
     .. js:autoclass:: someFile.SomeClass
 
-Unfortunately, Sphinx's ``~`` syntax doesn't work in these spots, so users will see the full paths in the documentation.
+Unfortunately, Sphinx's ``~`` syntax doesn't work in these spots, so users will
+see the full paths in the documentation.
 
 Configuration Reference
 -----------------------
@@ -302,44 +373,70 @@ Configuration Reference
   Use 'javascript' or 'typescript' depending on the language you use. The default is 'javascript'.
 
 ``js_source_path``
-  A list of directories to scan (non-recursively) for JS or TS source files, relative to Sphinx's conf.py file. Can be a string instead if there is only one. If there is more than one, ``root_for_relative_js_paths`` must be specified as well. Defaults to '../'.
+  A list of directories to scan (non-recursively) for JS or TS source files,
+  relative to Sphinx's conf.py file. Can be a string instead if there is only
+  one. If there is more than one, ``root_for_relative_js_paths`` must be
+  specified as well. Defaults to ``../``.
 
 ``jsdoc_config_path``
-  A conf.py-relative path to a JSDoc config file, which is useful if you want to specify your own JSDoc options, like recursion and custom filename matching. If using TypeDoc, you can also point to a ``tsconfig.json`` file.
+  A conf.py-relative path to a JSDoc config file, which is useful if you want
+  to specify your own JSDoc options, like recursion and custom filename
+  matching. If using TypeDoc, you can also point to a ``tsconfig.json`` file.
 
 ``root_for_relative_js_paths``
-  Relative JS entity paths are resolved relative to this path. Defaults to ``js_source_path`` if it is only one item.
+  Relative JS entity paths are resolved relative to this path. Defaults to
+  ``js_source_path`` if it is only one item.
 
 ``jsdoc_cache``
-  Path to a file where JSDoc output will be cached. If omitted, JSDoc will be run every time Sphinx is. If you have a large number of source files, it may help to configure this value. But be careful: the cache is not automatically flushed if your source code changes; you must delete it manually.
+  Path to a file where JSDoc output will be cached. If omitted, JSDoc will be
+  run every time Sphinx is. If you have a large number of source files, it may
+  help to configure this value. But be careful: the cache is not automatically
+  flushed if your source code changes; you must delete it manually.
 
 Example
 =======
 
-A good example using most of sphinx-js's functionality is the Fathom documentation. A particularly juicy page is https://mozilla.github.io/fathom/ruleset.html. Click the "View page source" link to see the raw directives.
+A good example using most of sphinx-js's functionality is the Fathom
+documentation. A particularly juicy page is
+https://mozilla.github.io/fathom/ruleset.html. Click the "View page source"
+link to see the raw directives.
 
-`ReadTheDocs <https://readthedocs.org/>`_ is the canonical hosting platform for Sphinx docs and now supports sphinx-js as an opt-in beta. Put this in the ``.readthedocs.yml`` file at the root of your repo::
+`ReadTheDocs <https://readthedocs.org/>`_ is the canonical hosting platform for
+Sphinx docs and now supports sphinx-js as an opt-in beta. Put this in the
+``.readthedocs.yml`` file at the root of your repo::
 
     requirements_file: docs/requirements.txt
     build:
       image: latest
 
-Then put the version of sphinx-js you want in ``docs/requirements.txt``. For example... ::
+Then put the version of sphinx-js you want in ``docs/requirements.txt``. For
+example::
 
     sphinx-js==3.1.2
 
-Or, if you prefer, the Fathom repo carries a `Travis CI configuration <https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/.travis.yml#L41>`_ and a `deployment script <https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/tooling/travis-deploy-docs>`_ for building docs with sphinx-js and publishing them to GitHub Pages. Feel free to borrow them.
+Or, if you prefer, the Fathom repo carries a `Travis CI configuration
+<https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/.travis.yml#L41>`_
+and a `deployment script
+<https://github.com/mozilla/fathom/blob/92304b8ad4768e90c167c3d93f9865771f5a6d80/tooling/travis-deploy-docs>`_
+for building docs with sphinx-js and publishing them to GitHub Pages. Feel free
+to borrow them.
 
 Caveats
 =======
 
-* We don't understand the inline JSDoc constructs like ``{@link foo}``; you have to use Sphinx-style equivalents for now, like ``:js:func:`foo``` (or simply ``:func:`foo``` if you have set ``primary_domain = 'js'`` in conf.py.
-* So far, we understand and convert the JSDoc block tags ``@param``, ``@returns``, ``@throws``, ``@example`` (without the optional ``<caption>``), ``@deprecated``, ``@see``, and their synonyms. Other ones will go *poof* into the ether.
+* We don't understand the inline JSDoc constructs like ``{@link foo}``; you
+  have to use Sphinx-style equivalents for now, like ``:js:func:`foo``` (or
+  simply ``:func:`foo``` if you have set ``primary_domain = 'js'`` in conf.py.
+* So far, we understand and convert the JSDoc block tags ``@param``,
+  ``@returns``, ``@throws``, ``@example`` (without the optional ``<caption>``),
+  ``@deprecated``, ``@see``, and their synonyms. Other ones will go *poof* into
+  the ether.
 
 Tests
 =====
 
-Run the tests using tox, which will also install JSDoc and TypeDoc at pinned versions::
+Run the tests using tox, which will also install JSDoc and TypeDoc at pinned
+versions::
 
     pip install tox
     tox
