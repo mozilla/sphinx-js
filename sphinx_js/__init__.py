@@ -86,9 +86,9 @@ def fix_staticfunction_objtype():
     from sphinx.domains.javascript import JavaScriptDomain, JSObject
     from sphinx.locale import _
 
-    if "staticfunction" in JavaScriptDomain.object_types:
+    if 'staticfunction' in JavaScriptDomain.object_types:
         return
-    JavaScriptDomain.object_types["staticfunction"] = ObjType(_('static function'), 'func')
+    JavaScriptDomain.object_types['staticfunction'] = ObjType(_('static function'), 'func')
 
     orig_get_index_text = JSObject.get_index_text
 

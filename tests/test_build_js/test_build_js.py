@@ -1,4 +1,5 @@
 from sphinx import __version__ as sphinx_version
+
 from tests.testing import SphinxBuildTestCase
 
 
