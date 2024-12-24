@@ -61,7 +61,7 @@ class Analyzer:
         """Return an iterator of parent nodes"""
         while True:
             node = node.get('__parent')
-            if not node or node['id'] == 0:
+            if not node or node.get('id', 0) == 0:
                 # We went all the way up but didn't find a containing module.
                 return
             elif node.get('kindString') == 'External module':
@@ -88,6 +88,16 @@ class Analyzer:
             else:
                 raise ValueError('Could not find deppath')
         raise ValueError('Could not find deppath')
+
+    def _sources(self, node):
+        """Recursively find a "sources" key in node or its parents.
+
+        Return None if no sources can be found.
+        """
+        if not node:
+            return None
+        return node.get('sources') or self._sources(node.get('__parent'))
+
 
     def _top_level_properties(self, node):
         source = node.get('sources')[0]
@@ -216,7 +226,7 @@ class Analyzer:
             # many attr of Functions.
             sigs = node.get('signatures')
             first_sig = sigs[0]  # Should always have at least one
-            first_sig['sources'] = node['sources']
+            first_sig['sources'] = self._sources(node)
             return self._convert_node(first_sig)
         elif kind in ['Call signature', 'Constructor signature']:
             # This is the real meat of a function, method, or constructor.
@@ -250,7 +260,7 @@ class Analyzer:
         """
         types = []
         for type in node.get(kind, []):
-            if type['type'] == 'reference':
+            if type['type'] == 'reference' and 'id' in type:
                 pathname = Pathname(make_path_segments(self._index[type['id']],
                                                        self._base_dir))
                 types.append(pathname)
