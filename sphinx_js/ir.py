@@ -232,3 +232,11 @@ class Class(TopLevel, _MembersAndSupers):
     # itself. These are supported and extracted by jsdoc, but they end up in an
     # `undocumented: True` doclet and so are presently filtered out. But we do
     # have the space to include them someday.
+
+
+@dataclass
+class Module(TopLevel):
+    authors: List[str]
+    version: str
+    license_information: str
+    members: Optional[List[Union[Class, Function]]]
